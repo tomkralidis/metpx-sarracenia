@@ -246,7 +246,7 @@ def doWmoTraitementSpecifique(bulletin):
 		bulletin = bulletin.replace('\n\x1e','\n')
 
 	if bulletin[:4] in ['SRCN','SRMN','SRND','SRWA','SRMT','SRUS','SXVX','SXWA']:
-		bulletin = bulletin.replace('~','\n'):
+		bulletin = bulletin.replace('~','\n')
 
 	if bulletin[-1] != '\n':
 		bulletin = bulletin + '\n'
