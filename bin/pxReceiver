@@ -59,7 +59,7 @@ def main():
     direction = "receiver"
 
     # Message d'usage pour le option parser
-    usage =  "%prog <source> (start|stop|restart|status)\n" \
+    usage =  "%prog <source> (start|stop|restart|reload|status)\n" \
              "       Un receiver reçoit les bulletins par une connection réseau.\n"
 
     if os.getuid() == 0:
@@ -103,10 +103,8 @@ def main():
     if options.type != 'collector':
         options.type= fet.sources[options.source]['type']
 
-    #fet.lockStopOrDie( fet.FET_DATA + fet.FET_RX + args[0] + '/.lock' , options.cmd )
     lockPath = fet.FET_DATA + fet.FET_RX + args[0]
     igniter = PXIgniter(direction, options.type, options.source, options.cmd, lockPath, options, logger)
-
 
     logger.writeLog(logger.INFO, "Début du programme, fichier de config chargé correctement")
     logger.writeLog(logger.DEBUG,"Protocole %s sélectionné", options.type )
