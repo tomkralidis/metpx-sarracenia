@@ -164,8 +164,7 @@ def sendFiles(c, files,logger):
         m = fet.clientMatch(c,f)
 	if not m:
 	    logger.writeLog( logger.INFO, "file " + os.path.basename(f) + " removed, no matching imask" )
-            if not fet.options.worklists:
-	        os.unlink(p)
+	    os.unlink(p)
 	    continue
         dfn = fet.destFileName(f,m)
         #print "match is: ", m
@@ -178,8 +177,7 @@ def sendFiles(c, files,logger):
                 there = dspec + '/' + dfn
                 try:
                     os.copy( p , there )
-                    if not fet.options.worklists:
-                        os.unlink( p )
+                    os.unlink( p )
                     logger.writeLog( logger.INFO, "fichier " + os.path.basename(f) + " livré à " + there )
                 except:
                     logger.writeLog( logger.ERROR, "pas capable d'ecrire" + there + ": " + repr(sys.exc_info()[0]) )
@@ -218,8 +216,7 @@ def sendFiles(c, files,logger):
                     ftp.storbinary("STOR " + tmpnam , pfn )
                     pfn.close()
                     ftp.rename( tmpnam, dfn )
-                    if not fet.options.worklists:
-                        os.unlink( p )
+                    os.unlink( p )
                     logger.writeLog( logger.INFO, "fichier " + os.path.basename(f) + " livré à "  + \
                       proto + ":" + hspec + " " + dspec + " " + dfn )
                 except:
@@ -252,13 +249,6 @@ def checkDir(d,logger):
 
     for t in os.listdir(d):
         p=os.path.join(d,t)
-        if t[0:4] == '.wl_':
-            wlf = open( p, 'r')
-            dirfiles = dirfiles + wlf.read().split()
-            wlf.close()
-            logger.writeLog( logger.DEBUG, "read worklist " + os.path.basename(t) )
-            os.unlink(p)
-            continue
         
         if ( t[0] == '.' ) or ( t[0:4] == 'tmp_' ) or (t[-4:] == '.tmp' ) or not os.access(p, os.R_OK):
             continue
@@ -286,14 +276,6 @@ def doClient(c,howtoprioritize,logger):
 
         dname=os.path.join(cname,t)
 
-        if t[0:4] == '.wl_':
-            wlf = open( dname, 'r')
-            cfiles = cfiles + wlf.read().split()
-            wlf.close()
-            logger.writeLog( logger.DEBUG, "read worklist " + os.path.basename(t) )
-            os.unlink(dname)
-            continue
-        
         if ( t[0] == '.' ) or ( t[0:4] == 'tmp_' ) or (t[-4:] == '.tmp' ) or not os.access(dname, os.R_OK):
             continue
 

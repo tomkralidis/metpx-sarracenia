@@ -173,6 +173,7 @@ class DiskReader:
 
 if __name__ == "__main__":
 
+    """
     (status, output) = commands.getstatusoutput("date")
     print output
     #reader = DiskReader("/home/ib/dads/dan/progProj/pds-nccs/bulletins", validation=True, sorterClass=MultiKeysStringSorter)
@@ -188,3 +189,7 @@ if __name__ == "__main__":
 
     (status, output) = commands.getstatusoutput("date")
     print output
+    """
+    iterator = _DirIterator('/apps/px/toto' , True)
+    for file in iterator:
+       print file

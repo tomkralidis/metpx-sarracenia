@@ -744,8 +744,6 @@ def startup(opts, logger):
             cfl=cf.split()
             if cfl[0] == 'usePDS':
                 options.use_pds=isTrue(cfl[1])
-            elif cfl[0] == 'worklists':
-                options.worklists=float(cfl[1])
             cf=pxconf.readline()
         pxconf.close()
     except:
