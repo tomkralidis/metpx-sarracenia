@@ -7,202 +7,202 @@ import struct, socket, curses, curses.ascii, string
 import socketManager
 
 class socketManagerAm(socketManager.socketManager):
-	__doc__ = socketManager.socketManager.__doc__ + \
-	"""
-	--- Spécialisation concrète pour la gestion de sockets AM ---
+    __doc__ = socketManager.socketManager.__doc__ + \
+    """
+    --- Spécialisation concrète pour la gestion de sockets AM ---
 
-	### Ajout de socketManagerAm ###
+    ### Ajout de socketManagerAm ###
 
-	* Attributs
+    * Attributs
 
-	patternAmRec		str
+    patternAmRec            str
 
-				- Pattern pour le découpage d'entête
-				  par struct
+                            - Pattern pour le découpage d'entête
+                              par struct
 
-	sizeAmRec		int
+    sizeAmRec               int
 
-				- Longueur de l'entête (en octets) 
-				  calculée par struct
-	
-	Auteur:	Louis-Philippe Thériault
-	Date:	Octobre 2004
-	"""
+                            - Longueur de l'entête (en octets)
+                              calculée par struct
 
-	#def __init__(self,logger,type='slave',localPort=9999,remoteHost=None,timeout=None):
-		#socketManager.socketManager.__init__(self,logger,type,localPort,remoteHost,timeout)
-	def __init__(self,logger,type='slave',port=9999,remoteHost=None,timeout=None):
-		socketManager.socketManager.__init__(self,logger,type,port,remoteHost,timeout)
+    Auteur: Louis-Philippe Thériault
+    Date:   Octobre 2004
+    """
 
-		# La taille du amRec est prise d'a partir du fichier ytram.h, à l'origine dans
-		# amtcp2file. Pour la gestion des champs l'on se refere au module struct
-		# de Python.
-		self.patternAmRec = '80sLL4sii4s4s20s'
-		self.sizeAmRec = struct.calcsize(self.patternAmRec)
+    #def __init__(self,logger,type='slave',localPort=9999,remoteHost=None,timeout=None):
+            #socketManager.socketManager.__init__(self,logger,type,localPort,remoteHost,timeout)
+    def __init__(self,logger,type='slave',port=9999,remoteHost=None,timeout=None):
+        socketManager.socketManager.__init__(self,logger,type,port,remoteHost,timeout)
 
-        def unwrapBulletin(self):
-		__doc__ = socketManager.socketManager.unwrapBulletin.__doc__ + \
-		"""### Ajout de socketManagerAm ###
+        # La taille du amRec est prise d'a partir du fichier ytram.h, à l'origine dans
+        # amtcp2file. Pour la gestion des champs l'on se refere au module struct
+        # de Python.
+        self.patternAmRec = '80sLL4sii4s4s20s'
+        self.sizeAmRec = struct.calcsize(self.patternAmRec)
 
-		   Définition de la méthode
+    def unwrapBulletin(self):
+        __doc__ = socketManager.socketManager.unwrapBulletin.__doc__ + \
+        """### Ajout de socketManagerAm ###
 
-		   Visibilité:	Privée
-		   Auteur:	Louis-Philippe Thériault
-		   Date:	Octobre 2004
-		"""
-                status = self.checkNextMsgStatus()
+           Définition de la méthode
 
-		if status == 'OK':
-	                (header,src_inet,dst_inet,threads,start,length,firsttime,timestamp,future) = \
-	                         struct.unpack(self.patternAmRec,self.inBuffer[0:self.sizeAmRec])
+           Visibilité:  Privée
+           Auteur:      Louis-Philippe Thériault
+           Date:        Octobre 2004
+        """
+        status = self.checkNextMsgStatus()
 
-        	        length = socket.ntohl(length)
+        if status == 'OK':
+            (header,src_inet,dst_inet,threads,start,length,firsttime,timestamp,future) = \
+                     struct.unpack(self.patternAmRec,self.inBuffer[0:self.sizeAmRec])
 
-	                bulletin = self.inBuffer[self.sizeAmRec:self.sizeAmRec + length]
+            length = socket.ntohl(length)
 
-	                return (bulletin,self.sizeAmRec + length)
-	        else:
-	                return '',0
+            bulletin = self.inBuffer[self.sizeAmRec:self.sizeAmRec + length]
 
-        def wrapBulletin(self,bulletin):
-                __doc__ = socketManager.socketManager.wrapBulletin.__doc__ + \
-                """### Ajout de socketManagerAm ###
-                   Nom:
-                   wrapBulletin
+            return (bulletin,self.sizeAmRec + length)
+        else:
+            return '',0
 
-                   Parametres d'entree:
-                   -bulletin:   un objet bulletinAm
+    def wrapBulletin(self,bulletin):
+        __doc__ = socketManager.socketManager.wrapBulletin.__doc__ + \
+        """### Ajout de socketManagerAm ###
+           Nom:
+           wrapBulletin
 
-                   Parametres de sortie:
-                   -Retourne le bulletin pret a envoyer en format string
+           Parametres d'entree:
+           -bulletin:   un objet bulletinAm
 
-                   Description:
-                   Ajoute l'entete AM appropriee au bulletin passe en parametre.
+           Parametres de sortie:
+           -Retourne le bulletin pret a envoyer en format string
 
-                   Auteur:      Pierre Michaud
-                   Date:        Janvier 2005
-                """
-		#initialisation des parametres de l'entete
-		#char header[80]
-		tmp = bulletin.getBulletin()
-		size = struct.calcsize('80s')
+           Description:
+           Ajoute l'entete AM appropriee au bulletin passe en parametre.
 
-		header = tmp[0:size]
-		listeHeader=[]
-		for i in header:
-			listeHeader.append(i)	
-		for i in range(size):
-			if listeHeader[i]==chr(curses.ascii.LF):
-				listeHeader[i]=chr(curses.ascii.NUL)
-		header = string.join(listeHeader,'')
+           Auteur:      Pierre Michaud
+           Date:        Janvier 2005
+        """
+        #initialisation des parametres de l'entete
+        #char header[80]
+        tmp = bulletin.getBulletin()
+        size = struct.calcsize('80s')
 
-		#unsigned long src_inet, dst_inet
-		src_inet = 0
-		dst_inet = 0
+        header = tmp[0:size]
+        listeHeader=[]
+        for i in header:
+            listeHeader.append(i)
+        for i in range(size):
+            if listeHeader[i]==chr(curses.ascii.LF):
+                listeHeader[i]=chr(curses.ascii.NUL)
+        header = string.join(listeHeader,'')
 
-		#unsigned char threads[4]
-		threads='0'+chr(255)+'0'+'0'
+        #unsigned long src_inet, dst_inet
+        src_inet = 0
+        dst_inet = 0
 
-		#unsigned int start, length
-		start = 0
-		length = socket.htonl( len(bulletin.getBulletin()) )
+        #unsigned char threads[4]
+        threads='0'+chr(255)+'0'+'0'
 
-		#time_t firsttime, timestamp
-		firsttime = chr(curses.ascii.NUL)
-		timestamp = chr(curses.ascii.NUL)
+        #unsigned int start, length
+        start = 0
+        length = socket.htonl( len(bulletin.getBulletin()) )
 
-		#char future[20]
-		future = chr(curses.ascii.NUL)
+        #time_t firsttime, timestamp
+        firsttime = chr(curses.ascii.NUL)
+        timestamp = chr(curses.ascii.NUL)
 
-		#construction de l'entete	
-		bulletinHeader = struct.pack(self.patternAmRec,header,src_inet,dst_inet,threads,start \
-					,length,firsttime,timestamp,future)
+        #char future[20]
+        future = chr(curses.ascii.NUL)
 
-		#assemblage de l'entete avec le contenu du bulletin
-		wrappedBulletin = bulletinHeader + bulletin.getBulletin()
+        #construction de l'entete
+        bulletinHeader = struct.pack(self.patternAmRec,header,src_inet,dst_inet,threads,start \
+                                ,length,firsttime,timestamp,future)
 
-                return wrappedBulletin
+        #assemblage de l'entete avec le contenu du bulletin
+        wrappedBulletin = bulletinHeader + bulletin.getBulletin()
 
-        def checkNextMsgStatus(self):
-                __doc__ = socketManager.socketManager.checkNextMsgStatus.__doc__ + \
-                """### Ajout de socketManagerAm ###
+        return wrappedBulletin
 
-                   Définition de la méthode
+    def checkNextMsgStatus(self):
+        __doc__ = socketManager.socketManager.checkNextMsgStatus.__doc__ + \
+        """### Ajout de socketManagerAm ###
 
-		   Ne détecte pas si les données sont corrompues, limitations du 
-		   protocole AM ?
+           Définition de la méthode
 
-		   Visibilité:	Publique
-		   Auteur:	Louis-Philippe Thériault
-		   Date:	Octobre 2004
-                """
-                if len(self.inBuffer) >= self.sizeAmRec:
-                        (header,src_inet,dst_inet,threads,start,length,firsttime,timestamp,future) = \
-                                struct.unpack(self.patternAmRec,self.inBuffer[0:self.sizeAmRec])
+           Ne détecte pas si les données sont corrompues, limitations du
+           protocole AM ?
+
+           Visibilité:  Publique
+           Auteur:      Louis-Philippe Thériault
+           Date:        Octobre 2004
+        """
+        if len(self.inBuffer) >= self.sizeAmRec:
+            (header,src_inet,dst_inet,threads,start,length,firsttime,timestamp,future) = \
+                    struct.unpack(self.patternAmRec,self.inBuffer[0:self.sizeAmRec])
+        else:
+            return 'INCOMPLETE'
+
+        length = socket.ntohl(length)
+
+        if len(self.inBuffer) >= self.sizeAmRec + length:
+            return 'OK'
+        else:
+            return 'INCOMPLETE'
+
+    def sendBulletin(self,bulletin):
+        #__doc__ = socketManager.socketManager.sendBulletin.__doc__ + \
+        """
+        ###Methode concrete pour socketManagerAm###
+
+        Nom:
+        sendBulletin
+
+        Parametres d'entree:
+        -bulletin:
+                -un objet bulletin
+
+        Parametres de sortie:
+        -si succes: 0
+        -sinon: 1
+
+        Description:
+        Envoi au socket correspondant un bulletin AM et indique
+        si le bulletin a ete transfere totalement ou non.  Chaque
+        envoi s'assure de l'etat de la connexion.
+
+        Auteur:
+        Pierre Michaud
+
+        Date:
+        Decembre 2005
+        """
+        try:
+            #preparation du bulletin pour l'envoi
+            data = self.wrapBulletin(bulletin)
+
+            #tentative d'envoi et controle de la connexion
+            #mettre le try/except dans un while(1)????
+            try:
+                #envoi du bulletin
+                bytesSent = self.socket.send(data)
+
+                #verifier si l'envoi est un succes
+                if bytesSent != len(data):
+                    self.connected=False
+                    return 0
                 else:
-                        return 'INCOMPLETE'
+                    return 1
 
-                length = socket.ntohl(length)
+            except socket.error, e:
+                #erreurs potentielles: 104, 107, 110 ou 32
+                self.logger.writeLog(self.logger.ERROR,"senderAm.write(): la connexion est rompue: %s",str(e.args))
+                #modification du statut de la connexion
+                #tentative de reconnexion
+                self.connected = False
+                self.logger.writeLog(self.logger.INFO,"senderAm.write(): tentative de reconnexion")
+                self.socket.close()
+                self._socketManager__establishConnection()
 
-                if len(self.inBuffer) >= self.sizeAmRec + length:
-                        return 'OK'
-                else:
-                        return 'INCOMPLETE'
-
-        def sendBulletin(self,bulletin):
-                #__doc__ = socketManager.socketManager.sendBulletin.__doc__ + \
-                """
-                ###Methode concrete pour socketManagerAm###
-
-                Nom:
-                sendBulletin
-
-                Parametres d'entree:
-                -bulletin:
-                        -un objet bulletin
-
-                Parametres de sortie:
-                -si succes: 0
-                -sinon: 1
-
-                Description:
-                Envoi au socket correspondant un bulletin AM et indique
-                si le bulletin a ete transfere totalement ou non.  Chaque
-		envoi s'assure de l'etat de la connexion.
-
-                Auteur:
-                Pierre Michaud
-
-                Date:
-                Decembre 2005
-                """
-                try:
-                        #preparation du bulletin pour l'envoi
-                        data = self.wrapBulletin(bulletin)
-
-                        #tentative d'envoi et controle de la connexion
-                        #mettre le try/except dans un while(1)????
-                        try:
-                                #envoi du bulletin
-                                bytesSent = self.socket.send(data)
-
-                                #verifier si l'envoi est un succes
-                                if bytesSent != len(data):
-                                        self.connected=False
-                                        return 0
-                                else:
-                                        return 1
-
-                        except socket.error, e:
-                                #erreurs potentielles: 104, 107, 110 ou 32
-                                self.logger.writeLog(self.logger.ERROR,"senderAm.write(): la connexion est rompue: %s",str(e.args))
-                                #modification du statut de la connexion
-                                #tentative de reconnexion
-                                self.connected = False
-                                self.logger.writeLog(self.logger.INFO,"senderAm.write(): tentative de reconnexion")
-                                self.socket.close()
-                                self._socketManager__establishConnection()
-
-                except Exception, e:
-                        self.logger.writeLog(self.logger.ERROR,"socketManagerAm.sendBulletin(): erreur d'envoi: %s",str(e.args))
-                        raise
+        except Exception, e:
+            self.logger.writeLog(self.logger.ERROR,"socketManagerAm.sendBulletin(): erreur d'envoi: %s",str(e.args))
+            raise
