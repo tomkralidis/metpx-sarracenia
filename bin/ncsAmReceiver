@@ -294,6 +294,7 @@ while True:
 
 		except OSError, inst:
 
+			type,origine = 'ERROR','ERROR'
 			utils.writeLog(log,"*** Erreur : Manipulation du fichier impossible! (Ecriture avec un nom non standard)")
 			utils.writeLog(log,"*** Exception: " + str(inst.args[0]))
 			utils.writeLog(log,"Bulletin :\n" + unBulletin, sync=True)
