@@ -15,6 +15,7 @@ import string
 import curses
 import curses.ascii
 import commands
+import signal
 
 # La taille du wmoHeader est prise d'a partir du document :
 # "Use of TCP/IP on the GTS", pages 28-29, et l'exemple en C
@@ -220,6 +221,8 @@ class wmoSock:
 				self.socket.close()
 			# Broken pipe!
 				raise Exception('uDef','La connection est brisee')
+			elif inst.args[0] == 11:
+				break
 			else:
 				raise
 
@@ -235,3 +238,14 @@ class wmoSock:
 	"""Retourne une string de x large contenant le prochain compteur et l'incremente"""
 	self.counter = self.counter + 1
 	return string.zfill(self.counter,x)
+
+    def shutdownProperly(self,signum,stack):
+        """Fait un shutdown gracieux du socket"""
+        self.socket.shutdown(2)
+
+	try:
+		self.recvBuffer = self.recvBuffer + self.recv(1000000)
+	except socket.error, inst:
+		pass
+
+	self.socket.close()

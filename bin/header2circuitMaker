@@ -76,12 +76,19 @@ def main():
 					mapPrincipale[entete] = {}
 					mapPrincipale[entete]['routing_groups'] = []
 
-				mapPrincipale[entete]['routing_groups'].append(nomFic)
+				if mapPrincipale[entete]['routing_groups'].count(nomFic) == 0:
+					mapPrincipale[entete]['routing_groups'].append(nomFic)
+				elif config.outputErrs:
+					sys.stderr.write('Plusieurs definitions dans le meme circuit (' + entete + ',fichier ' + nomFic + ')\n')
 
 				if entete == entete2:
 					mapPrincipale[entete]['rename'] = ''
 				else:
-					mapPrincipale[entete]['rename'] = entete2
+					if not mapPrincipale[entete].has_key('rename'):
+						mapPrincipale[entete]['rename'] = entete2
+					else:
+						if config.outputErrs and mapPrincipale[entete]['rename'] != entete2:
+							sys.stderr.write('L\'entete de destination differe! (' + entete + ',fichier ' + nomFic  + ')\n')
 			else:
 				if config.showIgnoredLines:
 					os.write(ignoredLinesFic,nomFic + ': ' + ligne + '\n')
@@ -93,6 +100,8 @@ def main():
 
 	fileDesc = os.open(config.destFile, os.O_CREAT | os.O_WRONLY)
 	os.chmod(config.destFile,0644)
+
+	print 'Nombre d\'entrees : ' + str(len(mapPrincipale.keys()))
 
 	for key in mapPrincipale.keys():
 		os.write(fileDesc,key + ':' + string.join(mapPrincipale[key]['routing_groups'],' ') + ':' + mapPrincipale[key]['rename'] + ':\n')

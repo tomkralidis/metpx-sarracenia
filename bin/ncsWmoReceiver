@@ -15,6 +15,7 @@ import os
 import sys
 import time
 import string
+import signal
 
 sys.path.append(sys.path[0] + '/../lib')
 sys.path.append(sys.path[0] + '/../etc')
@@ -81,6 +82,7 @@ bulletinLib.extensionDynamique = bulletinLib.initExtension()
 # Init du socket
 utils.writeLog(log,"Tentative d'ouverture du socket...",sync=True)
 wmoSock = wmoSocketManager.wmoSock(config.port)
+signal.signal(signal.SIGTERM,wmoSock.shutdownProperly)
 utils.writeLog(log,"Succes de l'ouverture du socket!",sync=True)
 
 
@@ -90,6 +92,7 @@ while True:
                 utils.writeLog(log,"Contenu du reste du buffer (dernier bulletin incomplet) :\n" + wmoSock.recvBuffer,sync=True)
                 utils.writeLog(log,"Tentative d'ouverture du socket...",sync=True)
                 wmoSock = wmoSocketManager.wmoSock(config.port)
+		signal.signal(signal.SIGTERM,wmoSock.shutdownProperly)
                 utils.writeLog(log,"Succes de l'ouverture du socket!",sync=True)
                 connectionBrisee = False
 

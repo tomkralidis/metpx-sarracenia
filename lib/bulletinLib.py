@@ -17,6 +17,9 @@ import commands
 extension = ""
 extensionDynamique = False
 
+# Champs dans le fichier de header2circuit
+champsHeader2Circuit = 'entete:routing_groups:rename:'
+
 def chargerFicCollection(pathFicCollection):
 	""" *	Retourne une map contenant les entete a utiliser avec
  	    *	quelles stations. La cle se trouve a etre une concatenation des
@@ -165,3 +168,37 @@ def ecrireBulletins(listeBulletins,nomFichierOrig):
 def getType(bulletin):
 	"""Retourne AN,BI selon le type de bulletin."""
 	return 'AN'
+
+def loadCircuitFile(header2circuit_file):
+	"""Charge le fichier de header2circuit et retourne un map avec comme cle
+	   le premier champ de champsHeader2Circuit (premier token est la cle,
+	   le reste des tokens sont les cles d'un map contenant les valeurs 
+	   associes."""
+	unMap = {}
+	
+	try:
+		fic = os.open( header2circuit_file, os.O_RDONLY )
+	except Exception:
+		raise Exception('uDef','Impossible d\'ouvrir le fichier d\'entetes')
+
+	champs = champsHeader2Circuit.split(':')
+
+	lignes = os.read(fic,os.stat(header2circuit_file)[6])
+
+	for ligne in lignes.splitlines():
+		uneLigneSplitee = ligne.split(':')
+
+		unMap[uneLigneSplitee[0]] = {}
+
+		try:
+			for token in range( max( len(champs)-2,len(uneLigneSplitee)-2 ) ):
+				unMap[uneLigneSplitee[0]][champs[token+1]] = uneLigneSplitee[token+1]
+
+				if len(unMap[uneLigneSplitee[0]][champs[token+1]].split(' ')) > 1:
+					unMap[uneLigneSplitee[0]][champs[token+1]] = unMap[uneLigneSplitee[0]][champs[token+1]].split(' ')
+		except IndexError:
+			print ligne
+			raise Exception('uDef','Les champs ne concordent pas dans le fichier')
+
+	return unMap
+
