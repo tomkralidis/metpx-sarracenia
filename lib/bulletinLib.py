@@ -238,3 +238,23 @@ def circuitWriteBulls(bulletin,listeNoms,path):
 	except OSError, inst:
 		raise
 
+def doWmoTraitementSpecifique(bulletin):
+	"""Effectue des modifications sur les bulletins dans le but
+	   d'avoir les memes resultats que sur le tandem."""
+
+	if bulletin[:4] in ['SRCN','SXVX','SXWA','SXXX']:
+		bulletin = bulletin.replace('\n\x1e','\n')
+
+	if bulletin[:4] in ['SRCN','SRMN','SRND','SRWA','SRMT','SRUS','SXVX','SXWA']:
+		bulletin = bulletin.replace('~','\n'):
+
+	if bulletin[-1] != '\n':
+		bulletin = bulletin + '\n'
+
+	if bulletin[:4] in ['SRUS']:
+		bulletin = bulletin.replace('\t','')
+
+	if bulletin[:2] in ['SA']:
+		bulletin = bulletin.replace('\r','')
+
+	return bulletin

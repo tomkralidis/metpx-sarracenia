@@ -126,6 +126,9 @@ def traitementDuBuffer():
 
 
 		try:
+			# Traitement spécifique
+			unBulletin = bulletinLib.doWmoTraitementSpecifique(unBulletin)
+
 	                listeBulletinsModifies.append((unBulletin,unBulletin.splitlines()[0],unBulletin.splitlines()[0][0:2],unBulletin.splitlines()[0].split()[1]))
 		except IndexError:
 			listeBulletinsModifies.append((unBulletin,"ERROR_BULLETIN_" + unBulletin.splitlines()[0],'ERROR','ERROR'))
