@@ -59,7 +59,6 @@ class PXIgniter(Igniter):
 
    def _shutdown(self, sig, stack):
       """
-      No need for globals, self.attribute contains status
       Do the real work here. Depends of type of sender/receiver
       """
       #print "shutdown() has been called"
@@ -67,7 +66,6 @@ class PXIgniter(Igniter):
 
    def _reload(self, sig, stack):
       """
-      No need for globals, self.attribute contains status
       Do the real work here. Depends of type of sender/receiver
       """
       if self.gateway is None:
@@ -75,8 +73,20 @@ class PXIgniter(Igniter):
          print "No gateway object! Nothing can be done"
       else:
          #print self.gateway
-         fet.startup(self.options, self.logger)
-         self.logger.writeLog(self.logger.INFO, "%s has been reload" % self.direction)
+         if self.direction == 'sender':
+            fet.startup(self.options, self.logger)
+            self.logger.writeLog(self.logger.INFO, "%s has been reload" % self.direction)
+         elif self.direction == 'receiver':
+            fet.startup(self.options, self.logger)
+            if self.type = 'am':
+               self.gateway.unBulletinManager.reloadMapCircuit('/dev/null')
+               self.gateway.unBulletinManager.reloadMapEntetes(self.gateway.pathFichierStations)
+            if self.type = 'wmo':
+               self.gateway.unBulletinManager.reloadMapCircuit('/dev/null')
+
+            self.logger.writeLog(self.logger.INFO, "%s has been reload" % self.direction)
+         else:
+            print "What is it? A collector!"
       
    def reload(self):
       """

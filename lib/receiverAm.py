@@ -26,6 +26,8 @@ class receiverAm(gateway.gateway):
         self.establishConnection()
 
         self.logger.writeLog(logger.DEBUG,"Instanciation du bulletinManagerAm")
+        
+        self.pathFichierStations = fet.FET_ETC + 'collection_stations.conf'
 
         # Instanciation du bulletinManagerAm avec la panoplie d'arguments.
         self.unBulletinManager = \
@@ -34,7 +36,7 @@ class receiverAm(gateway.gateway):
                 pathDest = '/apps/pds/RAW/-PRIORITY', \
                 pathFichierCircuit = '/dev/null', \
                 SMHeaderFormat = options.AddSMHeader, \
-                pathFichierStations = fet.FET_ETC + 'collection_stations.conf', \
+                pathFichierStations = self.pathFichierStations, \
                 extension = options.extension, \
                 mapEnteteDelai = options.mapEnteteDelai,
                 use_pds = self.options.use_pds )
