@@ -59,6 +59,7 @@ class DiskReader:
         self.path = path                          # Path from where we ingest filenames
         self.clientName = os.path.basename(path)  # Last part of the path correspond to client name 
         self.validation = validation              # Name Validation active (True or False)
+        self.patternMatching = validation         # Pattern matching active (True or False)
         self.logger = logger                      # Use to log information
         self.batch = batch                        # Maximum number of files that we are interested to sort
         self.files = self._getFilesList()         # List of filenames under the path
@@ -124,12 +125,14 @@ class DiskReader:
                         if self.logger is not None:
                             self.logger.writeLog(self.logger.INFO, "Filename incorrect: " + file + " has been unlinked!")
                         continue
-                # Does the filename match a pattern
-                if not self._matchPattern(basename):
-                    os.unlink(file)
-                    if self.logger is not None:
-                        self.logger.writeLog(self.logger.INFO, "No pattern matching: " + file + " has been unlinked!")
-                    continue
+                # If we use pattern matching
+                if self.patternMatching:
+                    # Does the filename match a pattern ?
+                    if not self._matchPattern(basename):
+                        os.unlink(file)
+                        if self.logger is not None:
+                            self.logger.writeLog(self.logger.INFO, "No pattern matching: " + file + " has been unlinked!")
+                        continue
                 # We don't want to 
                 if len(files) >= batch:
                         break

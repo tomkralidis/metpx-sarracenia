@@ -192,8 +192,9 @@ def sendFiles(c, files,logger):
                     try:
                         ftp = FTP( hspec, uspec, pwspec )
                     except:
-                        excinfo= sys.exc_info()
-                        logger.writeLog( logger.ERROR, "pas capable de me brancher à " + uspec + '@' + hspec + "(old was " + ftphost + ": " + repr(sys.exc_info()[0]) )
+                        #excinfo= sys.exc_info()
+                        (type, value, tb) = sys.exc_info()
+                        logger.writeLog( logger.ERROR, "pas capable de me brancher à " + uspec + '@' + hspec + "(old was " + ftphost + ": " + "type: %s, value: %s" % (type, value))
                         time.sleep(10)  # relax, buy a cherry blossom, don't be shy.
                         return #FIXME: no point to continue looping...
 
