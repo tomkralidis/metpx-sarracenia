@@ -157,10 +157,10 @@ def sendFiles(c, files,logger):
     for p in files:
         f = p[p.rfind('/')+1:]
         m = fet.clientMatch(c,f)
-	if not m:
-	    logger.writeLog( logger.INFO, "file " + os.path.basename(f) + " removed, no matching imask" )
-	    os.unlink(p)
-	    continue
+        if not m:
+            logger.writeLog( logger.INFO, "file " + os.path.basename(f) + " removed, no matching imask" )
+            os.unlink(p)
+            continue
         dfn = fet.destFileName(f,m)
         #print "match is: ", m
         if dfn == '' or m[2] == 'NULL':
@@ -201,9 +201,9 @@ def sendFiles(c, files,logger):
 
                     ftphost=hspec
                     ftpdir=''
+                if ftpdir != dspec:
                     # We remove the first / (if there was only one => relative path, if there was two => absolute path)
                     dspec = dspec[1:]
-                if ftpdir != dspec:
                     ftp.cwd(dspec)
                     ftpdir = dspec
 
@@ -228,7 +228,7 @@ def sendFiles(c, files,logger):
                         logger.writeLog( logger.ERROR, "ftq.quit() problem! " + "Type: %s, Value: %s" % (type, value))
 
                     time.sleep(10) # see cherry blossom above.
-                    return 
+                    return
 
 
             else:
@@ -253,7 +253,7 @@ def checkDir(d,logger):
 
     for t in os.listdir(d):
         p=os.path.join(d,t)
-        
+
         if ( t[0] == '.' ) or ( t[0:4] == 'tmp_' ) or (t[-4:] == '.tmp' ) or not os.access(p, os.R_OK):
             continue
         dirfiles = dirfiles + [ p ]
