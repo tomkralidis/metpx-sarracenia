@@ -43,6 +43,7 @@ class wmoSock:
 	self.counter = 0
 	self.port = port
 	then = time.time()
+	self.socket.setsockopt(socket.SOL_SOCKET,socket.SO_KEEPALIVE,1)
 
 	if not master:
 		self.socket.listen(1)

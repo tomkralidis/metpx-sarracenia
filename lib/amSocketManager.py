@@ -38,6 +38,7 @@ class amSock(asyncore.dispatcher):
 	self.listen(True)
 	self.sendBuffer = str()
 	self.recvBuffer = str()
+	self.socket.setsockopt(socket.SOL_SOCKET,socket.SO_KEEPALIVE,1)
 
 	while True:
 		try:
