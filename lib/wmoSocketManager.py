@@ -240,12 +240,12 @@ class wmoSock:
 	self.counter = self.counter + 1
 	return string.zfill(self.counter,x)
 
-    def shutdownProperly(self,signum,stack):
+    def shutdownProperly(self):
         """Fait un shutdown gracieux du socket"""
         self.socket.shutdown(2)
 
 	try:
-		self.recvBuffer = self.recvBuffer + self.recv(1000000)
+		self.recvBuffer = self.recvBuffer + self.socket.recv(1000000)
 	except socket.error, inst:
 		pass
 

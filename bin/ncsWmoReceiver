@@ -82,7 +82,6 @@ bulletinLib.extensionDynamique = bulletinLib.initExtension()
 # Init du socket
 utils.writeLog(log,"Tentative d'ouverture du socket...",sync=True)
 wmoSock = wmoSocketManager.wmoSock(config.port)
-signal.signal(signal.SIGTERM,wmoSock.shutdownProperly)
 utils.writeLog(log,"Succes de l'ouverture du socket!",sync=True)
 
 def traitementDuBuffer():
@@ -169,7 +168,19 @@ def traitementDuBuffer():
         globals()['listeBulletinsModifies'] = listeBulletinsModifies
         globals()['compteur'] = compteur
         globals()['log'] = log
-	
+
+def shutdownProperly(sig,stack):
+	"""Finit le traitement du buffer courant et ferme le socket proprement."""
+	utils.writeLog(globals()['log'],"Fermeture propre du programme")
+	utils.writeLog(globals()['log'],"Fermeture du socket")
+	globals()['wmoSock'].shutdownProperly()
+	utils.writeLog(globals()['log'],"Traitement du reste du buffer")
+	traitementDuBuffer()
+	utils.writeLog(globals()['log'],"Fermeture du programme")
+	sys.exit(0)
+
+signal.signal(signal.SIGTERM,shutdownProperly)
+signal.signal(signal.SIGINT,shutdownProperly)
 
 while True:
         # Si la connection a ete brisee, l'on ecoute et on attends pour un nouvelle
