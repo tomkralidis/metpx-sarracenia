@@ -569,8 +569,7 @@ class bulletinManager:
 
         # Test d'existence du fichier
         try:
-            if not self.use_pds:
-                pathHeader2circuit = fet.FET_ETC + 'header2client.conf'
+            pathHeader2circuit = fet.FET_ETC + 'header2client.conf'
 
             fic = os.open( pathHeader2circuit, os.O_RDONLY )
         except Exception:
