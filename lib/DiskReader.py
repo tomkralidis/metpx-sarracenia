@@ -49,7 +49,7 @@ class DiskReader:
         Set the root path and the sorter class used for sorting
 
         The regex will serve (if we use validation) to validate that the filename has the following form:
-        SACN43_CWAO_012000_CYOJ_41613:ncp1:CWAO:SA:3.A.I.E::20050201200339"
+        SACN43_CWAO_012000_CYOJ_41613:ncp1:CWAO:SA::3.A.I.E:20050201200339"
 
         FIXME: The regex should be passed otherwise!  config file?
 
@@ -66,15 +66,15 @@ class DiskReader:
     def _validateName(self, filename):
         """
         Validate that the filename has the following form:
-        SACN43_CWAO_012000_CYOJ_41613:ncp1:CWAO:SA:3.A.I.E::20050201200339"
+        SACN43_CWAO_012000_CYOJ_41613:ncp1:CWAO:SA::3.A.I.E:20050201200339"
         """
         basename = os.path.basename(filename)
         match = self.regex.search(basename)
         if match:
-            print match.group(2), match.group(1)
+            #print match.group(2), match.group(1)
             return True
         else:
-            print "Don't match: " + basename
+            #print "Don't match: " + basename
             return False
 
     def _getFilesList(self):
