@@ -54,7 +54,7 @@ def ingestDir(d,s,logger):
 
     numfiles=0
 
-    logger.writeLog(logger.DEBUG, " examen de répertoire " + d + " débute." )
+    logger.writeLog(logger.DEBUG, "répertoire " + d + " débute." )
     for r in os.listdir(d):
         if ( r[0] == '.' ) or ( r[0:4] == 'tmp_' ) or (r[-4:] == '.tmp' ) or not os.access(r, os.R_OK):
             continue
@@ -169,7 +169,7 @@ def sendFiles(c, files,logger):
         dfn = fet.destFileName(f,m)
 #     print "match is: ", m
         if dfn == '' or m[2] == 'NULL':
-            logger.writeLog(logger.ERROR, "fichier " + f + " pas routable par " + c )
+            logger.writeLog(logger.ERROR, "fichier " + os.path.basename(f) + " pas routable par " + c )
             continue
         else:
             (proto, dspec, uspec, pwspec, hspec, pspec) = fet.urlSplit(m[2])
@@ -178,9 +178,9 @@ def sendFiles(c, files,logger):
                 try:
                     os.copy( p , there )
                     os.unlink( p )
-                    logger.writeLog( logger.INFO, "fichier " + f + " livré à " + there )
+                    logger.writeLog( logger.INFO, "fichier " + os.path.basename(f) + " livré à " + there )
                 except:
-                    logger.writeLog( logger.ERROR, "pas capable d'ecrire" + there ": " + repr(sys.exc_info()[0]) )
+                    logger.writeLog( logger.ERROR, "pas capable d'ecrire" + there + ": " + repr(sys.exc_info()[0]) )
                     time.sleep(10)  # relax, buy a cherry blossom, don't be shy.
                     return #FIXME: no point to continue looping...
 
@@ -198,7 +198,7 @@ def sendFiles(c, files,logger):
                         ftp = FTP( hspec, uspec, pwspec )
                     except:
                         excinfo= sys.exc_info()
-                        logger.writeLog( logger.ERROR, "chui pas capable de me brancher à " + uspec + '@' + hspec + ": " + repr(sys.exc_info()[0]) )
+                        logger.writeLog( logger.ERROR, "pas capable de me brancher à " + uspec + '@' + hspec + ": " + repr(sys.exc_info()[0]) )
                         time.sleep(10)  # relax, buy a cherry blossom, don't be shy.
                         return #FIXME: no point to continue looping...
 
@@ -217,10 +217,10 @@ def sendFiles(c, files,logger):
                     pfn.close()
                     ftp.rename( tmpnam, dfn )
                     os.unlink( p )
-                    logger.writeLog( logger.INFO, "fichier " + f + " livré à "  + \
+                    logger.writeLog( logger.INFO, "fichier " + os.path.basename(f) + " livré à "  + \
                       proto + ":" + hspec + " " + dspec + " " + dfn )
                 except:
-                    logger.writeLog( logger.ERROR, "pas capable d'écrire le fichier " + p + " à "  + proto + ":" + hspec + " " + dspec + " " + dfn + ": " + repr(sys.exc_info()[0]) )
+                    logger.writeLog( logger.ERROR, "pas capable d'écrire le fichier " + os.path.basename(p) + " à "  + proto + ":" + hspec + " " + dspec + " " + dfn + ": " + repr(sys.exc_info()[0]) )
                     ftp.quit()
                     time.sleep(10) # see cherry blossom above.
                     return 
