@@ -148,7 +148,7 @@ class gateway:
 
             if len(data) == 0:
             # S'il n'y a pas de nouveau data
-                time.sleep(1)
+                time.sleep(0.1)
             else:
                 self.write(data)
 
