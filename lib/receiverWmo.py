@@ -29,24 +29,14 @@ class receiverWmo(gateway.gateway):
         self.logger.writeLog(logger.DEBUG,"Instanciation du bulletinManagerWmo")
 
         # Instanciation du bulletinManagerWmo avec la panoplie d'arguments.
-        if not options.source:
-            self.unBulletinManager = \
-                  bulletinManagerWmo.bulletinManagerWmo(
-                      self.config.pathTemp,logger, \
-                      pathDest = self.config.pathDestination, \
-                      pathFichierCircuit = self.config.ficCircuits, \
-                      extension = self.config.extension, \
-                      mapEnteteDelai = self.config.mapEnteteDelai, \
-                      use_pds = self.config.use_pds
-                                                          )
-        else:
-            self.unBulletinManager = \
+        self.unBulletinManager = \
                   bulletinManagerWmo.bulletinManagerWmo(
                      fet.FET_DATA + fet.FET_RX + options.source, logger, \
-                     pathDest = '/dev/null', \
+                     pathDest = '/apps/pds/RAW/-PRIORITY', \
                      pathFichierCircuit = '/dev/null', \
                      extension = options.extension, \
-                     mapEnteteDelai = options.mapEnteteDelai )
+                     mapEnteteDelai = options.mapEnteteDelai,
+                     use_pds = options.use_pds )
 
     def shutdown(self):
         __doc__ = gateway.gateway.shutdown.__doc__ + \

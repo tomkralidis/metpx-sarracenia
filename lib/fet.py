@@ -64,6 +64,15 @@ options={}
 #              #2 use python urlparse and just do the rest.
 #              could reduce size of routines considerably
 
+def isTrue(s):
+    if  s == 'True' or s == 'true' or s == 'yes' or s == 'on' or \
+        s == 'Yes' or s == 'YES' or s == 'TRUE' or s == 'ON' or \
+        s == '1' or  s == 'On' :
+        return True
+    else:
+        return False
+
+
 def urlSplit(url):
 
     protocol=''
@@ -237,7 +246,7 @@ clients = {}
 #        with inheritance to override it.  but this is just a skeleton.
 #
 # -- for a file sender
-clientdefaults = [ [], '',10,'single-file','MultiKeysStringSorter',4,'3','000'  ]
+clientdefaults = [ [], '',10,'single-file','MultiKeysStringSorter',200,'3','000'  ]
 #
 
 # FIXME: currently get one global list of clients.
@@ -370,7 +379,7 @@ type -- URL indicating connection type
 
 """
 sourcedefaults = {
-    'extension':'MISSING:MISSING:MISSING:5',
+    'extension':':MISSING:MISSING:MISSING:MISSING',
     'type':None,
     'mapEnteteDelai':None,
     'port':0,
@@ -398,9 +407,15 @@ def readSources(logger):
             srcline=src.split()
             if ( len(srcline) >= 2 and not re.compile('^[ \t]*#').search(src) ) :
                 try:
-                    if srcline[0] == 'arrival':
+                 
+                    if srcline[0] == 'extension':
+                       if len(string.join(srcline[1:]).split(':')) != 5:
+                          logger.writeLog( logger.ERROR, "wrong number of fields in extension " + sourceid + " config: " + src )
+                       else:
+                           source[srcline[0]] = ':' + string.join(srcline[1:])
+                    elif srcline[0] == 'arrival':
                         source['mapEnteteDelai'] =  { srcline[1] : ( int(srcline[2]), int(srcline[3]) )  }
-                    elif srcline[0] == 'AddSMHeader' and (srcline[1] == 'True' ):
+                    elif srcline[0] == 'AddSMHeader' and isTrue(srcline[1]):
                         source[srcline[0]] = True
                     else:
                         source[srcline[0]] = string.join(srcline[1:])
@@ -730,8 +745,7 @@ def startup(opts, logger):
         while cf:
             cfl=cf.split()
             if clf[0] == 'usePDS':
-                if clf[1] == 'True':
-                    options.use_pds=True
+                options.use_pds=isTrue(clf[1])
             cf=pxconf.readline()
         pxconf.close()
     except:

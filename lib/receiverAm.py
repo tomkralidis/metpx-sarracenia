@@ -28,28 +28,16 @@ class receiverAm(gateway.gateway):
         self.logger.writeLog(logger.DEBUG,"Instanciation du bulletinManagerAm")
 
         # Instanciation du bulletinManagerAm avec la panoplie d'arguments.
-        if not options.source:
-            self.unBulletinManager = \
-                 bulletinManagerAm.bulletinManagerAm(
-                         self.config.pathTemp,logger, \
-                         pathDest = self.config.pathDestination, \
-                         pathFichierCircuit = self.config.ficCircuits, \
-                         SMHeaderFormat = self.config.SMHeaderFormat, \
-                         pathFichierStations = self.config.ficCollection, \
-                         extension = self.config.extension, \
-                         mapEnteteDelai = self.config.mapEnteteDelai, \
-                         use_pds = self.config.use_pds
-                                                         )
-        else:
-            self.unBulletinManager = \
-                  bulletinManagerAm.bulletinManagerAm(
-                     fet.FET_DATA + fet.FET_RX + options.source, logger, \
-                     pathDest = '/dev/null', \
-                     pathFichierCircuit = '/dev/null', \
-                     SMHeaderFormat = options.AddSMHeader, \
-                     pathFichierStations = fet.FET_ETC + 'collection_stations.conf', \
-                     extension = options.extension, \
-                     mapEnteteDelai = options.mapEnteteDelai )
+        self.unBulletinManager = \
+            bulletinManagerAm.bulletinManagerAm(
+                fet.FET_DATA + fet.FET_RX + options.source, logger, \
+                pathDest = '/apps/pds/RAW/-PRIORITY', \
+                pathFichierCircuit = '/dev/null', \
+                SMHeaderFormat = options.AddSMHeader, \
+                pathFichierStations = fet.FET_ETC + 'collection_stations.conf', \
+                extension = options.extension, \
+                mapEnteteDelai = options.mapEnteteDelai,
+                use_pds = self.options.use_pds )
 
 
 

@@ -28,7 +28,7 @@ directives
 'batch' <count>
     The integer maximum number of files to send between 
     checks to the queueing directory. (fileNumber)
-    default: 4
+    default: 100
 
 'order' (None|MultiKeysStringSorter)
     The ordering of files in the queuing directory.

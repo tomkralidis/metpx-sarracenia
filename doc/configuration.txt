@@ -39,15 +39,15 @@ samples of rx/<source>.conf
 
 type single-file		
 active yes
-extension 3:AMTCP2FILE:DADS:BULLETIN:ASCII
+extension :AMTCP2FILE:DADS:BULLETIN:ASCII
 
 type single-file
 active yes
-extension 3:AMTCP2FILE:DADS:BULLETIN:ASCII
+extension :AMTCP2FILE:DADS:BULLETIN:ASCII
 
 type am
 active yes
-extension 3:PPP1:-CCCC:-TT:-CIRCUIT:ncsAmReceiver
+extension :PPP1:-CCCC:-TT:-CIRCUIT:ncsAmReceiver
 
 type wmo
 active yes
