@@ -30,7 +30,7 @@ if len(sys.argv) == 2:
 
 	try:
 		fic_cfg = open(pathCfg,'r')
-		config = imp.load_source('config',pathCfg,fic_cfg)
+		config = imp.load_source('config','/dev/null',fic_cfg)
 		fic_cfg.close()
 	except IOError:
 		print "*** Erreur: Fichier de configuration inexistant, erreur fatale!"
@@ -112,6 +112,18 @@ def traitementDuBuffer():
 
                 # Extraction du prochain bulletin complet
                 unBulletin = listeBulletins.pop()
+
+                # S'il y a lieu remplacement des <CR><CR><LF> pour des <LF>
+		if config.formattageFinDeLigne:
+			if unBulletin.find('BUFR') == -1 and unBulletin.find('GRIB') == -1:
+				unBulletin = unBulletin.replace('\r\r\n','\n')
+			else:
+                                # Si le bulletin est un BUFR, l'on remplace le premier set,
+                                # puis le dernier (apres le 7777) s'il y a lieu
+				unBulletin = unBulletin.replace('\r\r\n','\n',1)
+				unBulletin = unBulletin[:unBulletin.rfind('7777')] + unBulletin[unBulletin.rfind('7777'):].replace('\r\r\n','\n')
+
+
 
 		try:
 	                listeBulletinsModifies.append((unBulletin,unBulletin.splitlines()[0],unBulletin.splitlines()[0][0:2],unBulletin.splitlines()[0].split()[1]))

@@ -28,7 +28,7 @@ if len(sys.argv) == 2:
 
 	try:
 		fic_cfg = open(pathCfg,'r')
-		config = imp.load_source('config',pathCfg,fic_cfg)
+		config = imp.load_source('config','/dev/null',fic_cfg)
 		fic_cfg.close()
 	except IOError:
 		print "*** Erreur: Fichier de configuration inexistant, erreur fatale!"
