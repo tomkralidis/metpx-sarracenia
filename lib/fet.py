@@ -772,6 +772,7 @@ def startup(opts, logger):
     if FET_ETC[-1] != '/':
         FET_ETC = FET_ETC + '/'
 
+    options.worklists=0
     options.use_pds=False
     try:
         pxconf = open( FET_ETC + 'px.conf', 'r' )
