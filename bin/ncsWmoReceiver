@@ -82,7 +82,7 @@ bulletinLib.extensionDynamique = bulletinLib.initExtension()
 # Init du socket
 utils.writeLog(log,"Tentative d'ouverture du socket...",sync=True)
 wmoSock = wmoSocketManager.wmoSock(config.port)
-utils.writeLog(log,"Succes de l'ouverture du socket!",sync=True)
+utils.writeLog(log,"Succes de l'ouverture du socket! (hote distant: " + wmoSock.addr[0] + ")",sync=True)
 
 def traitementDuBuffer():
 	"""Une passe pour le traitement du buffer du socket
@@ -145,7 +145,7 @@ def traitementDuBuffer():
 
                         # Ecrasement de l'ancien log pour sauver de la place...
                         os.close(log)
-                        log = utils.initLog(config.primaryLog,config.backupLog)
+                        log = utils.initLog(config.primaryLog,config.backupLog,intro="Rotation des logs (" + str(compteur) + " bulletins atteints)")
 
                 (unBulletin,nomFic,type,origine) = listeBulletinsModifies.pop()
 
@@ -209,7 +209,7 @@ while True:
                 utils.writeLog(log,"Tentative d'ouverture du socket...",sync=True)
                 wmoSock = wmoSocketManager.wmoSock(config.port)
 		signal.signal(signal.SIGTERM,wmoSock.shutdownProperly)
-                utils.writeLog(log,"Succes de l'ouverture du socket!",sync=True)
+                utils.writeLog(log,"Succes de l'ouverture du socket! (hote distant: " + wmoSock.addr[0] + ")",sync=True)
                 connectionBrisee = False
 
         # Sync du buffer

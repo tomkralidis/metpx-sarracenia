@@ -104,7 +104,7 @@ bulletinLib.extensionDynamique = bulletinLib.initExtension()
 # Init du socket
 utils.writeLog(log,"Tentative d'ouverture du socket...",sync=True)
 amSock = amSocketManager.amSock(config.port)
-utils.writeLog(log,"Succes de l'ouverture du socket!",sync=True)
+utils.writeLog(log,"Succes de l'ouverture du socket! (hote distant: " + amSock.addr[0] + ")",sync=True)
 
 while True:
 	# Si la connection a ete brisee, l'on ecoute et on attends pour un nouvelle
@@ -112,7 +112,7 @@ while True:
 		utils.writeLog(log,"Contenu du reste du buffer (dernier bulletin incomplet) :\n" + amSock.recvBuffer,sync=True)
 		utils.writeLog(log,"Tentative d'ouverture du socket...",sync=True)
 		amSock = amSocketManager.amSock(config.port)
-		utils.writeLog(log,"Succes de l'ouverture du socket!",sync=True)
+		utils.writeLog(log,"Succes de l'ouverture du socket! (hote distant: " + amSock.addr[0] + ")",sync=True)
 		connectionBrisee = False
 
 	# Sync du buffer
@@ -261,7 +261,7 @@ while True:
 			
 			# Ecrasement de l'ancien log pour sauver de la place...
 			os.close(log)
-			log = utils.initLog(config.primaryLog,config.backupLog)
+			log = utils.initLog(config.primaryLog,config.backupLog,intro="Rotation des logs (" + str(compteur) + " bulletins atteints)")
 
 		(unBulletin,nomFic,type,origine) = listeBulletinsModifies.pop()
 

@@ -159,9 +159,9 @@ while True:
 
 				# Déplacement des fichiers incertains
                                 for f in t[0]:
-                                        os.rename(workDir1+f,incertainDir+f)
+                                        os.rename(workDir1+f,incertainDir+f+':'+workDir1.split('/')[-2])
                                 for f in t[1]:
-                                        os.rename(workDir2+f,incertainDir+f)
+                                        os.rename(workDir2+f,incertainDir+f+':'+workDir2.split('/')[-2])
 
 		else:
 			utils.writeLog(log,"Effacement des fichiers " + fichiers + ', ils sont identiques')
