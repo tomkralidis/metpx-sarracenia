@@ -1,0 +1,46 @@
+#! /usr/bin/env python2
+# -*- coding: iso-8859-1 -*-
+#!/usr/bin/python
+
+# manual annihilation:
+#
+# killall ptx
+# killall prx
+# rm -f /apps/px/[rt]x/.lock
+
+import sys
+import os
+
+sys.path.insert(1, sys.path[0] + '/../lib')
+sys.path.insert(1,sys.path[0] + '/../lib/importedLibs')
+
+import fet
+
+
+def startThem(dir,name,cmd):
+  for cfname in os.listdir( dir ):
+    if cfname[-5:] != '.conf':
+      continue
+
+    id = cfname[:-5]
+    if os.fork() == 0:
+        os.execl( sys.path[0] + '/' + name , name, id, cmd )
+
+
+def start(cmd):
+  startThem( fet.FET_ETC + 'rx/', 'pxReceiver', cmd)
+  startThem( fet.FET_ETC + 'tx/', 'pxSender', cmd)
+
+
+
+if os.getuid() == 0:
+  print "FATAL: Do not start as root. It will be a mess."
+  sys.exit(2)
+
+if len(sys.argv) < 2:
+  print "USAGE: px (start|stop) "
+  sys.exit(1)
+
+start(sys.argv[1])
+sys.exit(0)
+

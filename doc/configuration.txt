@@ -1,0 +1,78 @@
+
+NOTE BENE:  THIS IS NOT DONE YET!
+
+current status:
+	ncsReceiver & ncsSender uses old style configs.
+        pxReceiver & pxSender uses the new.
+
+ etc/
+     header2client.conf
+     collection_stations.conf
+     collections.conf
+     rx/
+        <source>.conf
+     tx/
+	<client>.conf
+
+header2client.conf -- the direct route mapping table. 
+Each header is on it's own line, three fields per line, colon separated.
+AHL on the left, list of destinations in the middle, priority is third field.
+sample line:
+SICA01 MSLP:A E C H S F O Q:5:
+
+collectons_stations.conf -- the list of stations included in each collective bulletin.
+space separated lines, first field is the AHL with the space removed, rest
+are the four letter station id's for collections.
+
+FCCN41CWAO   CYBL CYCD CYCG CYDL CYKA CYLW CYXC CYXJ CYYF CYZY
+
+(OLD CONFIG: stnlist in etc.sample)
+
+collections.conf -- configuration file for collection process.
+  -- same as existing one.
+
+-------------------------------------
+For each receptions circuit (a "source" in px parlance), there
+is a configuration file in the rx directory.  by creating
+
+samples of rx/<source>.conf
+
+type single-file		
+active yes
+extension 3:AMTCP2FILE:DADS:BULLETIN:ASCII
+
+type single-file
+active yes
+extension 3:AMTCP2FILE:DADS:BULLETIN:ASCII
+
+type am
+active yes
+extension 3:PPP1:-CCCC:-TT:-CIRCUIT:ncsAmReceiver
+
+type wmo
+active yes
+extension 3:PPP1:-CCCC:-TT:-CIRCUIT:ncsWmoReceiver
+
+
+For each outgoing circuit, there 
+-----------------------------
+    sample etc/tx/ppp1_wmo.conf
+
+active yes
+type  single-file
+protocol https
+user iamwhatiam
+password sdgasdg
+host ppp1.cmc.ec.gc.ca
+directory /tmp/data_wmo
+filename  WHATFN
+imask *:nwsA:*:*:* 
+
+destination https://fred:fredpass@fredwether.com/disk1 WHATFN
+imask *:nwsG:*:*:* 
+
+
+For each circuit, there is a spooling/queueing directory.
+/apps/px/rx/<source>  for sources, and /apps/px/tx/<client> for outgoing ones.
+
+

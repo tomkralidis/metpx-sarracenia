@@ -1,8 +1,36 @@
 
 
-  -- AFTN support
+  -- move code to a new repository.
+        -- remove the old bin/'s
+        -- remove self.config support, commit to self.options.
+
+  -- develop basic self-test suite.
+
+  -- add use_pds support to options.
+
+  -- revamp coding standard.
+        -- change indents to 4, ban tabs. (reindent.py ... )
+        -- move 'authorship' to start of file, alone. not every routine.
+           If a file has more than one author major, list all at top (once)
+        -- scope (public vs. private) of a routine is revealed by it's name
+           this information is redundant. Date per routine is redundant.
+
+  -- clone PDS messages, to minimize impact on pds-stats & columbo.
+        -- put all log messages in English.
+        -- concise (there are a lot more of them.)
+
+  -- AFTN support -- DL
 	-- need a contingency if we move the Tandem.
 
+  -- end to end performance testing.
+
+  -- ability to interpret SIGHUP without hanging up the socket.
+
+  -- more options on receiver? (tune directory sleep timer or...)
+
+  -- move status out from .conf files, into q directories.
+     ie.   txq/<client>/.status -> active enabled
+     or just put it inside .lock?, no want to persist across restarts.
 
   -- student project... directory watching technique study.
 	-- opendir poll, versus, poll mtime, FAM, fcntl(D_NOTIFY, fcntl(I_NOTIFY)
@@ -11,9 +39,9 @@
 		-- when the directory is almost always empty
 		-- when the directory is getting multiple files per second.
 
-
   -- student project:
 	-- add sftp support into curl.
+	-- just work with the open source project and modify it.
 
 
   -- student project:
@@ -21,11 +49,10 @@
 	   see if we can add it.
 
 	
-  -- full ftp sender.
+  -- full ftp sender.   DL!
 	-- record byte count on send in log.
 	-- supports multiple protocols (http,https, sftp  etc...)
 	-- based on curl.
-
 
   -- full file fetcher, as another prx method.
   	-- based on Daniel's work for scribe files.
@@ -33,4 +60,33 @@
 	-- good market for this with implementation, if
            we do it right.
 
-   
+  -- add destination confirmation to the process of reading header2client.conf?
+     reject non-existent clients?
+
+  -- Documentation
+	-- Extract all the TIKI stuff .. dump it into docs/specs...
+           sub-dir like requirements/Spec/Design.?
+	-- keep it for reference.
+
+  -- i18n 
+     Logs and error messages controlled by locales, default English, 'C' locale.
+ 
+  -- add ingester routing directive, so that one can use
+     masked routing on socket connections. Currently, routing is fixed by type.
+     All sockets are directly mapped, and single-file is masked PDS-style. 
+
+  -- (only later, for PDS) add ingester conversion routines. to do the 
+     *2gif, or whatever conversions, and have all versions ingested.
+
+  -- once we get to PDS... all those unwrappers from Rejean... 
+
+  -- performance improvement, worklists...
+     drop off worklists in the q directories, rather than linking files...
+     reduces overhead... ie... receiver builds a list of files to q for each
+     client places the list in /apps/px/txq/q<source>_<unique>
+ 
+     Senders then read the names in all the q files, and perform the normal
+     priority sort.
+
+     faster than linking each file under heavy load, much less file system interaction.
+     test!?

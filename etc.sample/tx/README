@@ -1,0 +1,53 @@
+
+directives
+
+'type' <am|wmo|plain|wmofile>
+   am        	   - AM protocol socket
+   wmo        	   - WMO protocol socket
+   single-file     - Receive plain files (like a PDS.)
+   nwsfile         - receive bulletins in an archive
+   ukmetfile       - receive bulletins in an archive
+   wmofile         - receive bulletins in an archive
+
+'destination' <URL> <DESTFN>
+    Uniform Resource Locator to designate where a sender should connect to.
+    ie.  wmo://localhost:5012
+   
+    One can issue multiple destination directives in a single client.
+    but it there will be a severe performance penalty if delivering large
+    numbers of files to two different machines using the same client.
+    best to use separate clients, each with their own destination.
+
+    There are also synonyms for subsets of 'destination'
+    'protocol', 'host', 'user', 'password', 'directory', 'filename'
+   
+'connect_timeout'
+    on Socket connections, number of seconds to wait for connection 
+    to occur before printing a warning.
+
+'batch' <count>
+    The integer maximum number of files to send between 
+    checks to the queueing directory. (fileNumber)
+    default: 4
+
+'order' (None|MultiKeysStringSorter)
+    The ordering of files in the queuing directory.
+    None is least cost.
+    MultiKeysStringSorter ensures delivery by priority and time.
+    default: MultiKeysStringSorter
+    
+'imask' 
+
+
+----------------------------------------------------------------------------
+  
+type single-file
+destination ftp://dude:dpw@machine.example.org/data/dude WHATFN
+connect_timeout 300
+order MultiKeysStringSorter
+batch 200
+
+emask *:*:*:*:RADAR:*
+
+imask *:*:*:*:DIRECT:*
+

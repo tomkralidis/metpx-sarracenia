@@ -1,0 +1,38 @@
+
+directives
+
+'type' <am|wmo|single-file|bulletin-file>
+   am        	   - AM protocol socket
+   wmo        	   - WMO protocol socket
+   single-file     - Receive plain files (like a PDS.)
+   single-bulletin - receive bulletins in a file (ingested like from a socket.)
+
+'port' 5012
+   port to bind for reception, only used on socket protocols
+
+'extension' 1:AMTCP2FILE:DADS:BULLETIN:ASCII
+ 
+  the reception file or bulletin name will have appended to it
+  the following fields:
+
+    priority, ori_system : ori_site : data_type : data_format :
+
+  
+arrival CA 5 20
+arrival WO 20 40
+  mapping of what the valid times to receive a given type of bulletin are.
+  in this example for CA's, -5 or +20 minutes versus the issue time is 
+  the valid interval.
+
+AddSMHeader True
+  true if a header is to be inserted at the beginning of a SM or SI bulletins.
+  the header is of the form: "AAXX jjhh4\\n".
+
+  
+FIXME: NOT YET IMPLEMENTED:
+routing direct|pattern  
+	be able to choose how the bulletin/file received is mapped to clients
+	two methods exist: AHL lookup in header2clients.conf, or by 
+        patterns (imask&emask)
+
+	headerMap, pattern, whatfnMap ?
