@@ -765,6 +765,7 @@ def startup(opts, logger):
             opts.connect_timeout = int(clients[options.client][2])
             opts.sorter = 'MultiKeysStringSorter'
             opts.numFiles = 100
+            opts.batch = clients[options.client][5]
         else:
             logger.writeLog( logger.ERROR, "unknown client: " + options.client )
 
