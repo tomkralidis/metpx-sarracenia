@@ -209,6 +209,9 @@ def sendFiles(c, files,logger):
                       proto + ":" + hspec + " " + dspec + " " + dfn )
                 except:
                     logger.writeLog( logger.ERROR, "pas capable d'écrire le fichier " + p + " à "  + proto + ":" + hspec + " " + dspec + " " + dfn + ": " + repr(sys.exc_info()[0]) )
+                    ftp.quit()
+                    time.sleep(10) # see cherry blossom above.
+                    return 
 
 
             else:
