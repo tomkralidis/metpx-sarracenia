@@ -171,8 +171,15 @@ def sendFiles(c, files,logger):
             (proto, dspec, uspec, pwspec, hspec, pspec) = fet.urlSplit(m[2])
             if proto == 'file':
                 there = dspec + '/' + dfn
-                os.copy( p , there )
-                logger.writeLog( logger.INFO, "fichier " + f + " livré à " + there )
+                try:
+                    os.copy( p , there )
+                    os.unlink( p )
+                    logger.writeLog( logger.INFO, "fichier " + f + " livré à " + there )
+                except:
+                    logger.writeLog( logger.ERROR, "pas capable d'ecrire" + there ": " + repr(sys.exc_info()[0]) )
+                    time.sleep(10)  # relax, buy a cherry blossom, don't be shy.
+                    return #FIXME: no point to continue looping...
+
             elif proto == 'ftp':
 
                 # assure ourselves that the ftp object is initialized.

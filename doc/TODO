@@ -12,6 +12,9 @@
            this information is redundant. Date per routine is redundant.
            available from source management system.
 
+  -- sender
+        -- drop on aging support.
+
   -- clone PDS messages, to minimize impact on pds-stats & columbo.
         -- put all log messages in English.
         -- concise (there are a lot more of them.)
