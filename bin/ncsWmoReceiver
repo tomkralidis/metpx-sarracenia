@@ -1,0 +1,171 @@
+#! /usr/bin/env python2
+############################################################
+#
+# Ce programme lit un stream WMO contenant des bulletins
+# meteos, effectue des modifications et les ecrit sur le
+# disque.
+#
+# Par: Louis-Philippe Theriault
+#      Stagiaire, CMC
+#
+############################################################
+
+import commands
+import os
+import sys
+import time
+import string
+
+sys.path.append(sys.path[0] + '/../lib')
+sys.path.append(sys.path[0] + '/../etc')
+import utils
+import bulletinLib
+import imp
+import wmoSocketManager
+
+# Lecture du fichier de configuration du programme
+if len(sys.argv) == 2:
+        pathCfg = sys.argv[1]
+
+	try:
+		fic_cfg = open(pathCfg,'r')
+		config = imp.load_source('config',pathCfg,fic_cfg)
+		fic_cfg.close()
+	except IOError:
+		print "*** Erreur: Fichier de configuration inexistant, erreur fatale!"
+		sys.exit(-1)
+else:
+        print "*** Erreur: Aucun fichier de config en entree, erreur fatale !\n" + \
+	      "            Le chemin du fichier doit etre le chemin complet"
+        sys.exit(-1)
+
+# Init du log
+try:
+	log = utils.initLog(config.primaryLog,config.backupLog)
+except Exception, inst:
+	print "*** Erreur: Creation du log impossible !\n" + str(inst)
+	sys.exit(-1)
+
+# Copie des parametres
+extension = config.extension
+destDir = utils.normalizePath(config.sendDir)
+tempDir = utils.normalizePath(config.tempDir)
+
+# Normalisation des paths
+config.sendDir = utils.normalizePath(config.sendDir)
+config.tempDir = utils.normalizePath(config.tempDir)
+
+# Diverses structures contenant les informations cruciales
+listeBulletins = []	# Liste des bulletins contenus dans le buffer
+listeBulletinsModifies = []	# Liste des bulletins une fois traites ainsi que leur nom (tuple: (bulletin,nom,type,origine))
+contenuDeBulletin = []  # Contenu du bulletin courant sous forme de liste des lignes du bulletin
+unBulletin = ""		# Une bulletin avec les lignes fusionnees
+compteur = 0		# Compteur pour les bulletins
+connectionBrisee = False        # True si la connection a lachee recamment
+
+# Test des parametres
+try:
+	utils.testAccess([(destDir,os.W_OK),(tempDir,os.W_OK)])
+except Exception, inst:
+	if inst.args[0] == 'uDef':
+		print "*** Erreur: la parametre suivant \'" + inst.args[1] + "\' est non existant ou les permissions sont erronees"
+		utils.writeLog(log, "*** Erreur: la parametre suivant \'" + inst.args[1] + "\' est non existant",sync = True)
+		sys.exit(-1)
+	else:
+		raise
+
+# Init de l'entete
+bulletinLib.extension = extension
+bulletinLib.extensionDynamique = bulletinLib.initExtension()
+
+# Init du socket
+utils.writeLog(log,"Tentative d'ouverture du socket...",sync=True)
+wmoSock = wmoSocketManager.wmoSock(config.port)
+utils.writeLog(log,"Succes de l'ouverture du socket!",sync=True)
+
+
+while True:
+        # Si la connection a ete brisee, l'on ecoute et on attends pour un nouvelle
+        if connectionBrisee:
+                utils.writeLog(log,"Contenu du reste du buffer (dernier bulletin incomplet) :\n" + wmoSock.recvBuffer,sync=True)
+                utils.writeLog(log,"Tentative d'ouverture du socket...",sync=True)
+                wmoSock = wmoSocketManager.wmoSock(config.port)
+                utils.writeLog(log,"Succes de l'ouverture du socket!",sync=True)
+                connectionBrisee = False
+
+        # Sync du buffer
+        try:
+                wmoSock.readBuffer()
+        except Exception, inst:
+                if len(inst.args) == 2 and inst.args[0] == 'uDef' and inst.args[1] == 'La connection est brisee':
+                        utils.writeLog(log,"La connection est brisee!")
+                        utils.writeLog(log,"Traitement du reste du buffer",sync=True)
+                        connectionBrisee = True
+                else:
+                        raise
+
+	# Copie des bulletins dans une liste
+	while True:
+		unBulletin = wmoSock.getNextBulletin()
+		if unBulletin == '':
+			break
+		listeBulletins.append(unBulletin)
+
+	# Pour chaque bulletins dans la liste des bulletins bruts
+	while True:
+
+		if len(listeBulletins) == 0:
+			break
+
+		# Extraction du prochain bulletin complet
+		unBulletin = listeBulletins.pop()
+
+		listeBulletinsModifies.append((unBulletin,unBulletin.splitlines()[0]))
+
+	# Ecriture des bulletins sur le disque
+	while True:
+
+		if len(listeBulletinsModifies) == 0:
+			break
+
+		compteur = compteur + 1
+		if compteur > 99999:
+			compteur = 1
+			
+			# Ecrasement de l'ancien log pour sauver de la place...
+			os.close(log)
+			log = utils.initLog(config.primaryLog,config.backupLog)
+
+		(unBulletin,nomFic) = listeBulletinsModifies.pop()
+
+		try:
+			nomFic = (nomFic + ' ' + string.zfill(compteur,5) + bulletinLib.getExtension()).replace(' ','_').replace('__','_')
+			unFichier = os.open( tempDir + nomFic , os.O_CREAT | os.O_WRONLY )
+
+			os.write( unFichier , unBulletin )
+			os.close( unFichier )
+			os.chmod(tempDir + nomFic,0644)
+
+			os.rename( tempDir + nomFic , destDir + nomFic )
+
+			# Le transfert du fichier est un succes
+			utils.writeLog(log,'Ecriture du fichier <' + destDir + nomFic + '>')	
+
+		except OSError, inst:
+
+			utils.writeLog(log,"*** Erreur : Manipulation du fichier impossible! (Ecriture avec un nom non standard)")
+			utils.writeLog(log,"*** Exception: " + str(inst.args[0]))
+			utils.writeLog(log,"Bulletin :\n" + unBulletin, sync=True)
+
+			nomFic = 'ERROR_BULLETIN_UNPRINTABLE_HEADER_' + string.zfill(compteur,5) + bulletinLib.getExtension()
+			unFichier = os.open( tempDir + nomFic , os.O_CREAT | os.O_WRONLY )
+
+			os.write( unFichier , unBulletin )
+                        os.close( unFichier )
+                        os.chmod(tempDir + nomFic,0644)
+
+                        os.rename( tempDir + nomFic , destDir + nomFic )
+
+                        # Le transfert du fichier est un succes
+                        utils.writeLog(log,'Ecriture du fichier <' + destDir + nomFic + '>')
+
