@@ -332,7 +332,7 @@ def readClients(logger):
                     client[4] = maskline[1]
                 elif maskline[0] == 'batch':
                     client[5] = int(maskline[1])
-                mask=cliconf.readline()
+            mask=cliconf.readline()
 
         cliconf.close()
         client[0] = patterns
@@ -506,15 +506,15 @@ def dbName(ingestname):
     else:
         return ''
 
-
-def clientQDirName( client ):
+def clientQDirName(client, ingestname):
     """Return the directory into which a file of a given priority should be placed.
     A couple of different layouts being contemplated.
     /apps/px/txq/<client>/YYYYmmddhh ??
     """
     global clients
-    return FET_DATA + FET_TX + client + '/' +  time.strftime( "%Y%m%d%H", time.gmtime(time.time()) ) + '/'
-
+    parts = ingestname.split(":")
+    priority = parts[4].split(".")[0]
+    return FET_DATA + FET_TX + client + '/'+ priority + '/' +  time.strftime( "%Y%m%d%H", time.gmtime(time.time()) ) + '/'
 
 def clientMatch(c,ingestname):
 
@@ -548,8 +548,6 @@ def clientMatches(ingestname):
 
 #  print hits
     return hits
-
-
 
 def destFileName(ingestname, climatch):
     """ return the appropriate destination give the climatch client specification.
@@ -631,48 +629,9 @@ def linkFile(f,l):
 #  print "link(", f, l, ")"
     os.link( f, l )
 
-qWorkLists={}
-lastWorkListPush=0
-
-def pushWorkList(logger):
-  """ push all work lists to client queues. 
-  """
-  global qWorkLists
-  global lastWorkListPush
-
-  now = time.time()
-  if (now - lastWorkListPush <= options.worklists): 
-      return
-
-  for i in qWorkLists.keys():
-     cname=clientQDirName( i )
-     createDir(cname)
-     wklname = cname + '.wl_' + options.source + '_' +  \
-                 time.strftime( "%H%M%S", time.gmtime(time.time()) ) 
-     wk = open( wklname, 'w')
-     wk.write( string.join( qWorkLists[i], '\n' ) )
-     wk.close()
-     logger.writeLog( logger.INFO, "wrote worklist" + wklname )
-
-  qWorkLists={}
-  lastWorkListPush=time.time()
-   
-
-def queueWorkList(dbfile,c,logger):
-  """ add to worklists for a client, trigger push if the interval has expired, 
-  """
-
-  if c in qWorkLists.keys():
-     qWorkLists[c] = qWorkLists[c] + [ dbfile ]
-  else:
-     qWorkLists[c] = [ dbfile ]
-
-  pushWorkList(logger)
-
 
 def directIngest(ingestname,clist,lfn,logger):
     """ link lfn into the db & client spools based on ingestname & clients
-
         accepts a list of matching clients.
     """
 
@@ -687,33 +646,19 @@ def directIngest(ingestname,clist,lfn,logger):
         return 1
 
     for c in clist:
-        if options.worklists:
-          queueWorkList(dbn, c, logger )
-        else:
-          cname=clientQDirName( c )
-          linkFile(dbn , cname + ingestname )
-          """
-          pathname = FET_DATA + FET_TX + c + '/' +  time.strftime( "%Y%m%d%H", time.gmtime(time.time()) ) + '/'
-          filename = pathname + ingestname
-          if os.path.exists(pathname):
-            os.link(dbn, filename)
-          else:
-            os.makedirs(pathname, 01775)
-            os.link(dbn, filename)
-          """
+        cname=clientQDirName(c, ingestname)
+        linkFile(dbn , cname + ingestname)
 
     logger.writeLog( logger.INFO, "queued for " + string.join(clist) )
     return 1
-
-
 
 def ingest(ingestname,lfn,logger):
     """ link lfn into the database & client spools, based on ingestname & pri
 
        apply all the masks to ingestname to find the clients who should receive
        it, and insert it in their queues.
-
     """
+
     clist=map( lambda x: x[0], clientMatches(ingestname))
     return directIngest(ingestname,clist,lfn,logger)
 
@@ -791,7 +736,6 @@ def startup(opts, logger):
     if FET_ETC[-1] != '/':
         FET_ETC = FET_ETC + '/'
 
-    options.worklists=0
     options.use_pds=False
     try:
         pxconf = open( FET_ETC + 'px.conf', 'r' )
