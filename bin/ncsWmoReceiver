@@ -85,6 +85,91 @@ wmoSock = wmoSocketManager.wmoSock(config.port)
 signal.signal(signal.SIGTERM,wmoSock.shutdownProperly)
 utils.writeLog(log,"Succes de l'ouverture du socket!",sync=True)
 
+def traitementDuBuffer():
+	"""Une passe pour le traitement du buffer du socket
+	   
+	   Les variables globales sont copies au debut puis 
+	   a la fin"""
+	# Copie des variables globales
+	wmoSock = globals()['wmoSock']
+	connectionBrisee = globals()['connectionBrisee']
+	listeBulletins = globals()['listeBulletins']
+	listeBulletinsModifies = globals()['listeBulletinsModifies']
+	compteur = globals()['compteur']
+	log = globals()['log']
+
+        # Copie des bulletins dans une liste
+        while True:
+                unBulletin = wmoSock.getNextBulletin()
+                if unBulletin == '':
+                        break
+                listeBulletins.append(unBulletin)
+
+        # Pour chaque bulletins dans la liste des bulletins bruts
+        while True:
+
+                if len(listeBulletins) == 0:
+                        break
+
+                # Extraction du prochain bulletin complet
+                unBulletin = listeBulletins.pop()
+                listeBulletinsModifies.append((unBulletin,unBulletin.splitlines()[0]))
+
+        # Ecriture des bulletins sur le disque
+        while True:
+
+                if len(listeBulletinsModifies) == 0:
+                        break
+
+                compteur = compteur + 1
+                if compteur > 99999:
+                        compteur = 1
+
+                        # Ecrasement de l'ancien log pour sauver de la place...
+                        os.close(log)
+                        log = utils.initLog(config.primaryLog,config.backupLog)
+
+                (unBulletin,nomFic) = listeBulletinsModifies.pop()
+
+                try:
+                        nomFic = (nomFic + ' ' + string.zfill(compteur,5) + bulletinLib.getExtension()).replace(' ','_').replace('__','_')
+                        unFichier = os.open( tempDir + nomFic , os.O_CREAT | os.O_WRONLY )
+
+                        os.write( unFichier , unBulletin )
+                        os.close( unFichier )
+                        os.chmod(tempDir + nomFic,0644)
+
+                        os.rename( tempDir + nomFic , destDir + nomFic )
+
+                        # Le transfert du fichier est un succes
+                        utils.writeLog(log,'Ecriture du fichier <' + destDir + nomFic + '>')
+
+                except OSError, inst:
+
+                        utils.writeLog(log,"*** Erreur : Manipulation du fichier impossible! (Ecriture avec un nom non standard)")
+                        utils.writeLog(log,"*** Exception: " + str(inst.args[0]))
+                        utils.writeLog(log,"Bulletin :\n" + unBulletin, sync=True)
+
+                        nomFic = 'ERROR_BULLETIN_UNPRINTABLE_HEADER_' + string.zfill(compteur,5) + bulletinLib.getExtension()
+                        unFichier = os.open( tempDir + nomFic , os.O_CREAT | os.O_WRONLY )
+
+                        os.write( unFichier , unBulletin )
+                        os.close( unFichier )
+                        os.chmod(tempDir + nomFic,0644)
+
+                        os.rename( tempDir + nomFic , destDir + nomFic )
+
+                        # Le transfert du fichier est un succes
+                        utils.writeLog(log,'Ecriture du fichier <' + destDir + nomFic + '>')
+
+	# Assignement des variables globales
+        globals()['wmoSock'] = wmoSock
+        globals()['connectionBrisee'] = connectionBrisee
+        globals()['listeBulletins'] = listeBulletins
+        globals()['listeBulletinsModifies'] = listeBulletinsModifies
+        globals()['compteur'] = compteur
+        globals()['log'] = log
+	
 
 while True:
         # Si la connection a ete brisee, l'on ecoute et on attends pour un nouvelle
@@ -107,68 +192,4 @@ while True:
                 else:
                         raise
 
-	# Copie des bulletins dans une liste
-	while True:
-		unBulletin = wmoSock.getNextBulletin()
-		if unBulletin == '':
-			break
-		listeBulletins.append(unBulletin)
-
-	# Pour chaque bulletins dans la liste des bulletins bruts
-	while True:
-
-		if len(listeBulletins) == 0:
-			break
-
-		# Extraction du prochain bulletin complet
-		unBulletin = listeBulletins.pop()
-
-		listeBulletinsModifies.append((unBulletin,unBulletin.splitlines()[0]))
-
-	# Ecriture des bulletins sur le disque
-	while True:
-
-		if len(listeBulletinsModifies) == 0:
-			break
-
-		compteur = compteur + 1
-		if compteur > 99999:
-			compteur = 1
-			
-			# Ecrasement de l'ancien log pour sauver de la place...
-			os.close(log)
-			log = utils.initLog(config.primaryLog,config.backupLog)
-
-		(unBulletin,nomFic) = listeBulletinsModifies.pop()
-
-		try:
-			nomFic = (nomFic + ' ' + string.zfill(compteur,5) + bulletinLib.getExtension()).replace(' ','_').replace('__','_')
-			unFichier = os.open( tempDir + nomFic , os.O_CREAT | os.O_WRONLY )
-
-			os.write( unFichier , unBulletin )
-			os.close( unFichier )
-			os.chmod(tempDir + nomFic,0644)
-
-			os.rename( tempDir + nomFic , destDir + nomFic )
-
-			# Le transfert du fichier est un succes
-			utils.writeLog(log,'Ecriture du fichier <' + destDir + nomFic + '>')	
-
-		except OSError, inst:
-
-			utils.writeLog(log,"*** Erreur : Manipulation du fichier impossible! (Ecriture avec un nom non standard)")
-			utils.writeLog(log,"*** Exception: " + str(inst.args[0]))
-			utils.writeLog(log,"Bulletin :\n" + unBulletin, sync=True)
-
-			nomFic = 'ERROR_BULLETIN_UNPRINTABLE_HEADER_' + string.zfill(compteur,5) + bulletinLib.getExtension()
-			unFichier = os.open( tempDir + nomFic , os.O_CREAT | os.O_WRONLY )
-
-			os.write( unFichier , unBulletin )
-                        os.close( unFichier )
-                        os.chmod(tempDir + nomFic,0644)
-
-                        os.rename( tempDir + nomFic , destDir + nomFic )
-
-                        # Le transfert du fichier est un succes
-                        utils.writeLog(log,'Ecriture du fichier <' + destDir + nomFic + '>')
-
+	traitementDuBuffer()
