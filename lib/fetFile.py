@@ -109,8 +109,8 @@ def checkSource(s, sources,logger):
             os.chdir(dname)
             dmodified[ dname ] = dstat.st_mtime
             ingestDir( dname, s, logger )
-
-        time.sleep(4)
+        else:
+            time.sleep(1)
 
 
 #
@@ -318,7 +318,9 @@ def doClient(c,howtoprioritize,logger):
     if cfiles:
         cfiles.sort(howtoprioritize)
         sendFiles( c, cfiles, logger )
-
+    else:
+        fet.pushWorkList()
+        time.sleep(1)
 
 
 def checkClient( c, clients, howtoprioritize, logger ):
@@ -341,7 +343,6 @@ def checkClient( c, clients, howtoprioritize, logger ):
 
     while(1):
         doClient(c,howtoprioritize,logger)
-        time.sleep(4)
 
 
 def filePrio( x, y ):

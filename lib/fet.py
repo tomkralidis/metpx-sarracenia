@@ -337,7 +337,7 @@ def readClients(logger):
         cliconf.close()
         client[0] = patterns
         clients[clientid] = copy.deepcopy(client)
-        logger.writeLog( logger.INFO, "read config of client " + clientid )
+        logger.writeLog( logger.DEBUG, "read config of client " + clientid )
         client[1]=''
         host=''
         port=''
@@ -638,6 +638,11 @@ def pushWorkList():
   """ push all work lists to client queues. 
   """
   global qWorkLists
+  global lastWorkListPush
+
+  now = time.time()
+  if (now - lastWorkListPush <= options.worklists): 
+      return
 
   for i in qWorkLists.keys():
      cname=clientQDirName( i )
@@ -646,23 +651,21 @@ def pushWorkList():
                  time.strftime( "%H%M%S", time.gmtime(time.time()) ) , 'w')
      wk.write( string.join( qWorkLists[i], '\n' ) )
      wk.close()
+
   qWorkLists={}
+  lastWorkListPush=time.time()
    
 
 def queueWorkList(dbfile,c):
   """ add to worklists for a client, trigger push if the interval has expired, 
   """
-  global lastWorkListPush
 
   if c in qWorkLists.keys():
      qWorkLists[c] = qWorkLists[c] + [ dbfile ]
   else:
      qWorkLists[c] = [ dbfile ]
 
-  now = time.time()
-  if (now - lastWorkListPush > options.worklists): 
-     pushWorkList()
-     lastWorkListPush=time.time()
+  pushWorkList()
 
 
 def directIngest(ingestname,clist,lfn,logger):
@@ -787,11 +790,11 @@ def startup(opts, logger):
             if cfl[0] == 'usePDS':
                 options.use_pds=isTrue(cfl[1])
             elif cfl[0] == 'worklists':
-                options.worklists=int(cfl[1])
+                options.worklists=float(cfl[1])
             cf=pxconf.readline()
         pxconf.close()
     except:
-        logger.writeLog( logger.NOTICE, "could not open global px config: " +
+        logger.writeLog( logger.INFO, "could not open global px config: " +
                 FET_ETC + 'px.conf'  )
 
     if not options.use_pds:
