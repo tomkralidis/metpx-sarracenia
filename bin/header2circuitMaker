@@ -1,0 +1,106 @@
+#! /usr/bin/env python2
+############################################################
+#
+# Convertit les entrees des fichiers de circuits du tandem
+# en des fichiers de conversion de l'entete au circuit.
+#
+# Par: Louis-Philippe Theriault
+#      Stagiaire, CMC
+#
+############################################################
+
+import commands
+import os
+import sys
+import time
+import string
+
+sys.path.append(sys.path[0] + '/../lib')
+sys.path.append(sys.path[0] + '/../etc')
+import utils
+import bulletinLib
+import imp
+
+# Lecture du fichier de configuration du programme
+if len(sys.argv) == 2:
+        pathCfg = sys.argv[1]
+
+        try:
+                fic_cfg = open(pathCfg,'r')
+                config = imp.load_source('config',pathCfg,fic_cfg)
+                fic_cfg.close()
+        except IOError:
+                print "*** Erreur: Fichier de configuration inexistant, erreur fatale!"
+                sys.exit(-1)
+else:
+        print "*** Erreur: Aucun fichier de config en entree, erreur fatale !\n" + \
+              "            Le chemin du fichier doit etre le chemin complet"
+        sys.exit(-1)
+
+config.inputDir = utils.normalizePath(config.inputDir)
+
+def main():
+	mapPrincipale = {}
+	lesFichiers = os.listdir(config.inputDir)
+
+	if config.showIgnoredLines:
+		if os.access(config.destFile + '.ignoredLines',os.F_OK):
+			os.remove(config.destFile + '.ignoredLines')
+
+		ignoredLinesFic = os.open(config.destFile + '.ignoredLines', os.O_CREAT | os.O_WRONLY)
+		os.chmod(config.destFile + '.ignoredLines',0644)
+
+	for nomFic in lesFichiers:
+		fileDesc = os.open(config.inputDir + nomFic, os.O_RDONLY)
+		data = os.read(fileDesc,os.stat(config.inputDir + nomFic)[6])
+
+		for ligne in data.splitlines():
+			if len(ligne) > 20 and ligne[0:10].isalnum() and ligne[11:21].isalnum():
+				try:
+					if len(ligne.split('*')) > 1:
+						entete = ligne.split('*')[0][:6] + ' ' + ligne.split('*')[0][6:]
+						entete2 = ligne.split('*')[1][:len(entete)-1][:6] + ' ' + ligne.split('*')[1][:len(entete)-1][6:]
+					elif len(ligne.split('+')) > 1:
+						entete = ligne.split('+')[0][:6] + ' ' + ligne.split('+')[0][6:]
+						entete2 = ligne.split('+')[1][:len(entete)-1][:6] + ' ' + ligne.split('+')[1][:len(entete)-1][6:]
+					else:
+						if config.showIgnoredLines:
+							os.write(ignoredLinesFic,nomFic + ': ' + ligne + '\n')
+						continue
+				except Exception:
+					if config.showIgnoredLines:
+						os.write(ignoredLinesFic,nomFic + ': ' + ligne + '\n')
+					continue
+
+				if not mapPrincipale.has_key(entete):
+					mapPrincipale[entete] = {}
+					mapPrincipale[entete]['routing_groups'] = []
+
+				mapPrincipale[entete]['routing_groups'].append(nomFic)
+
+				if entete == entete2:
+					mapPrincipale[entete]['rename'] = ''
+				else:
+					mapPrincipale[entete]['rename'] = entete2
+			else:
+				if config.showIgnoredLines:
+					os.write(ignoredLinesFic,nomFic + ': ' + ligne + '\n')
+
+		os.close(fileDesc)
+	
+	if os.access(config.destFile,os.F_OK):
+		os.remove(config.destFile)
+
+	fileDesc = os.open(config.destFile, os.O_CREAT | os.O_WRONLY)
+	os.chmod(config.destFile,0644)
+
+	for key in mapPrincipale.keys():
+		os.write(fileDesc,key + ':' + string.join(mapPrincipale[key]['routing_groups'],' ') + ':' + mapPrincipale[key]['rename'] + ':\n')
+
+	os.close(fileDesc)
+
+	if config.showIgnoredLines:
+		os.close(ignoredLinesFic)
+		
+
+main()
