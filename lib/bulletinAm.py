@@ -216,6 +216,13 @@ class bulletinAm(bulletin.bulletin):
         if self.getType() in ['UG','UK','US'] and self.bulletin[1] == '':
             self.bulletin.remove('')
 
+	if self.bulletin[0][0] == '\x00':
+		self.replaceChar('\x00','')
+		self.replaceChar('\x03\x04\n','')
+
+	if self.bulletin[0][:6] in ['RACN00']:
+		self.replaceChar('\x02','')
+
         bulletin.bulletin.verifyHeader(self)
 
     def getFormattedSystemTime(self):
