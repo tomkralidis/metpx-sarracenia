@@ -96,7 +96,7 @@ def urlSplit(url):
         rest = url[delim+3:]
 
     if rest[0] == '/':
-        destdir = rest
+        dirspec = rest
     else:
         delim = string.find(rest,'/')
         if delim > 0:
