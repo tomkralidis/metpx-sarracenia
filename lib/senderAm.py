@@ -67,12 +67,11 @@ class senderAm(gateway.gateway):
         # Instanciation du bulletinManagerAm selon les arguments issues du fichier
         # de configuration
         self.logger.writeLog(logger.DEBUG,"Instanciation du bulletinManagerAm")
-        self.unBulletinManagerAm = \
-            bulletinManagerAm.bulletinManagerAm(
+        self.unBulletinManagerAm = bulletinManagerAm.bulletinManagerAm(
                  fet.FET_DATA + fet.FET_TX + options.client, logger)
-            self.config.remoteHost = options.host
-            self.config.localPort = options.port
-            self.config.timeout    = options.connect_timeout
+        self.options.remoteHost = options.host
+        self.options.localPort = options.port
+        self.options.timeout    = options.connect_timeout
 
         self.listeFichiersDejaChoisis = []
         self.reader = None
@@ -134,19 +133,12 @@ class senderAm(gateway.gateway):
         # Instanciation du socketManagerAm
         self.logger.writeLog(self.logger.DEBUG,"Instanciation du socketManagerAm")
 
-        if self.options.client:
-            self.unSocketManagerAm = \
+        self.unSocketManagerAm = \
                  socketManagerAm.socketManagerAm(
                          self.logger,type='master', \
                          port=self.options.port,\
                          remoteHost=self.options.host,
                          timeout=self.options.connect_timeout)
-        else:
-            self.unSocketManagerAm = \
-                 socketManagerAm.socketManagerAm(self.logger,type='master', \
-                      port=self.config.remoteHost[1],\
-                      remoteHost=self.config.remoteHost[0],
-                      timeout=self.config.timeout)
 
     def read(self):
         __doc__ =  gateway.gateway.read.__doc__ + \
@@ -171,20 +163,13 @@ class senderAm(gateway.gateway):
         Date:
         Janvier 2005
         """
-        if not self.options.client:
-            self.reader = DiskReader(
-                self.config.rootPath,
-                eval(self.config.sorter))
-            self.reader.sort()
-            return(self.reader.getFilesContent(self.config.fileNumber))
-        else:
-            self.reader = DiskReader(
+        self.reader = DiskReader(
                  fet.FET_DATA + fet.FET_TX + self.options.client,
                  True, # name validation
                  self.logger,
                  eval(self.options.sorter))
-            self.reader.sort()
-            return(self.reader.getFilesContent(fet.clients[self.options.client][5]))
+        self.reader.sort()
+        return(self.reader.getFilesContent(fet.clients[self.options.client][5]))
 
         """
         data = []

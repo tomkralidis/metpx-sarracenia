@@ -26,42 +26,19 @@ class collectionGateway(gateway.gateway):
         # Instanciation des collectionManager(writer)
         self.logger.writeLog(logger.DEBUG,"Instanciation du collectionManager")
 
-        if options.collector:
-            self.unCollectionManager = \
-                 collectionManager.collectionManager( logger )
-        else:
-            self.unCollectionManager = \
-                 collectionManager.collectionManager(
-                         self.config.pathTemp,logger, \
-                         self.config.ficCollection, \
-                         self.config.collectionParams, \
-                         self.config.delaiMaxSeq, \
-                         self.config.ficCircuits, \
-                         pathDest = self.config.pathDestination, \
-                         extension = self.config.extension \
-                                                         )
+        self.unCollectionManager = \
+            collectionManager.collectionManager( logger )
 
         # Instanciation du bulletinManager(reader/writer)
         self.logger.writeLog(logger.DEBUG,"Instanciation du bulletinManager")
-        if options.collector:
-            self.unBulletinManager = \
+        self.unBulletinManager = \
                   bulletinManager.bulletinManager(
                           pathTemp=fet.FET_DATA+fet.FET_TMP,
                           logger=logger,
                           pathSource=fet.FET_DATA+fet.FET_CL,
-                          pathDest='/dev/null',
+                          pathDest='/apps/pds/RAW/-PRIORITY',
                           pathFichierCircuit=fet.FET_ETC+'header2client.conf',
                           extension=options.extension,
-                          use_pds = fet.options.use_pds
-                          )
-        else:
-            self.unBulletinManager = \
-                  bulletinManager.bulletinManager(
-                          self.config.pathTemp,logger, \
-                          pathSource = self.config.pathSource, \
-                          pathDest = self.config.pathDestination, \
-                          pathFichierCircuit = None, \
-                          extension = self.config.extension \
                           use_pds = fet.options.use_pds
                           )
 
@@ -160,13 +137,13 @@ class collectionGateway(gateway.gateway):
             # Partage du même map pour les 2 managers
             self.unBulletinManager.setMapCircuits(self.unCollectionManager.getMapCircuits())
 
-            self.config.ficCircuits = ficCircuits
+            self.options.ficCircuits = ficCircuits
 
             # Reload du fichier de stations
             # -----------------------------
             self.unCollectionManager.reloadMapEntetes(ficCollection)
 
-            self.config.ficCollection = ficCollection
+            self.options.ficCollection = ficCollection
 
             # Reload des paramètres de la collection
             # --------------------------------------

@@ -83,14 +83,9 @@ class receiverWmo(gateway.gateway):
 
         # Instanciation du socketManagerWmo
 
-        if self.options.source:
-            self.unSocketManagerWmo = \
+        self.unSocketManagerWmo = \
                   socketManagerWmo.socketManagerWmo(self.logger,type='slave', \
                                                          port=self.options.port)
-        else:
-            self.unSocketManagerWmo = \
-                  socketManagerWmo.socketManagerWmo(self.logger,type='slave', \
-                                                         port=self.config.localPort)
 
     def read(self):
         __doc__ =  gateway.gateway.read.__doc__ + \

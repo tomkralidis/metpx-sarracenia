@@ -85,14 +85,9 @@ class receiverAm(gateway.gateway):
         self.logger.writeLog(self.logger.DEBUG,"Instanciation du socketManagerAm")
 
         # Instanciation du socketManagerAm
-        if self.options.source:
-            self.unSocketManagerAm = \
+        self.unSocketManagerAm = \
                 socketManagerAm.socketManagerAm(self.logger,type='slave', \
                         port=self.options.port)
-        else:
-            self.unSocketManagerAm = \
-                socketManagerAm.socketManagerAm(self.logger,type='slave', \
-                        port=self.config.localPort)
 
     def read(self):
         __doc__ =  gateway.gateway.read.__doc__ + \
