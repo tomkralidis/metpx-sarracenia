@@ -197,8 +197,43 @@ def loadCircuitFile(header2circuit_file):
 				if len(unMap[uneLigneSplitee[0]][champs[token+1]].split(' ')) > 1:
 					unMap[uneLigneSplitee[0]][champs[token+1]] = unMap[uneLigneSplitee[0]][champs[token+1]].split(' ')
 		except IndexError:
-			print ligne
-			raise Exception('uDef','Les champs ne concordent pas dans le fichier')
+			raise Exception('uDef','Les champs ne concordent pas dans le fichier',ligne)
 
 	return unMap
 
+def circuitRename(nomOriginal,entete,mapCircuit):
+	"""Ajoute les noms de circuits a l'entete et retourne une liste des noms modifies.
+
+	Le nom original est le nom qui serait donne au fichier.
+	L'entete est les 2 premiers tokens du bulletin separes par des espaces"""
+	if not mapCircuit.has_key(entete):
+		raise Exception('uDef','Entete nom trouvee dans fichier de circuits')
+
+	nomsCircuits = []
+	
+	try:
+		for c in mapCircuit[entete]['routing_groups']:
+		
+			nomsCircuits.append( c + '_' + nomOriginal )
+	except KeyError:
+		pass
+
+	return nomsCircuits
+
+def circuitWriteBulls(bulletin,listeNoms,path):
+	"""Ecrit le bulletin dans path et fait des liens avec les autres
+	noms"""
+	try:
+		premierFichier = listeNoms[0]
+		fic = os.open( path + premierFichier , os.O_CREAT | os.O_WRONLY )
+		os.write(fic,bulletin)
+		os.close(fic)
+		os.chmod(path + premierFichier,0644)
+
+		for n in listeNoms[1:]:
+
+			os.link(path + premierFichier, path + n)
+			os.chmod(path + n,0644)
+
+	except OSError, inst:
+		raise

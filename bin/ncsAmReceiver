@@ -53,6 +53,15 @@ except Exception, inst:
 extension = config.extension
 ficCollection = config.ficCollection
 
+try:
+	ficCircuits = config.ficCircuits
+	if ficCircuits != None:
+		mapCircuits = bulletinLib.loadCircuitFile(ficCircuits)
+except AttributeError, inst:
+	attributAbsent = inst.args[0].split('\'')[3]
+	utils.writeLog(log,'Attribut ' + attributAbsent + ' manquant dans le fichier de config (voir le fichier de config en exemple)')
+	ficCircuits = None
+
 # Normalisation des paths
 destDir = utils.normalizePath(config.sendDir)
 tempDir = utils.normalizePath(config.tempDir)
@@ -258,16 +267,25 @@ while True:
 
 		try:
 			nomFic = (nomFic + ' ' + string.zfill(compteur,5) + bulletinLib.getExtension(type,origine)).replace(' ','_').replace('__','_')
-			unFichier = os.open( tempDir + nomFic , os.O_CREAT | os.O_WRONLY )
 
-			os.write( unFichier , unBulletin )
-			os.close( unFichier )
-			os.chmod(tempDir + nomFic,0644)
+			if ficCircuits == None or nomFic.find('ERROR') =! -1 :
+				unFichier = os.open( tempDir + nomFic , os.O_CREAT | os.O_WRONLY )
 
-			os.rename( tempDir + nomFic , destDir + nomFic )
+				os.write( unFichier , unBulletin )
+				os.close( unFichier )
+				os.chmod(tempDir + nomFic,0644)
 
-			# Le transfert du fichier est un succes
-			utils.writeLog(log,'Ecriture du fichier <' + destDir + nomFic + '>')	
+				os.rename( tempDir + nomFic , destDir + nomFic )
+
+				# Le transfert du fichier est un succes
+				utils.writeLog(log,'Ecriture du fichier <' + destDir + nomFic + '>')	
+			else:
+				listeNoms = bulletinLib.circuitRename(nomFic,string.join(unBulletin.splitlines()[0].split()[:2],' '),mapCircuits)
+
+				bulletinLib.circuitWriteBulls(unBulletin,listeNoms,tempDir)
+
+				for f in listeNoms:
+					os.rename( tempDir + f , destDir + f )
 
 		except OSError, inst:
 

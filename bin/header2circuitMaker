@@ -89,6 +89,8 @@ def main():
 					else:
 						if config.outputErrs and mapPrincipale[entete]['rename'] != entete2:
 							sys.stderr.write('L\'entete de destination differe! (' + entete + ',fichier ' + nomFic  + ')\n')
+							if mapPrincipale[entete] == entete2:
+								mapPrincipale[entete]['rename'] = entete2
 			else:
 				if config.showIgnoredLines:
 					os.write(ignoredLinesFic,nomFic + ': ' + ligne + '\n')
