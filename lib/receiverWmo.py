@@ -101,6 +101,9 @@ class receiverWmo(gateway.gateway):
            Modification le 25 janvier 2005: getNextBulletins()
            retourne une liste de bulletins.
 
+	   Modification le 7 Fév 2005: Si une corruption est détectée dans les
+           données, la connection se réinitialise. (LP)
+
            Auteur:      Louis-Philippe Thériault
         """
         if self.unSocketManagerWmo.isConnected():
@@ -109,6 +112,10 @@ class receiverWmo(gateway.gateway):
             except socketManager.socketManagerException, e:
                 if e.args[0] == 'la connexion est brisee':
                     self.logger.writeLog(self.logger.ERROR,"Perte de connection, traîtement du reste du buffer")
+                    data, nbBullEnv = self.unSocketManagerWmo.closeProperly()
+                elif e.args[0] == 'corruption dans les données':
+                    self.logger.writeLog(self.logger.ERROR,\
+                       "Corruption détectée dans les données\nContenu du buffer:\n%s" % e.args[2])
                     data, nbBullEnv = self.unSocketManagerWmo.closeProperly()
                 else:
                     raise
