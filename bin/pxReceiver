@@ -153,6 +153,8 @@ logger = None
 if __name__ == '__main__':
     try:
         main()
+    except SystemExit:
+        raise
     except Exception, e:
         if logger != None and e.args != ():
             logger.writeLog(logger.EXCEPTION,"Exception: " + ''.join(traceback.format_exception(Exception,e,sys.exc_traceback)))
