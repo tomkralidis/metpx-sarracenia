@@ -75,6 +75,7 @@ def main():
 	logger.writeLog(logger.INFO, "Début du programme, fichier de config chargé correctement")
         logger.writeLog(logger.DEBUG,"Protocole %s sélectionné", options.type )
 
+
 	# Branchement selon le type de protocole	
 	if options.type == 'am':
 
@@ -96,11 +97,11 @@ def main():
            
            #fetFile.checkClient( options.client, fet.clients, fetFile.filePrio, logger )
            while True:
-               reader = DiskReader(fet.FET_DATA + fet.FET_TX + options.client, options.batch, 
+               reader = DiskReader(fet.FET_DATA + fet.FET_TX + options.client, fet.options.batch, 
                                    True, logger, MultiKeysStringSorter)
                reader.sort()
                if len(reader.sortedFiles) >= 1:
-                   fet.sendFiles(options.client, reader.sortedFiles[:options.batch], logger)
+                   fet.sendFiles(options.client, reader.sortedFiles[:fet.options.batch], logger)
                else:
                    time.sleep(1)
 
