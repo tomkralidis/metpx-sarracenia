@@ -221,51 +221,20 @@ class senderWmo(gateway.gateway):
         self.logger.writeLog(self.logger.DEBUG,"%d nouveaux bulletins sont envoyes",len(data))
 
         for index in range(len(data)):
-          #  try:
-                rawBulletin = data[index]
-                unBulletinWmo = bulletinWmo.bulletinWmo(rawBulletin,self.logger,finalLineSeparator='\r\r\n')
-                succes = self.unSocketManagerWmo.sendBulletin(unBulletinWmo)
-                #si le bulletin a ete envoye correctement, le fichier est efface
-                if succes:
-                    self.logger.writeLog(self.logger.INFO,"sent %s", os.path.basename(self.reader.sortedFiles[index]) )
-                    self.unBulletinManagerWmo.effacerFichier(self.reader.sortedFiles[index])
-                    self.logger.writeLog(self.logger.DEBUG,"senderWmo.write(..): Effacage de " + self.reader.sortedFiles[index])
-                else:
-                    self.logger.writeLog(self.logger.INFO,"%s: probleme d'envoi ", os.path.basename(self.reader.sortedFiles[index]))
-         """
-            except Exception, e:
-                if e==104 or e==110 or e==32 or e==107:
-                    self.logger.writeLog(self.logger.ERROR,"senderWmo.write(): la connexion est rompue: %s",str(e.args))
-                else:
-                    self.logger.writeLog(self.logger.ERROR,"senderWmo.write(): erreur: %s",str(e.args))
-                raise
-         """
-        """
-        self.logger.writeLog(self.logger.DEBUG,"%d nouveaux bulletins sont envoyes",len(data))
-        for key in data:
                 try:
-                        #creation du bulletin wmo
-                        rawBulletin = data[key]
+                        rawBulletin = data[index]
                         unBulletinWmo = bulletinWmo.bulletinWmo(rawBulletin,self.logger,finalLineSeparator='\r\r\n')
-                        #envoi du bulletin wmo
                         succes = self.unSocketManagerWmo.sendBulletin(unBulletinWmo)
-
-                        #si le bulletin a ete envoye correctement, le fichier
-                        #est efface, sinon le bulletin est retire de la liste
-                        #de fichier deja envoyes
+                        #si le bulletin a ete envoye correctement, le fichier est efface
                         if succes:
-                                self.logger.writeLog(self.logger.INFO,"bulletin %s envoye ",key)
-                                self.unBulletinManagerWmo.effacerFichier(key)
-                                self.logger.writeLog(self.logger.DEBUG,"%s est efface",key)
+                                self.logger.writeLog(self.logger.INFO,"sent %s", os.path.basename(self.reader.sortedFiles[index]) )
+                                self.unBulletinManagerWmo.effacerFichier(self.reader.sortedFiles[index])
+                                self.logger.writeLog(self.logger.DEBUG,"senderWmo.write(..): Effacage de " + self.reader.sortedFiles[index])
                         else:
-                                self.logger.writeLog(self.logger.INFO,"bulletin %s: probleme d'envoi ",key)
-                                if self.listeFichiersDejaChoisis.count(key)>0:
-                                        self.listeFichiersDejaChoisis.remove(key)
-
+                                self.logger.writeLog(self.logger.INFO,"%s: probleme d'envoi ", os.path.basename(self.reader.sortedFiles[index]))
                 except Exception, e:
                         if e==104 or e==110 or e==32 or e==107:
                                 self.logger.writeLog(self.logger.ERROR,"senderWmo.write(): la connexion est rompue: %s",str(e.args))
                         else:
                                 self.logger.writeLog(self.logger.ERROR,"senderWmo.write(): erreur: %s",str(e.args))
                         raise
-        """
