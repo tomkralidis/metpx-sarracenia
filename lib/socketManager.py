@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 """Gestionnaire de sockets générique"""
 
-import socket, time, string, sys
+import socket, time, string, sys, traceback
 
 __version__ = '2.0'
 
@@ -141,7 +141,6 @@ class socketManager:
             # En attente de connexion
             self.socket.listen(1)
 
-            self.logger.writeLog(self.logger.INFO,"En attente de connexion (mode listen)")
 
             while True:
                 # Commented by DL (2005-03-30) at the request of AMB
@@ -150,11 +149,22 @@ class socketManager:
                     self.socket.close()
                     raise socketManagerException('timeout dépassé')
                 """
+                self.logger.writeLog(self.logger.INFO,"En attente de connexion (mode listen)")
                 try:
                     conn, self.remoteHost = self.socket.accept()
                     break
                 except TypeError:
                     time.sleep(1)
+                except socket.error:
+                    (type, value, tb) = sys.exc_info()
+                    # Normally, this error is generated when a SIGHUP signal is sent and the system call (socket.accept())
+                    # is interrupted
+                    if value[0] == 4: 
+                       self.logger.writeLog(self.logger.ERROR, "Type: %s, Value: %s" % (type, value))
+                       #self.logger.writeLog(self.logger.ERROR, ''.join(traceback.format_exception(type, value, tb)))
+                    # For case we are not aware at this time, we raise the exception
+                    else:
+                       raise
 
             self.socket.close()
             self.socket = conn
