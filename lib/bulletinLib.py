@@ -103,9 +103,9 @@ def getFormattedSystemTime():
 def initExtension():
 	"""A etre execute une fois au debut du programme, initialise 
 	   l'extension"""
-	return '-TT' in extension.split(':') or '-CCCC' in extension.split(':') or '-CIRCUIT' in extension.split(':')
+	return '-TT' in extension.split(':') or '-CCCC' in extension.split(':')
 
-def getExtension(type='NonImplante',origine='NonImplante',circuits='NonImplante'):
+def getExtension(type='NonImplante',origine='nonImplante'):
 	"""Retourne l'extension appropriee pour le fichier du bulletin courant"""
 	if not extensionDynamique:
 		return extension
@@ -117,9 +117,6 @@ def getExtension(type='NonImplante',origine='NonImplante',circuits='NonImplante'
 
 		if '-CCCC' in params:
 			params[params.index('-CCCC')] = origine
-
-		if '-CIRCUIT' in params:
-			params[params.index('-CIRCUIT')] = circuits
 
 		return string.join(params,':')
 
@@ -245,10 +242,10 @@ def doWmoTraitementSpecifique(bulletin):
 	"""Effectue des modifications sur les bulletins dans le but
 	   d'avoir les memes resultats que sur le tandem."""
 
-	if bulletin[:4] in ['SRCN','SXVX','SXWA','SXXX']:
+	if bulletin[:4] in ['SDUS','WSUS','SRCN','SRMN','SRND','SRWA','SRMT','SXAA','SXCN','SXVX','SXWA','SXXX','FOCN','WAUS']:
 		bulletin = bulletin.replace('\n\x1e','\n')
 
-	if bulletin[:4] in ['SRCN','SRMN','SRND','SRWA','SRMT','SRUS','SXVX','SXWA']:
+	if bulletin[:4] in ['SRCN','SRMN','SRND','SRWA','SRMT','SXCN','SRUS','SXVX','SXWA']:
 		bulletin = bulletin.replace('~','\n')
 
 	if bulletin[-1] != '\n':
@@ -257,7 +254,32 @@ def doWmoTraitementSpecifique(bulletin):
 	if bulletin[:4] in ['SRUS']:
 		bulletin = bulletin.replace('\t','')
 
-	if bulletin[:2] in ['SA']:
-		bulletin = bulletin.replace('\r','')
+        if bulletin[:4] in ['WWST']:
+                bulletin = bulletin.replace('\xba','')
+
+        if bulletin[:4] in ['USXX']:
+                bulletin = bulletin.replace('\x18','')
+
+        if bulletin[:4] in ['SRUS']:
+                bulletin = bulletin.replace('\x1a','')
+
+        if bulletin[:4] in ['SRMT']:
+                bulletin = bulletin.replace('\x12','')
+
+        if bulletin[:4] in ['SXUS','SXCN']:
+                bulletin = bulletin.replace('\x7f','?')
+
+        if bulletin[:4] in ['SXVX','SRUS']:
+                bulletin = bulletin.replace('\x7f','')
+
+	bulletin = bulletin.replace('\r','')
+
+	if bulletin[:2] in ['SA','SM']:
+                bulletin = bulletin.replace('\x03\n','')
+
+	if bulletin[-2:] == '\n\n':
+		bulletin = bulletin[:-1]
 
 	return bulletin
+
+
