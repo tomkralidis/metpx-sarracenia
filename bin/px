@@ -18,36 +18,36 @@ sys.path.insert(1,sys.path[0] + '/../lib/importedLibs')
 import fet
 
 def startThem(dir,name,cmd):
-  """
-  sleep A and sleep B sont la pour regler un probleme de synchronisation qui 
-  survient lors du startupDB a un moment ou le rep. de la journee 
-  n'est pas present. Il vont disparaitre lors de la reorg.
-  """
-  counter = 0
-  for cfname in os.listdir( dir ):
-    if cfname[-5:] != '.conf':
-      continue
+    """
+    sleep A and sleep B sont la pour regler un probleme de synchronisation qui
+    survient lors du startupDB a un moment ou le rep. de la journee
+    n'est pas present. Il vont disparaitre lors de la reorg.
+    """
+    counter = 0
+    for cfname in os.listdir( dir ):
+        if cfname[-5:] != '.conf':
+            continue
 
-    id = cfname[:-5]
-    counter += 1
-    if os.fork() == 0:
-      if counter == 2:
-        time.sleep(0.1)  # sleep A
-      os.execl( sys.path[0] + '/' + name , name, id, cmd )
+        id = cfname[:-5]
+        counter += 1
+        if os.fork() == 0:
+            if counter == 2:
+                time.sleep(0.1)  # sleep A
+            os.execl( sys.path[0] + '/' + name , name, id, cmd )
 
 def start(cmd):
-  startThem( fet.FET_ETC + 'rx/', 'pxReceiver', cmd)
-  time.sleep(0.1) # sleep B
-  startThem( fet.FET_ETC + 'tx/', 'pxSender', cmd)
-  time.sleep(2)   # sleep C
+    startThem( fet.FET_ETC + 'rx/', 'pxReceiver', cmd)
+    time.sleep(0.1) # sleep B
+    startThem( fet.FET_ETC + 'tx/', 'pxSender', cmd)
+    time.sleep(2)   # sleep C
 
 if os.getuid() == 0:
-  print "FATAL: Do not start as root. It will be a mess."
-  sys.exit(2)
+    print "FATAL: Do not start as root. It will be a mess."
+    sys.exit(2)
 
 if len(sys.argv) < 2:
-  print "USAGE: px (start|stop|restart|status) "
-  sys.exit(1)
+    print "USAGE: px (start|stop|restart|status) "
+    sys.exit(1)
 
 start(sys.argv[1])
 sys.exit(0)

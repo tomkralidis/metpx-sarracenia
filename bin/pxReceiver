@@ -2,11 +2,11 @@
 # -*- coding: UTF-8 -*-
 #! /usr/bin/env python2
 # -----------------------------------------------------
-# Définition globale pour le traîtement effectué par un 
+# Définition globale pour le traîtement effectué par un
 # Receiver (socket2file).
 #
-# Auteur:	Louis-Philippe Thériault
-# Date:		Octobre 2004
+# Auteur:       Louis-Philippe Thériault
+# Date:         Octobre 2004
 
 import sys, signal, traceback
 
@@ -23,125 +23,125 @@ from PXIgniter import PXIgniter
 
 # Définition de la méthode de shutdown "propre"
 def shutdown(sig,stack):
-  global unGateway
-  global logger
-  global isShutdowning
+    global unGateway
+    global logger
+    global isShutdowning
 
-  logger.writeLog(logger.DEBUG,"Reception d'un signal (signal=%d)",sig)
+    logger.writeLog(logger.DEBUG,"Reception d'un signal (signal=%d)",sig)
 
-  if not isShutdowning:
-    # Pour que le shutdown ne se fasse q'une fois
-    isShutdowning = True
-    logger.writeLog(logger.INFO,"Fermeture du programme (signal=%d)",sig)
-    unGateway.shutdown()
-    fet.lockStopOrDie( fet.FET_DATA + fet.FET_RX + fet.options.source + '/.lock' , 'stop' )
-    sys.exit()
+    if not isShutdowning:
+        # Pour que le shutdown ne se fasse q'une fois
+        isShutdowning = True
+        logger.writeLog(logger.INFO,"Fermeture du programme (signal=%d)",sig)
+        unGateway.shutdown()
+        fet.lockStopOrDie( fet.FET_DATA + fet.FET_RX + fet.options.source + '/.lock' , 'stop' )
+        sys.exit()
 
 # Définition de la méthode de reload de config via SIGHUP
 def reloadConfig(sig,stack):
-   global unGateway
-   global logger
-   global options
+    global unGateway
+    global logger
+    global options
 
-   logger.writeLog(logger.DEBUG,"Reception d'un signal (signal=%d)",sig)
-   if fet.options.source:
-      fet.startup(fet.options,logger)
-      if (fet.options.type=='wmo') or (fet.options.type=='am'):
-         unGateway.initMapEntete('/dev/null')
-         unGateway.bulletinManager.initMapCircuit(unGateway,'/dev/null')
-   else:
-      unGateway.reloadConfig()
+    logger.writeLog(logger.DEBUG,"Reception d'un signal (signal=%d)",sig)
+    if fet.options.source:
+        fet.startup(fet.options,logger)
+        if (fet.options.type=='wmo') or (fet.options.type=='am'):
+            unGateway.initMapEntete('/dev/null')
+            unGateway.bulletinManager.initMapCircuit(unGateway,'/dev/null')
+    else:
+        unGateway.reloadConfig()
 
 def main():
-	global logger
-	global unGateway
+    global logger
+    global unGateway
 
-        direction = "receiver"
+    direction = "receiver"
 
-	# Message d'usage pour le option parser
-	usage =  "%prog <source> (start|stop|restart|status)\n" \
-	         "       Un receiver reçoit les bulletins par une connection réseau.\n"
+    # Message d'usage pour le option parser
+    usage =  "%prog <source> (start|stop|restart|status)\n" \
+             "       Un receiver reçoit les bulletins par une connection réseau.\n"
 
-	if os.getuid() == 0:
-	   print "FATAL: Do not start as root. It will be a mess."
-	   sys.exit(2)
+    if os.getuid() == 0:
+        print "FATAL: Do not start as root. It will be a mess."
+        sys.exit(2)
 
-	# Instanciation du option parser
-	parser = OptionParser(usage)
-        fet.addStandardOptions(parser)
+    # Instanciation du option parser
+    parser = OptionParser(usage)
+    fet.addStandardOptions(parser)
 
-	options,args = parser.parse_args()
+    options,args = parser.parse_args()
 
-	# Un seul argument doit être fourni
-	if len(args) > 2:
-		parser.error("trop d'arguments fournis")
-	elif len(args) == 0:
-		parser.error("aucun source fourni")
-	
-	# Chargement de la config pour savoir le type de protocole et le path du log
+    # Un seul argument doit être fourni
+    if len(args) > 2:
+        parser.error("trop d'arguments fournis")
+    elif len(args) == 0:
+        parser.error("aucun source fourni")
 
-	if args[0] == 'collector':
-	   	options.type='collector'
-		options.collector=True
-		options.source=None
-		options.client=None
-	else:
-		options.type='unknown'
-		options.source = args[0]
-		options.collector=False
+    # Chargement de la config pour savoir le type de protocole et le path du log
 
-        options.cmd = args[1]
+    if args[0] == 'collector':
+        options.type='collector'
+        options.collector=True
+        options.source=None
+        options.client=None
+    else:
+        options.type='unknown'
+        options.source = args[0]
+        options.collector=False
 
-        # FIXME: Vérifier que typeProtocole est défini et le fichier de log
+    options.cmd = args[1]
 
-	# Init du log
-        logger = log.log(options.dataDir + '/log/rx_' + args[0] + '.log',
-		debug=options.debug )
+    # FIXME: Vérifier que typeProtocole est défini et le fichier de log
 
-        fet.startup(options,logger)
+    # Init du log
+    logger = log.log(options.dataDir + '/log/rx_' + args[0] + '.log',
+            debug=options.debug )
 
-	if options.type != 'collector':
-            options.type= fet.sources[options.source]['type']
+    fet.startup(options,logger)
 
-        #fet.lockStopOrDie( fet.FET_DATA + fet.FET_RX + args[0] + '/.lock' , options.cmd )
-        lockPath = fet.FET_DATA + fet.FET_RX + args[0]
-        igniter = PXIgniter(direction, options.type, options.source, options.cmd, lockPath)
+    if options.type != 'collector':
+        options.type= fet.sources[options.source]['type']
+
+    #fet.lockStopOrDie( fet.FET_DATA + fet.FET_RX + args[0] + '/.lock' , options.cmd )
+    lockPath = fet.FET_DATA + fet.FET_RX + args[0]
+    igniter = PXIgniter(direction, options.type, options.source, options.cmd, lockPath)
 
 
-	logger.writeLog(logger.INFO, "Début du programme, fichier de config chargé correctement")
-        logger.writeLog(logger.DEBUG,"Protocole %s sélectionné", options.type )
+    logger.writeLog(logger.INFO, "Début du programme, fichier de config chargé correctement")
+    logger.writeLog(logger.DEBUG,"Protocole %s sélectionné", options.type )
 
-	# Branchement selon le type de protocole	
-	if options.type == 'am':
+    # Branchement selon le type de protocole
+    if options.type == 'am':
 
-		import receiverAm
-		unGateway = receiverAm.receiverAm('/dev/null',options,logger)
-	
-	elif options.type == 'wmo':
-	
-		import receiverWmo
-		unGateway = receiverWmo.receiverWmo('/dev/null',options,logger)
-	
-	elif options.type == 'single-file':
-		import fetFile
-		fetFile.checkSource( options.source, fet.sources, logger )
+        import receiverAm
+        unGateway = receiverAm.receiverAm('/dev/null',options,logger)
 
-	elif options.type == 'bulletin-file':
-		import bulletinFileReceiver
-		bulletinFileReceiver.run(logger)
+    elif options.type == 'wmo':
 
-	elif options.type == 'collector':
-        	import collectionGateway
-        	unGateway = collectionGateway.collectionGateway(
-			'/dev/null', options, logger)
+        import receiverWmo
+        unGateway = receiverWmo.receiverWmo('/dev/null',options,logger)
 
-	else:
-		raise Exception('Type de protocole non reconnu')	# FIXME
+    elif options.type == 'single-file':
+        import fetFile
+        fetFile.checkSource( options.source, fet.sources, logger )
 
-	unGateway.run()
+    elif options.type == 'bulletin-file':
+        import bulletinFileReceiver
+        bulletinFileReceiver.run(logger)
+
+    elif options.type == 'collector':
+        import collectionGateway
+        unGateway = collectionGateway.collectionGateway(
+                '/dev/null', options, logger)
+
+    else:
+        raise Exception('Type de protocole non reconnu')        # FIXME
+
+    unGateway.run()
 
 global logger
-global isShutdowning 
+global isShutdowning
 global unGateway
 
 isShutdowning = False
@@ -149,10 +149,9 @@ logger = None
 
 
 if __name__ == '__main__':
-	try:
-		main()
-	except Exception, e:
-		if logger != None and e.args != ():
-			logger.writeLog(logger.EXCEPTION,"Exception: " + ''.join(traceback.format_exception(Exception,e,sys.exc_traceback)))
-		raise
-
+    try:
+        main()
+    except Exception, e:
+        if logger != None and e.args != ():
+            logger.writeLog(logger.EXCEPTION,"Exception: " + ''.join(traceback.format_exception(Exception,e,sys.exc_traceback)))
+        raise

@@ -2,12 +2,12 @@
 # -*- coding: UTF-8 -*-
 #! /usr/bin/env python2
 # -----------------------------------------------------
-# Définition globale pour le traîtement effectué par un 
+# Définition globale pour le traîtement effectué par un
 # sender (file2socket).
 #
-# Auteur:	Louis-Philippe Thériault
+# Auteur:       Louis-Philippe Thériault
 # Modifications: Pierre Michaud
-# Date:		Octobre 2004
+# Date:         Octobre 2004
 
 import sys, signal
 
@@ -24,107 +24,107 @@ import fet
 import os.path
 
 def main():
-	global logger
-	global unGateway
+    global logger
+    global unGateway
 
-        if os.geteuid() == 0:
-           print "FATAL: Do not start as root. It will be a mess."
-	   sys.exit(2)
+    if os.geteuid() == 0:
+        print "FATAL: Do not start as root. It will be a mess."
+        sys.exit(2)
 
-        direction = "sender"
-        
-	# Message d'usage pour l' option parser
-	usage =  "%prog <client> (start|stop|restart|status)\n" \
-		 "	 Un sender lit les bulletins dans un repertoire du disque et les\n" \
-		 "	 envoie a un destinataire.  de\n" 
+    direction = "sender"
 
-	# Instanciation de l'option parser
-	parser = OptionParser(usage)
-        fet.addStandardOptions(parser)
+    # Message d'usage pour l' option parser
+    usage =  "%prog <client> (start|stop|restart|status)\n" \
+             "       Un sender lit les bulletins dans un repertoire du disque et les\n" \
+             "       envoie a un destinataire.  de\n"
 
-	options,args = parser.parse_args()
-	
-	# Un seul argument doit être fourni
-	if len(args) > 2:
-		parser.error("trop d'arguments fournis")
-	elif len(args) == 0:
-  	        parser.error("aucun client fourni")
-	
-        options.client = args[0]
-	options.cmd    = args[1]
+    # Instanciation de l'option parser
+    parser = OptionParser(usage)
+    fet.addStandardOptions(parser)
 
-        # FIXME: Vérifier que typeProtocole est défini et le fichier de log
+    options,args = parser.parse_args()
 
+    # Un seul argument doit être fourni
+    if len(args) > 2:
+        parser.error("trop d'arguments fournis")
+    elif len(args) == 0:
+        parser.error("aucun client fourni")
 
-	# Init du log
+    options.client = args[0]
+    options.cmd    = args[1]
 
-	#FIXME: want to log fet.startup messages, will leave chicken dropping
-	#       files when invalid clients are entered.
-	logger = log.log(options.dataDir + '/log/tx_' + options.client + '.log', options.debug )
-
-        fet.startup(options,logger)
-	if options.client not in fet.clients.keys():
-	      logger.writeLog(logger.FATAL, "fin anormale, client invalide.")
-	      print "fin anormale: client invalide."
-	      sys.exit(1)
-
-        #fet.lockStopOrDie(fet.FET_DATA + fet.FET_TX + options.client + '/.lock' , options.cmd )
-        lockPath = fet.FET_DATA + fet.FET_TX + args[0]
-        igniter = PXIgniter(direction, options.type, options.client, options.cmd, lockPath)
-
-	logger.writeLog(logger.INFO, "Début du programme, fichier de config chargé correctement")
-        logger.writeLog(logger.DEBUG,"Protocole %s sélectionné", options.type )
+    # FIXME: Vérifier que typeProtocole est défini et le fichier de log
 
 
-	# Branchement selon le type de protocole	
-	if options.type == 'am':
+    # Init du log
 
-	   import senderAm
-	   unGateway = senderAm.senderAm('/dev/null',options,logger)
-	
-	elif options.type == 'wmo':
-	
-	   import senderWmo
-	   unGateway = senderWmo.senderWmo('/dev/null',options,logger)
+    #FIXME: want to log fet.startup messages, will leave chicken dropping
+    #       files when invalid clients are entered.
+    logger = log.log(options.dataDir + '/log/tx_' + options.client + '.log', options.debug )
 
-	elif options.type == 'amis':
+    fet.startup(options,logger)
+    if options.client not in fet.clients.keys():
+        logger.writeLog(logger.FATAL, "fin anormale, client invalide.")
+        print "fin anormale: client invalide."
+        sys.exit(1)
 
-	   import senderAMIS
-	   unGateway = senderAMIS.senderAMIS('/dev/null',options,logger)
+    #fet.lockStopOrDie(fet.FET_DATA + fet.FET_TX + options.client + '/.lock' , options.cmd )
+    lockPath = fet.FET_DATA + fet.FET_TX + args[0]
+    igniter = PXIgniter(direction, options.type, options.client, options.cmd, lockPath)
 
-	elif options.type == 'single-file':
-	   import fetFile
-           
-           #fetFile.checkClient( options.client, fet.clients, fetFile.filePrio, logger )
-           while True:
-               reader = DiskReader(fet.FET_DATA + fet.FET_TX + options.client, fet.options.batch, 
-                                   True, logger, MultiKeysStringSorter)
-               reader.sort()
-               if len(reader.sortedFiles) >= 1:
-                   sortedFiles = reader.sortedFiles[:fet.options.batch]
-                   logger.writeLog(logger.INFO, "%d bulletins will be sent" % len(sortedFiles))
-                   fetFile.sendFiles(options.client, reader.sortedFiles[:fet.options.batch], logger)
-               else:
-                   time.sleep(1)
+    logger.writeLog(logger.INFO, "Début du programme, fichier de config chargé correctement")
+    logger.writeLog(logger.DEBUG,"Protocole %s sélectionné", options.type )
 
-	else:
-	   raise Exception('Type de protocole non reconnu')	
 
-	# Définition de la méthode de shutdown "propre"
-	def shutdown(sig,stack):
-		global unGateway
-		global logger
+    # Branchement selon le type de protocole
+    if options.type == 'am':
 
-		logger.writeLog(logger.INFO,"Fermeture du programme (signal=%d)",sig)
-		
-		unGateway.shutdown()
-		sys.exit(-1)
-	
-	# Assignement des signaux avec le shutdown
-	#signal.signal(signal.SIGTERM,shutdown)
-	#signal.signal(signal.SIGINT,shutdown)
+        import senderAm
+        unGateway = senderAm.senderAm('/dev/null',options,logger)
 
-	unGateway.run()
+    elif options.type == 'wmo':
+
+        import senderWmo
+        unGateway = senderWmo.senderWmo('/dev/null',options,logger)
+
+    elif options.type == 'amis':
+
+        import senderAMIS
+        unGateway = senderAMIS.senderAMIS('/dev/null',options,logger)
+
+    elif options.type == 'single-file':
+        import fetFile
+
+        #fetFile.checkClient( options.client, fet.clients, fetFile.filePrio, logger )
+        while True:
+            reader = DiskReader(fet.FET_DATA + fet.FET_TX + options.client, fet.options.batch,
+                                True, logger, MultiKeysStringSorter)
+            reader.sort()
+            if len(reader.sortedFiles) >= 1:
+                sortedFiles = reader.sortedFiles[:fet.options.batch]
+                logger.writeLog(logger.INFO, "%d bulletins will be sent" % len(sortedFiles))
+                fetFile.sendFiles(options.client, reader.sortedFiles[:fet.options.batch], logger)
+            else:
+                time.sleep(1)
+
+    else:
+        raise Exception('Type de protocole non reconnu')
+
+    # Définition de la méthode de shutdown "propre"
+    def shutdown(sig,stack):
+        global unGateway
+        global logger
+
+        logger.writeLog(logger.INFO,"Fermeture du programme (signal=%d)",sig)
+
+        unGateway.shutdown()
+        sys.exit(-1)
+
+    # Assignement des signaux avec le shutdown
+    #signal.signal(signal.SIGTERM,shutdown)
+    #signal.signal(signal.SIGINT,shutdown)
+
+    unGateway.run()
 
 if __name__ == '__main__':
-	main()
+    main()
