@@ -54,7 +54,7 @@ class DiskReader:
         FIXME: The regex should be passed otherwise!  config file?
 
         """
-        self.regex = re.compile(r'^.*:.*:.*:.*:(\d)*:.*:(\d{14})$')  # Regex used to validate filenames
+        self.regex = re.compile(r'^.*?:.*?:.*?:.*?:.*?:(\d).*?:(\d{14})$')  # Regex used to validate filenames
         self.path = path                    # Path from where we ingest filenames
         self.validation = validation        # Name Validation active (True or False)
         self.logger = logger                # Use to log information
@@ -71,10 +71,10 @@ class DiskReader:
         basename = os.path.basename(filename)
         match = self.regex.search(basename)
         if match:
-            #print match.group(2), match.group(1)
+            print match.group(2), match.group(1)
             return True
         else:
-            #print "Don't match: " + basename
+            print "Don't match: " + basename
             return False
 
     def _getFilesList(self):
@@ -88,7 +88,8 @@ class DiskReader:
         files = []
         for file in dirIterator:
             if not os.path.isdir(file):
-                if os.path.basename(file)[0] == '.':
+                basename = os.path.basename(file)
+                if basename[0] == '.' or basename[-4:] == ".tmp" or not os.access(file, os.R_OK):
                     continue
                 if self.validation:
                     if self._validateName(file):
