@@ -36,6 +36,7 @@ ficTmpDir1 = tempDir+'dir1_fichier'
 ficTmpDir2 = tempDir+'dir2_fichier'
 diffFilePath = config.diffResultFile
 incorrectDir = utils.normalizePath(config.incorrectDir)
+fichierRet = config.fichierRet
 
 # Init du log
 try:
@@ -111,7 +112,7 @@ def catSortWriteFichiers(dir,listeFics, dest):
 	le repertoire temporaire"""
 	f = ''
 	for fic in listeFics:
-		f = f + dir + fic + ' '
+		f = f + dir + fic + ' ' + fichierRet + ' '
 
 	commands.getoutput('cat ' + f + ' | sort > ' + dest)
 
