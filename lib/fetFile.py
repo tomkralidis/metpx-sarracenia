@@ -160,7 +160,6 @@ def sendFiles(c, files,logger):
     ftphost=''
     ftpdir=''
     for p in files:
-        print p
         f = p[p.rfind('/')+1:]
         m = fet.clientMatch(c,f)
 	if not m:
