@@ -175,7 +175,8 @@ def sendFiles(c, files,logger):
                     os.unlink( p )
                     logger.writeLog( logger.INFO, "fichier " + os.path.basename(f) + " livré à " + there )
                 except:
-                    logger.writeLog( logger.ERROR, "pas capable d'ecrire" + there + ": " + repr(sys.exc_info()[0]) )
+                    (type, value, tb) = sys.exc_info()
+                    logger.writeLog( logger.ERROR, "pas capable d'ecrire" + there + ": " + "type: %s, value: %s" % (type, value))
                     time.sleep(10)  # relax, buy a cherry blossom, don't be shy.
                     return #FIXME: no point to continue looping...
 
@@ -216,7 +217,8 @@ def sendFiles(c, files,logger):
                     logger.writeLog( logger.INFO, "fichier " + os.path.basename(f) + " livré à "  + \
                       proto + ":" + hspec + " " + dspec + " " + dfn )
                 except:
-                    logger.writeLog( logger.ERROR, "pas capable d'écrire le fichier " + os.path.basename(p) + " à "  + proto + ":" + hspec + " " + dspec + " " + dfn + ": " + repr(sys.exc_info()[0]) )
+                    (type, value, tb) = sys.exc_info()
+                    logger.writeLog( logger.ERROR, "pas capable d'écrire le fichier " + os.path.basename(p) + " à "  + proto + ":" + hspec + " " + dspec + " " + dfn + ": " + "type: %s, value: %s" % (type, value))
                     ftp.quit()
                     time.sleep(10) # see cherry blossom above.
                     return 
