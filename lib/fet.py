@@ -645,6 +645,10 @@ def directIngest(ingestname,clist,lfn,logger):
     if len (clist) < 1:
         return 1
 
+    # Problem bulletins are databased, but not sent to clients
+    if not (ingestname.find("PROBLEM_BULLETIN") == -1):
+       return 1
+    
     for c in clist:
         cname=clientQDirName(c, ingestname)
         linkFile(dbn , cname + ingestname)
