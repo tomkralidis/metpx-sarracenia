@@ -59,7 +59,7 @@ def main():
         direction = "receiver"
 
 	# Message d'usage pour le option parser
-	usage =  "%prog <source> (start|stop|restart)\n" \
+	usage =  "%prog <source> (start|stop|restart|status)\n" \
 	         "       Un receiver reçoit les bulletins par une connection réseau.\n"
 
 	if os.getuid() == 0:

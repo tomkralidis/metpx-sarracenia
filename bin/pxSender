@@ -32,7 +32,7 @@ def main():
         direction = "sender"
         
 	# Message d'usage pour l' option parser
-	usage =  "%prog <client> (start|stop|restart)\n" \
+	usage =  "%prog <client> (start|stop|restart|status)\n" \
 		 "	 Un sender lit les bulletins dans un repertoire du disque et les\n" \
 		 "	 envoie a un destinataire.  de\n" 
 
