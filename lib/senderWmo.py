@@ -167,6 +167,7 @@ class senderWmo(gateway.gateway):
         """
         self.reader = DiskReader(
                  fet.FET_DATA + fet.FET_TX + self.options.client,
+                 fet.clients[self.options.client][5],
                  True,
                  self.logger,
                  eval(fet.clients[self.options.client][4]) )

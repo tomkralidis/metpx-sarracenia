@@ -165,6 +165,7 @@ class senderAm(gateway.gateway):
         """
         self.reader = DiskReader(
                  fet.FET_DATA + fet.FET_TX + self.options.client,
+                 fet.clients[self.options.client][5],
                  True, # name validation
                  self.logger,
                  eval(self.options.sorter))

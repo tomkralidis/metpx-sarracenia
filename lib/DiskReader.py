@@ -11,7 +11,7 @@
 #############################################################################################
 
 """
-import os, re, commands
+import os, os.path, re, commands
 from MultiKeysStringSorter import MultiKeysStringSorter
 
 class _DirIterator(object):
@@ -44,7 +44,7 @@ class _DirIterator(object):
 
 class DiskReader:
 
-    def __init__(self, path, validation=False, logger=None, sorterClass=None):
+    def __init__(self, path, batch=20000, validation=False, logger=None, sorterClass=None):
         """
         Set the root path and the sorter class used for sorting
 
@@ -58,6 +58,7 @@ class DiskReader:
         self.path = path                    # Path from where we ingest filenames
         self.validation = validation        # Name Validation active (True or False)
         self.logger = logger                # Use to log information
+        self.batch = batch                  # Maximum number of files that we are interested to sort
         self.files = self._getFilesList()   # List of filenames under the path
         self.sortedFiles = []               # Sorted filenames
         self.data = []                      # Content of x filenames (x is set in getFilesContent())
@@ -78,13 +79,29 @@ class DiskReader:
             return False
 
     def _getFilesList(self):
+
+        priorities = ['1', '2', '3', '4', '5']
+        files = []
+        start = 0
+
+        for priority in priorities:
+            start = len(files)
+            if start < self.batch:
+               path = self.path + '/' + priority
+               if os.path.exists(path):
+                  files += self._getFilesListForOneBranch(path, self.batch - start)
+        return files
+
+    def _getFilesListForOneBranch(self, path, batch):
         """
         Set and return a list of all the filenames (not directories) contained in root directory (path) and
         all the subdirectories under it. A validation is done (if self.validation is True) on the names.
-        If a filename is not valid, the file is unlinked and a log entry is added to the log.
+        If a filename is not valid, the file is unlinked and a log entry is added to the log. Batch is the
+        maximum number of files that can be returned.
+
         FIXME: Add try/except for unlink
         """
-        dirIterator = _DirIterator(self.path, True)
+        dirIterator = _DirIterator(path, True)
         files = []
         for file in dirIterator:
             if not os.path.isdir(file):
@@ -96,12 +113,16 @@ class DiskReader:
                     continue
                 elif self.validation:
                     if self._validateName(file):
+                        if len(files) >= batch:
+                            break
                         files.append(file)
                     else:
                         os.unlink(file)
                         if self.logger is not None:
                             self.logger.writeLog(self.logger.INFO, "Filename incorrect: " + file + " has been unlinked!")
                 else:
+                    if len(files) >= batch:
+                        break
                     files.append(file)
         return files
     
@@ -154,10 +175,16 @@ if __name__ == "__main__":
 
     (status, output) = commands.getstatusoutput("date")
     print output
-    reader = DiskReader("/home/ib/dads/dan/progProj/pds-nccs/bulletins", validation=True, sorterClass=MultiKeysStringSorter)
+    #reader = DiskReader("/home/ib/dads/dan/progProj/pds-nccs/bulletins", validation=True, sorterClass=MultiKeysStringSorter)
+    reader = DiskReader("/apps/px/bulletins", 41, validation=True, sorterClass=MultiKeysStringSorter)
     (status, output) = commands.getstatusoutput("date")
     print output
-    #print reader.files
+    for file in  reader.files:
+       print file
     reader.sort()
+    print "************************************ Sorted files *******************************************"
+    for file in  reader.sortedFiles:
+       print file
+
     (status, output) = commands.getstatusoutput("date")
     print output

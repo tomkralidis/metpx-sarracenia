@@ -2,7 +2,8 @@ import sys, string, random
 
 #root = "/apps/pds/tools/ColumboNCCS/testfiles1/"
 #root = "/home/ib/dads/dan/progProj/pds-nccs/bulletins/tata/"
-root = "/apps/px/txq/dummy/"
+#root = "/apps/px/txq/dummy/"
+root = '/apps/px/bulletins/2/'
 numFiles = sys.argv[1]
 size = sys.argv[2]
 letters = list(string.letters)
