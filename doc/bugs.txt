@@ -29,4 +29,8 @@ Reporte     Corrige     Description
                         devrait etre captee et ignoree.
 
 
+17/03/05                Crash du Receiver.  Error "No such file
+			or directory".  Voir detail dans le 
+			courriel.
+
 
