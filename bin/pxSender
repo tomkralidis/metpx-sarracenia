@@ -16,7 +16,7 @@ sys.path.append(sys.path[0] + '/../etc')
 sys.path.append(sys.path[0] + '/../lib/importedLibs')
 
 from MultiKeysStringSorter import MultiKeysStringSorter
-from DiskReader impor DiskReader
+from DiskReader import DiskReader
 from optparse import OptionParser
 from PXIgniter import PXIgniter
 import gateway, log, time
@@ -97,7 +97,7 @@ def main():
            #fetFile.checkClient( options.client, fet.clients, fetFile.filePrio, logger )
            while True:
                reader = DiskReader(fet.FET_DATA + fet.FET_TX + options.client, options.batch, 
-                                   validation=True, logger, MultiKeysStringSorter)
+                                   True, logger, MultiKeysStringSorter)
                reader.sort()
                if len(reader.sortedFiles) >= 1:
                    fet.sendFiles(options.client, reader.sortedFiles[:options.batch], logger)
