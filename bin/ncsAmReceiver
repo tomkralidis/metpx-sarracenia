@@ -269,7 +269,7 @@ while True:
 		circuits = 'FichierDeCircuitAbsent'
 		if ficCircuits != None:
 			if mapCircuits.has_key( ' '.join(unBulletin.splitlines()[0].split(' ')[:2]) ):
-				circuits = '.'.join(mapCircuits[' '.join(unBulletin.splitlines()[0].split(' ')[:2]])
+				circuits = '.'.join(mapCircuits[' '.join(unBulletin.splitlines()[0].split(' ')[:2])]['routing_groups'])
 			else:
 				circuits = 'EnteteIntrouvable'
 
