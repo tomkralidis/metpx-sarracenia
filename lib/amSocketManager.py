@@ -101,5 +101,8 @@ class amSock(asyncore.dispatcher):
 		except socket.error, inst:
 			if inst.args[0] == 11:
 				time.sleep(1)
+                        elif inst.args[0] == 104:
+                                self.socket.close()
+                                raise Exception('uDef','La connection est brisee')
 			else:
 				raise
