@@ -10,6 +10,7 @@ import sys
 import os
 import commands
 import time
+import imp
 
 def sendmail(to, msg, subject='(Aucun sujet)',header='',footer=''):
 	"""Envoie un mail en utilisant la commande sendmail.
@@ -215,10 +216,9 @@ def listSubstract( list1 , list2 ):
 
 	return list1copie
 
-def loadPythonConfigFile(path):
+def loadPythonConfigFile(pathCfg=sys.argv[min(1,len(sys.argv)-1)]):
         """Lecture du fichier de configuration du programme"""
-        if len(sys.argv) == 2:
-                pathCfg = sys.argv[1]
+        if len(sys.argv) >= 2:
 
                 try:
                         fic_cfg = open(pathCfg,'r')

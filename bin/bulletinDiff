@@ -1,0 +1,131 @@
+#! /usr/bin/env python2
+############################################################
+#
+# Par: Louis-Philippe Theriault
+#      Stagiaire, CMC
+#
+############################################################
+
+import commands
+import os
+import sys
+import time
+import string
+
+sys.path.append(sys.path[0] + '/../lib')
+sys.path.append(sys.path[0] + '/../etc')
+import utils
+import bulletinLib
+import imp
+
+# Chargement du fichier de config
+if len(sys.argv) >= 2:
+	config = utils.loadPythonConfigFile()
+else:
+	print "*** Erreur : Pas d'argument en entrée !!"
+
+# Copie des arguments
+sep = config.separateur
+compareFics = config.compareFics
+nbPref = config.nbPrefixesIdentiques
+workDir1 = utils.normalizePath(config.dir1)
+workDir2 = utils.normalizePath(config.dir2)
+delai = config.delai
+tempDir = utils.normalizePath(config.tempDir)
+ficTmpDir1 = tempDir+'dir1_fichier'
+ficTmpDir2 = tempDir+'dir2_fichier'
+diffFilePath = config.diffResultFile
+
+# Init du log
+try:
+        log = utils.initLog(config.primaryLog,config.backupLog)
+	diffFile = utils.initLog(diffFilePath)
+except Exception, inst:
+        print "*** Erreur: Creation du log impossible !\n" + str(inst)
+        sys.exit(-1)
+
+# Test d'existence des arguments
+
+def compareFileName(n1,n2):
+        """Compare les noms de fichiers"""
+        n1 = n1.split(sep)[:nbPref]
+        n2 = n2.split(sep)[:nbPref]
+
+        if n1 == n2: return 0
+        elif n1 > n2: return 1
+        else: return -1
+
+def getLesDerniersFichiers(dir1,dir2):
+	"""Retourne une liste de tuples de liste de fichiers (!) 
+	qui seraient associés pour la comparaison"""
+	ficDir1 = os.listdir(dir1)
+	ficDir2 = os.listdir(dir2)
+
+	ficDir1.sort()
+	ficDir2.sort()
+
+	lesFichiers = []
+	lDir1 = []
+	lDir2 = []
+
+	fPrecedent = 'A' + sep + 'B' + sep + 'C' + sep + 'D'
+
+	while len(ficDir1) and len(ficDir2):
+		
+		res = compareFileName(ficDir1[0],ficDir2[0])
+
+		if res == 0:
+			f1 = ficDir1.pop(0)
+			f2 = ficDir2.pop(0)
+
+			if not compareFileName(fPrecedent,f1) == 0 and lDir1 != []:
+			# Les nouveau fichiers sont pas les memes
+				lesFichiers.append( (lDir1,lDir2) )
+				lDir1 = list()
+				lDir2 = list()
+
+			lDir1.append(f1)
+			lDir2.append(f2)
+			fPrecedent = f1
+
+		elif res == -1:
+			# Le nombre de fichiers est différent dans les 2 repertoires
+			ficDir1.pop(0)
+		else:
+			ficDir2.pop(0)
+
+	if lDir1 != []:
+		lesFichiers.append( (lDir1,lDir2) )
+
+	return lesFichiers
+			
+def catSortWriteFichiers(dir,listeFics, dest):
+	"""Recoit une liste de fichiers et les cat/sort et l'ecrit dans
+	le repertoire temporaire"""
+	f = ''
+	for fic in listeFics:
+		f = f + dir + fic + ' '
+
+	commands.getoutput('cat ' + f + ' | sort > ' + dest)
+
+
+while True:
+
+	derniersFichiers = getLesDerniersFichiers(workDir1,workDir2)
+
+	print derniersFichiers
+
+	for t in derniersFichiers:
+		if len(t[0]) == 1:
+			compRes = compareFics(workDir1 + t[0][0],workDir2 + t[1][0])
+		else:
+			f1 = catSortWriteFichiers(workDir1, t[0], ficTmpDir1)
+			f2 = catSortWriteFichiers(workDir2, t[1], ficTmpDir2)
+			compRes = compareFics(ficTmpDir1,ficTmpDir2)
+			
+			os.remove(ficTmpDir1)
+			os.remove(ficTmpDir2)
+
+		print compRes
+
+	time.sleep(delai)
