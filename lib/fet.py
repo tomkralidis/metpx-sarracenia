@@ -690,8 +690,15 @@ def directIngest(ingestname,clist,lfn,logger):
         if options.worklists:
           queueWorkList(dbn, c, logger )
         else:
-          cname=clientQDirName( c )
-          linkFile(dbn , cname + ingestname )
+          #cname=clientQDirName( c )
+          #linkFile(dbn , cname + ingestname )
+          pathname = FET_DATA + FET_TX + c + '/' +  time.strftime( "%Y%m%d%H", time.gmtime(time.time()) ) + '/'
+          filename = pathname + ingestname
+          if os.path.exists(pathname):
+            os.link(dbn, filename)
+          else:
+            os.makedirs(pathname, 01775)
+            os.link(dbn, filename)
 
     logger.writeLog( logger.INFO, "queued for " + string.join(clist) )
     return 1
