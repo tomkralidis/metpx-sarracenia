@@ -12,16 +12,22 @@ Reporte     Corrige     Description
                         manquant (donc un repertoire a creer)
 
 
-11/03/05                pxSender (socket) crash lorsque le client
+11/03/05    30/03/05    pxSender (socket) crash lorsque le client
                         a l'autre bout n'est pas disponible.
                         pxSender devrait attendre 30 sec. et
                         essayer a nouveau.
 
+                        Fix: Timeout general (une fois ce timeout ecoule, tout arretait) a ete
+                        mis en commentaires. Ajout de message (dans le log) indiquant un sleep
+                        de 30 secondes, repete indefiniment.
 
 
-11/03/05                pxReceiver distribue les fichiers "PROBLEM"
+
+11/03/05    30/03/05    pxReceiver distribue les fichiers "PROBLEM"
                         aux clients.  Ces fichiers devraient
                         seulement etre databases.
+
+                        Fix: fet ne transmet plus les fichiers PROBLEM_BULLETIN aux clients.
 
 
 14/03/05    14/03/05    pxReceiver a crashe en tentant de creer
