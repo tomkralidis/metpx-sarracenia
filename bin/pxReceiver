@@ -105,7 +105,7 @@ def main():
 
     #fet.lockStopOrDie( fet.FET_DATA + fet.FET_RX + args[0] + '/.lock' , options.cmd )
     lockPath = fet.FET_DATA + fet.FET_RX + args[0]
-    igniter = PXIgniter(direction, options.type, options.source, options.cmd, lockPath)
+    igniter = PXIgniter(direction, options.type, options.source, options.cmd, lockPath, options, logger)
 
 
     logger.writeLog(logger.INFO, "Début du programme, fichier de config chargé correctement")
@@ -116,11 +116,13 @@ def main():
 
         import receiverAm
         unGateway = receiverAm.receiverAm('/dev/null',options,logger)
+        igniter.setGateway(unGateway)
 
     elif options.type == 'wmo':
 
         import receiverWmo
         unGateway = receiverWmo.receiverWmo('/dev/null',options,logger)
+        igniter.setGateway(unGateway)
 
     elif options.type == 'single-file':
         import fetFile

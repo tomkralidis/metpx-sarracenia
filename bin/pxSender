@@ -70,7 +70,7 @@ def main():
 
     #fet.lockStopOrDie(fet.FET_DATA + fet.FET_TX + options.client + '/.lock' , options.cmd )
     lockPath = fet.FET_DATA + fet.FET_TX + args[0]
-    igniter = PXIgniter(direction, options.type, options.client, options.cmd, lockPath)
+    igniter = PXIgniter(direction, options.type, options.client, options.cmd, lockPath, options, logger)
 
     logger.writeLog(logger.INFO, "Début du programme, fichier de config chargé correctement")
     logger.writeLog(logger.DEBUG,"Protocole %s sélectionné", options.type )
@@ -81,16 +81,19 @@ def main():
 
         import senderAm
         unGateway = senderAm.senderAm('/dev/null',options,logger)
+        igniter.setGateway(unGateway)
 
     elif options.type == 'wmo':
 
         import senderWmo
         unGateway = senderWmo.senderWmo('/dev/null',options,logger)
+        igniter.setGateway(unGateway)
 
     elif options.type == 'amis':
 
         import senderAMIS
-        senderAMIS.senderAMIS(options,logger)
+        unGateway = senderAMIS.senderAMIS(options,logger)
+        igniter.setGateway(unGateway)
 
     elif options.type == 'single-file':
         import fetFile
@@ -123,7 +126,7 @@ def main():
     # Assignement des signaux avec le shutdown
     #signal.signal(signal.SIGTERM,shutdown)
     #signal.signal(signal.SIGINT,shutdown)
-
+    
     unGateway.run()
 
 if __name__ == '__main__':
