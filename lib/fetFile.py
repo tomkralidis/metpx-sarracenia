@@ -200,7 +200,7 @@ def sendFiles(c, files,logger):
                         ftp = FTP( hspec, uspec, pwspec )
                     except:
                         excinfo= sys.exc_info()
-                        logger.writeLog( logger.ERROR, "pas capable de me brancher à " + uspec + '@' + hspec + ": " + repr(sys.exc_info()[0]) )
+                        logger.writeLog( logger.ERROR, "pas capable de me brancher à " + uspec + '@' + hspec + "(old was " + ftphost + ": " + repr(sys.exc_info()[0]) )
                         time.sleep(10)  # relax, buy a cherry blossom, don't be shy.
                         return #FIXME: no point to continue looping...
 
@@ -255,7 +255,8 @@ def checkDir(d,logger):
         if t[0:4] == '.wl_':
             wlf = open( p, 'r')
             dirfiles = dirfiles + wlf.read().split()
-            wlf.close
+            wlf.close()
+            logger.writeLog( logger.DEBUG, "read worklist " + os.path.basename(t) )
             os.unlink(p)
             continue
         
@@ -284,21 +285,23 @@ def doClient(c,howtoprioritize,logger):
     for t in os.listdir( cname ):
 
         dname=os.path.join(cname,t)
+
         if t[0:4] == '.wl_':
             wlf = open( dname, 'r')
             cfiles = cfiles + wlf.read().split()
-            wlf.close
+            wlf.close()
+            logger.writeLog( logger.DEBUG, "read worklist " + os.path.basename(t) )
             os.unlink(dname)
             continue
         
+        if ( t[0] == '.' ) or ( t[0:4] == 'tmp_' ) or (t[-4:] == '.tmp' ) or not os.access(dname, os.R_OK):
+            continue
+
         # if the dir has changed, then ingest.
         try:
             dstat=os.stat(dname) ;
         except:
-            continue
-
-        if ( t[0] == '.' ) or ( t[0:4] == 'tmp_' ) or (t[-4:] == '.tmp' ) or \
-                not os.access(dname, os.R_OK):
+            logger.writeLog( logger.WARNING, "stat failed for " + dname )
             continue
 
         if not stat.S_ISDIR(dstat[stat.ST_MODE]):
@@ -308,10 +311,7 @@ def doClient(c,howtoprioritize,logger):
         if not dname in dmodified.keys():
             dmodified[ dname ] = 0
 
-        #print "trying: ", clients[c], clients[c][0], pri, dname
-        #print "check for files in: ", dname, dstat.st_mtime,dmodified[ dname]
-
-        if dstat.st_mtime > dmodified[ dname ] :
+        if (dstat.st_mtime+2) >= dmodified[ dname ] :
             dmodified[ dname ] = dstat.st_mtime
             cfiles= cfiles + checkDir( dname, logger )
 
@@ -319,8 +319,8 @@ def doClient(c,howtoprioritize,logger):
         cfiles.sort(howtoprioritize)
         sendFiles( c, cfiles, logger )
     else:
-        fet.pushWorkList()
-        time.sleep(1)
+        fet.pushWorkList(logger)
+    time.sleep(1) # this sleep is absolutely critical... avoids deadlock conditions with mtime,
 
 
 def checkClient( c, clients, howtoprioritize, logger ):

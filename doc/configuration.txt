@@ -1,9 +1,30 @@
+start up the whole system:
 
-NOTE BENE:  THIS IS NOT DONE YET!
+   px start|stop
 
-current status:
-	ncsReceiver & ncsSender uses old style configs.
-        pxReceiver & pxSender uses the new.
+
+startup individual circuits...
+   pxSender [--suppress_logging <num>] <client> (stop|start|reload) 
+   pxReceiver [--suppress_debug <num>] <client> (stop|start|reload) 
+
+the higher the number of logging suppresion, the less information will
+be logged. default is 100 (suppress debug completely.) specify a number
+less than 100 for more information.  (Yes this is wonky, it's not my
+fault, look in the logging module at how the priorities are defined.
+Yes, they are inverted from the UNIX standard... very odd ... PS)
+here they are:
+
+levels to set for various types of logging:
+    CRITICAL = 50
+    FATAL = 50
+    ERROR = 40
+    WARN = 30
+    WARNING = 30
+    INFO = 20
+    DEBUG = 10
+    VERYVERBOSE = 5
+    VERYVERYVERBOSE = 3
+   
 
  etc/
      header2client.conf
@@ -32,35 +53,30 @@ collections.conf -- configuration file for collection process.
   -- same as existing one.
 
 -------------------------------------
-For each receptions circuit (a "source" in px parlance), there
+For each reception circuit (a "source" in px parlance), there
 is a configuration file in the rx directory.  by creating
 
 samples of rx/<source>.conf
 
 type single-file		
-active yes
-extension :AMTCP2FILE:DADS:BULLETIN:ASCII
+extension AMTCP2FILE:DADS:BULLETIN:ASCII:3
 
 type single-file
-active yes
-extension :AMTCP2FILE:DADS:BULLETIN:ASCII
+extension AMTCP2FILE:DADS:BULLETIN:ASCII:4
 
 type am
-active yes
-extension :PPP1:-CCCC:-TT:-CIRCUIT:ncsAmReceiver
+extension PPP1:-CCCC:-TT:pxRx:-CIRCUIT
 
 type wmo
-active yes
-extension 3:PPP1:-CCCC:-TT:-CIRCUIT:ncsWmoReceiver
+extension NWS:-CCCC:-TT:pxRx:-CIRCUIT
 
 
 For each outgoing circuit, there 
 -----------------------------
     sample etc/tx/ppp1_wmo.conf
 
-active yes
 type  single-file
-protocol https
+protocol ftp
 user iamwhatiam
 password sdgasdg
 host ppp1.cmc.ec.gc.ca
@@ -72,7 +88,7 @@ destination https://fred:fredpass@fredwether.com/disk1 WHATFN
 imask *:nwsG:*:*:* 
 
 
-For each circuit, there is a spooling/queueing directory.
+For each circuit, there is a spooling/queueing/working directory.
 /apps/px/rx/<source>  for sources, and /apps/px/tx/<client> for outgoing ones.
 
 

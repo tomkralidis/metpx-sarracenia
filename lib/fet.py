@@ -172,7 +172,7 @@ def addStandardOptions(parser):
         help="name of source (when receiving) identifying config and queue directories" )
     parser.add_option( "-c", "--client", default=None, dest="client",
         help="name of client (when tranmitting) identifying config and queue directories" )
-    parser.add_option( "-v", "--debug", default=0, type="int",
+    parser.add_option( "-d", "--suppress_debug", default=100, type="int",
         dest="debug", help="makes it ridiculously more voluble"  )
 
 
@@ -430,7 +430,7 @@ def readSources(logger):
         srcconf.close()
 
         sources[sourceid] = copy.deepcopy(source)
-        logger.writeLog( logger.INFO, "read config of source " + sourceid )
+        logger.writeLog( logger.DEBUG, "read config of source " + sourceid )
 
 
 def readCollections(options,logger):
@@ -634,7 +634,7 @@ def linkFile(f,l):
 qWorkLists={}
 lastWorkListPush=0
 
-def pushWorkList():
+def pushWorkList(logger):
   """ push all work lists to client queues. 
   """
   global qWorkLists
@@ -647,16 +647,18 @@ def pushWorkList():
   for i in qWorkLists.keys():
      cname=clientQDirName( i )
      createDir(cname)
-     wk = open( cname + '.wl_' + options.source + '_' +  \
-                 time.strftime( "%H%M%S", time.gmtime(time.time()) ) , 'w')
+     wklname = cname + '.wl_' + options.source + '_' +  \
+                 time.strftime( "%H%M%S", time.gmtime(time.time()) ) 
+     wk = open( wklname, 'w')
      wk.write( string.join( qWorkLists[i], '\n' ) )
      wk.close()
+     logger.writeLog( logger.INFO, "wrote worklist" + wklname )
 
   qWorkLists={}
   lastWorkListPush=time.time()
    
 
-def queueWorkList(dbfile,c):
+def queueWorkList(dbfile,c,logger):
   """ add to worklists for a client, trigger push if the interval has expired, 
   """
 
@@ -665,7 +667,7 @@ def queueWorkList(dbfile,c):
   else:
      qWorkLists[c] = [ dbfile ]
 
-  pushWorkList()
+  pushWorkList(logger)
 
 
 def directIngest(ingestname,clist,lfn,logger):
@@ -686,7 +688,7 @@ def directIngest(ingestname,clist,lfn,logger):
 
     for c in clist:
         if options.worklists:
-          queueWorkList(dbn, c )
+          queueWorkList(dbn, c, logger )
         else:
           cname=clientQDirName( c )
           linkFile(dbn , cname + ingestname )

@@ -31,7 +31,7 @@ class log:
        Date:        Octobre 2004
     """
 
-    def __init__(self,filename,debug=True):
+    def __init__(self,filename,debug=100):
         self.debug = debug
 
         # Init du handler et du formatter pour le log normal
@@ -48,14 +48,13 @@ class log:
         # Ajout des niveaux de loggers
         self.log.setLevel(logging.INFO)
 
-        if self.debug:
+        if self.debug < 100 :
             # Init du handler et du formatter pour le log debug
             unTimedRotatingFileHandlerDebug = logging.handlers.TimedRotatingFileHandler(filename+'_debug', when='midnight', interval=1, backupCount=5)
             unTimedRotatingFileHandlerDebug.setFormatter(unFormatter)
-
             self.logDebug = logging.Logger("Debug")
             self.logDebug.addHandler(unTimedRotatingFileHandlerDebug)
-            self.logDebug.setLevel(3)
+            self.logDebug.setLevel(self.debug)
 
         self.CRITICAL = logging.CRITICAL
         self.ERROR = logging.ERROR
@@ -64,7 +63,7 @@ class log:
         self.WARNING = logging.WARNING
         self.INFO = logging.INFO
         self.EXCEPTION = logging.ERROR
-        self.VERYVERBOSE = 5            # Niveau de logging 5
+        self.VERYVERBOSE = 5            
         self.VERYVERYVERBOSE = 3
 
         # Setting du nom pour les niveaux "custom"
@@ -100,5 +99,5 @@ class log:
         """
         self.log.log(level, msg, *args, **kwargs)
 
-        if self.debug:
+        if self.debug < 100:
             self.logDebug.log(level, msg, *args, **kwargs)

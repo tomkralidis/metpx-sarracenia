@@ -98,9 +98,8 @@ def main():
         # FIXME: Vérifier que typeProtocole est défini et le fichier de log
 
 	# Init du log
-        logger = log.log(options.dataDir + '/log/' + 
-		os.path.basename(sys.argv[0]) + "_" + args[0] + '.log',
-		options.debug )
+        logger = log.log(options.dataDir + '/log/rx_' + args[0] + '.log',
+		debug=options.debug )
 
         fet.startup(options,logger)
 
