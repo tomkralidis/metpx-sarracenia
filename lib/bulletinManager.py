@@ -712,8 +712,7 @@ class bulletinManager:
 
         now = time.strftime("%d%H%M",time.localtime())
 
-#               try:
-        if True:
+        try:
             bullTime = unBulletin.getHeader().split()[2]
             header = unBulletin.getHeader()
 
@@ -729,9 +728,9 @@ class bulletinManager:
             # Si le cas n'est pas défini, considéré comme correct
                 return
 
-#               except Exception:
-#                       unBulletin.setError('Découpage d\'entête impossible')
-#                       return
+        except Exception:
+            unBulletin.setError('Découpage d\'entête impossible')
+            return
 
         # Détection si wrap up et correction pour le calcul
         if abs(int(now[:2]) - int(bullTime[:2])) > 10:
