@@ -219,7 +219,12 @@ def sendFiles(c, files,logger):
                 except:
                     (type, value, tb) = sys.exc_info()
                     logger.writeLog( logger.ERROR, "pas capable d'écrire le fichier " + os.path.basename(p) + " à "  + proto + ":" + hspec + " " + dspec + " " + dfn + ": " + "type: %s, value: %s" % (type, value))
-                    ftp.quit()
+                    try:
+                        ftp.quit()
+                    except:
+                        (type, value, tb) = sys.exc_info()
+                        logger.writeLog( logger.ERROR, "ftq.quit() problem! " + "Type: %s, Value: %s" % (type, value))
+
                     time.sleep(10) # see cherry blossom above.
                     return 
 
