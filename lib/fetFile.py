@@ -199,21 +199,21 @@ def sendFiles(c, files,logger):
 
                 #FIXME: does not take care of tmp renaming or chmod yet.
                 try:
-                    pfn = open( p, 'r' )
                     #FIXME: does not do the chmod thing, uses a temporary name instead.
+                    pfn = open( p, 'r' )
                     ftp.storbinary("STOR tmp_" + dfn, pfn )
-                    ftp.rename("tmp_" + dfn, dfn )
                     pfn.close()
+                    ftp.rename("tmp_" + dfn, dfn )
+                    os.unlink( p )
                     logger.writeLog( logger.INFO, "fichier " + f + " livré à "  + \
                       proto + ":" + hspec + " " + dspec + " " + dfn )
                 except:
-                    logger.writeLog( logger.ERROR, "chui pas capable d'écrire le fichier " + p + " à "  + proto + ":" + hspec + " " + dspec + " " + dfn + ": " + repr(sys.exc_info()[0]) )
+                    logger.writeLog( logger.ERROR, "pas capable d'écrire le fichier " + p + " à "  + proto + ":" + hspec + " " + dspec + " " + dfn + ": " + repr(sys.exc_info()[0]) )
 
 
             else:
                 logger.writeLog( logger.INFO, "protocol " + proto + " pas encore implanté. Ça te tentera de t´y mettre?" )
 
-        os.unlink( p )
 
     if ftphost != '':
         ftp.quit()
