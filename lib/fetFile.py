@@ -348,12 +348,12 @@ def checkClient( c, clients, howtoprioritize, logger ):
 def filePrio( x, y ):
     """ comparator function for sort.
 
-        based on criteria (fields 5 and 6 are the priority and timestamp,
+        based on criteria (fields 4 and 6 are the priority and timestamp,
         respectively.  )
     """
     xx = os.path.basename(x).split(':')
     yy = os.path.basename(y).split(':')
-    return cmp ( xx[5] + xx[6], yy[5] + yy[6] )
+    return cmp ( xx[4] + xx[6], yy[4] + yy[6] )
 
 
 #checkClient( sys.argv[1], fet.clients, filePrio, logger )

@@ -49,12 +49,12 @@ class DiskReader:
         Set the root path and the sorter class used for sorting
 
         The regex will serve (if we use validation) to validate that the filename has the following form:
-        SACN43_CWAO_012000_CYOJ_41613:ncp1:CWAO:SA::3.A.I.E:20050201200339"
+        SACN43_CWAO_012000_CYOJ_41613:ncp1:CWAO:SA:3.A.I.E::20050201200339"
 
         FIXME: The regex should be passed otherwise!  config file?
 
         """
-        self.regex = re.compile(r'^.*?:.*?:.*?:.*?:.*?:(\d).*?:(\d{14})$')  # Regex used to validate filenames
+        self.regex = re.compile(r'^.*?:.*?:.*?:.*?:(\d).*?:.*?:(\d{14})$')  # Regex used to validate filenames
         self.path = path                    # Path from where we ingest filenames
         self.validation = validation        # Name Validation active (True or False)
         self.logger = logger                # Use to log information
@@ -66,7 +66,7 @@ class DiskReader:
     def _validateName(self, filename):
         """
         Validate that the filename has the following form:
-        "SACN43_CWAO_012000_CYOJ_41613:ncp1:CWAO:SA::3.A.I.E:20050201200339"
+        "SACN43_CWAO_012000_CYOJ_41613:ncp1:CWAO:SA:3.A.I.E::20050201200339"
         """
         basename = os.path.basename(filename)
         match = self.regex.search(basename)
@@ -89,9 +89,12 @@ class DiskReader:
         for file in dirIterator:
             if not os.path.isdir(file):
                 basename = os.path.basename(file)
-                if basename[0] == '.' or basename[-4:] == ".tmp" or not os.access(file, os.R_OK):
+                if basename[0:4] == '.wl_':
+                   self._addWorkingList(file, files) 
+                   continue
+                elif basename[0] == '.' or basename[-4:] == ".tmp" or not os.access(file, os.R_OK):
                     continue
-                if self.validation:
+                elif self.validation:
                     if self._validateName(file):
                         files.append(file)
                     else:
@@ -101,6 +104,22 @@ class DiskReader:
                 else:
                     files.append(file)
         return files
+    
+    def _addWorkingList(self, workingListName, files):
+       """
+       Add filenames contained in file workingListName to self.files (indirectly by appending 
+       them to files)
+       """
+       workingListFile = open(workingListName, 'r')
+       workingList = workingListFile.readlines()
+       for file in workingList:
+          if self.validation:
+             if self._validatName(file):
+                files.append(file)
+             elif self.logger is not None:
+                self.logger.writeLog(self.logger.INFO, "Filename incorrect: " + file + " was in " + workingListName)
+          else:
+             files.append(file)
 
     def getFilesContent(self, number=1000000):
         """
