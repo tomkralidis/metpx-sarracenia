@@ -1,9 +1,7 @@
 # -*- coding: UTF-8 -*-
 """Gestionnaire de sockets générique"""
 
-import socket
-import time
-import string
+import socket, time, string, sys
 
 __version__ = '2.0'
 
@@ -120,17 +118,23 @@ class socketManager:
             self.logger.writeLog(self.logger.INFO,"Tentative de connexion à l'hôte distant %s", str(self.remoteHost) )
 
             while True:
+                # Commented by DL (2005-03-30) at the request of AMB
+                """
                 if self.timeout != None and (time.time() - then) > self.timeout:
                     self.socket.close()
                     raise socketManagerException('timeout dépassé')
+                """
 
                 try:
                     self.socket.connect((
                             socket.gethostbyname(self.remoteHost),
                             int(self.port) ))
                     break
+
                 except socket.error:
-                    time.sleep(5)
+                    (type, value, tb) = sys.exc_info()
+                    self.logger.writeLog(self.logger.ERROR, "Type: %s, Value: %s, Sleeping 30 seconds ..." % (type, value))
+                    time.sleep(30)
 
         #connexion type serveur (exemple PDS-NCCS: un receiver) ou bidirectionnelle
         else:
@@ -140,10 +144,12 @@ class socketManager:
             self.logger.writeLog(self.logger.INFO,"En attente de connexion (mode listen)")
 
             while True:
+                # Commented by DL (2005-03-30) at the request of AMB
+                """
                 if self.timeout != None and (time.time() - then) > self.timeout:
                     self.socket.close()
                     raise socketManagerException('timeout dépassé')
-
+                """
                 try:
                     conn, self.remoteHost = self.socket.accept()
                     break
