@@ -615,12 +615,14 @@ def createDir(dir):
     """
     global dirs_created
 
-    if not (dir in dirs_created) and not os.path.exists( dir ):
-        try:
-            os.makedirs( dir, 01775 )
-            dirs_created = dirs_created + [ dir ]
-        except OSError, e:
-            print e
+    if not (dir in dirs_created):
+        dirs_created  = dirs_created + [ dir ]
+        if not os.path.exists(dir):
+            try:
+                os.makedirs( dir, 01775 )
+            except OSError, e:
+                #FIXME: Should I log this?
+                print e
 
 def linkFile(f,l):
     """ make a link l to the existing file f,
