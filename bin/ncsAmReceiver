@@ -268,7 +268,7 @@ while True:
 		try:
 			nomFic = (nomFic + ' ' + string.zfill(compteur,5) + bulletinLib.getExtension(type,origine)).replace(' ','_').replace('__','_')
 
-			if ficCircuits == None or nomFic.find('ERROR') =! -1 :
+			if ficCircuits == None or nomFic.find('ERROR') != -1 :
 				unFichier = os.open( tempDir + nomFic , os.O_CREAT | os.O_WRONLY )
 
 				os.write( unFichier , unBulletin )
@@ -289,6 +289,8 @@ while True:
 
 				for f in listeNoms:
 					os.rename( tempDir + f , destDir + f )
+					# Le transfert du fichier est un succes
+					utils.writeLog(log,'Ecriture du fichier <' + destDir + f + '>')
 
 		except OSError, inst:
 
