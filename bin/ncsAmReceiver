@@ -216,7 +216,7 @@ while True:
 					prefixe_nom_bulletin = 'ERROR_BULLETIN_'
 					uneEnteteDeBulletin = contenuDeBulletin[2]
 
-					extensionFichier = bulletinLib.getExtension('ERROR','ERROR')
+					extensionFichier = bulletinLib.getExtension('ERROR','ERROR','ERROR')
 					uneStation = 'UNKNOWN'
 
 					utils.writeLog(log,"*** Erreur : Pattern de station non trouve !")
@@ -265,41 +265,36 @@ while True:
 
 		(unBulletin,nomFic,type,origine) = listeBulletinsModifies.pop()
 
-		try:
-			nomFic = (nomFic + ' ' + string.zfill(compteur,5) + bulletinLib.getExtension(type,origine)).replace(' ','_').replace('__','_')
-
-			if ficCircuits == None or nomFic.find('ERROR') != -1 :
-				unFichier = os.open( tempDir + nomFic , os.O_CREAT | os.O_WRONLY )
-
-				os.write( unFichier , unBulletin )
-				os.close( unFichier )
-				os.chmod(tempDir + nomFic,0644)
-
-				os.rename( tempDir + nomFic , destDir + nomFic )
-
-				# Le transfert du fichier est un succes
-				utils.writeLog(log,'Ecriture du fichier <' + destDir + nomFic + '>')	
+		# Fetch des circuits
+		circuits = 'FichierDeCircuitAbsent'
+		if ficCircuits != None:
+			if mapCircuits.has_key( ' '.join(unBulletin.splitlines()[0].split(' ')[:2]) ):
+				circuits = '.'.join(mapCircuits[' '.join(unBulletin.splitlines()[0].split(' ')[:2]])
 			else:
-				try:
-					listeNoms = bulletinLib.circuitRename(nomFic,string.join(unBulletin.splitlines()[0].split()[:2],' '),mapCircuits)
-				except Exception:
-					listeNoms = ['CIRCUITINTROUVABLE_' + nomFic]
+				circuits = 'EnteteIntrouvable'
 
-				bulletinLib.circuitWriteBulls(unBulletin,listeNoms,tempDir)
+		try:
+			nomFic = (nomFic + ' ' + string.zfill(compteur,5) + bulletinLib.getExtension(type,origine,circuits)).replace(' ','_').replace('__','_')
 
-				for f in listeNoms:
-					os.rename( tempDir + f , destDir + f )
-					# Le transfert du fichier est un succes
-					utils.writeLog(log,'Ecriture du fichier <' + destDir + f + '>')
+			unFichier = os.open( tempDir + nomFic , os.O_CREAT | os.O_WRONLY )
+
+			os.write( unFichier , unBulletin )
+			os.close( unFichier )
+			os.chmod(tempDir + nomFic,0644)
+
+			os.rename( tempDir + nomFic , destDir + nomFic )
+
+			# Le transfert du fichier est un succes
+			utils.writeLog(log,'Ecriture du fichier <' + destDir + nomFic + '>')	
 
 		except OSError, inst:
 
-			type,origine = 'ERROR','ERROR'
+			type,origine,circuits = 'ERROR','ERROR'
 			utils.writeLog(log,"*** Erreur : Manipulation du fichier impossible! (Ecriture avec un nom non standard)")
 			utils.writeLog(log,"*** Exception: " + str(inst.args[0]))
 			utils.writeLog(log,"Bulletin :\n" + unBulletin, sync=True)
 
-			nomFic = 'ERROR_BULLETIN_UNPRINTABLE_HEADER_' + string.zfill(compteur,5) + bulletinLib.getExtension(type,origine)
+			nomFic = 'ERROR_BULLETIN_UNPRINTABLE_HEADER_' + string.zfill(compteur,5) + bulletinLib.getExtension(type,origine,circuits)
 			unFichier = os.open( tempDir + nomFic , os.O_CREAT | os.O_WRONLY )
 
 			os.write( unFichier , unBulletin )

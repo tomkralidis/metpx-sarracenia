@@ -103,9 +103,9 @@ def getFormattedSystemTime():
 def initExtension():
 	"""A etre execute une fois au debut du programme, initialise 
 	   l'extension"""
-	return '-TT' in extension.split(':') or '-CCCC' in extension.split(':')
+	return '-TT' in extension.split(':') or '-CCCC' in extension.split(':') or '-CIRCUIT' in extension.split(':'):
 
-def getExtension(type='NonImplante',origine='nonImplante'):
+def getExtension(type='NonImplante',origine='NonImplante',circuits='NonImplante'):
 	"""Retourne l'extension appropriee pour le fichier du bulletin courant"""
 	if not extensionDynamique:
 		return extension
@@ -117,6 +117,9 @@ def getExtension(type='NonImplante',origine='nonImplante'):
 
 		if '-CCCC' in params:
 			params[params.index('-CCCC')] = origine
+
+		if '-CIRCUIT' in params:
+			params[params.index('-CIRCUIT')] = circuits
 
 		return string.join(params,':')
 
