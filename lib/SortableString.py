@@ -29,7 +29,7 @@ class SortableString:
 
     def _getKeys(self):
         parts = self.basename.split(":")
-        self.priority = parts[4].split(".")[0]
+        self.priority = parts[5].split(".")[0]
         self.timestamp = parts[6]
         self.concatenatedKeys = self.priority + self.timestamp
 
