@@ -168,7 +168,7 @@ def sendFiles(c, files,logger):
 	        os.unlink(p)
 	    continue
         dfn = fet.destFileName(f,m)
-#     print "match is: ", m
+        #print "match is: ", m
         if dfn == '' or m[2] == 'NULL':
             logger.writeLog(logger.ERROR, "fichier " + os.path.basename(f) + " pas routable par " + c )
             continue
@@ -252,6 +252,13 @@ def checkDir(d,logger):
 
     for t in os.listdir(d):
         p=os.path.join(d,t)
+        if t[0:4] == '.wl_':
+            wlf = open( p, 'r')
+            dirfiles = dirfiles + wlf.read().split()
+            wlf.close
+            os.unlink(p)
+            continue
+        
         if ( t[0] == '.' ) or ( t[0:4] == 'tmp_' ) or (t[-4:] == '.tmp' ) or not os.access(p, os.R_OK):
             continue
         dirfiles = dirfiles + [ p ]
@@ -274,13 +281,13 @@ def doClient(c,howtoprioritize,logger):
     cname = fet.FET_DATA + fet.FET_TX + c
     cfiles = []
 
-    for dname in map( lambda x: os.path.join(cname,x), os.listdir( cname )):
+    for t in os.listdir( cname ):
 
-        if os.path.basename(dname)[0:4] == '.wl_':
+        dname=os.path.join(cname,t)
+        if t[0:4] == '.wl_':
             wlf = open( dname, 'r')
-            wl = wlf.read().split()
+            cfiles = cfiles + wlf.read().split()
             wlf.close
-            cfiles = cfiles + wl
             os.unlink(dname)
             continue
         
@@ -290,7 +297,12 @@ def doClient(c,howtoprioritize,logger):
         except:
             continue
 
+        if ( t[0] == '.' ) or ( t[0:4] == 'tmp_' ) or (t[-4:] == '.tmp' ) or \
+                not os.access(dname, os.R_OK):
+            continue
+
         if not stat.S_ISDIR(dstat[stat.ST_MODE]):
+            cfiles = cfiles + [ dname ]
             continue
 
         if not dname in dmodified.keys():

@@ -33,7 +33,7 @@ def shutdown(sig,stack):
     isShutdowning = True
     logger.writeLog(logger.INFO,"Fermeture du programme (signal=%d)",sig)
     unGateway.shutdown()
-    fet.lockStopOrDie( fet.FET_DATA + fet.FET_RX + args[0] + '/.lock' , 'stop' )
+    fet.lockStopOrDie( fet.FET_DATA + fet.FET_RX + fet.options.source + '/.lock' , 'stop' )
     sys.exit()
 
 # Définition de la méthode de reload de config via SIGHUP

@@ -89,6 +89,9 @@ def urlSplit(url):
     protocol = url[0:delim]
     if protocol == 'file':
         rest = url[delim+1:]
+        if len(rest) == 0:
+            return [ protocol, dirspec, user, password, host, port ]
+
     else:
         rest = url[delim+3:]
 
@@ -125,7 +128,7 @@ def urlSplit(url):
             else:
                 host=rest
 
-#  print "urlSplit proto="+ protocol +" dir="+ dirspec +' u='+ user +' pw='+ password +' h='+ host  +' port='+ port
+    #print "urlSplit proto="+ protocol +" dir="+ dirspec +' u='+ user +' pw='+ password +' h='+ host  +' port='+ port
     return [ protocol, dirspec, user, password, host, port ]
 
 
@@ -310,7 +313,7 @@ def readClients(logger):
                     if client[1] == '':
                         client[1]=urlJoin(protocol,destdir,user,password,host,port)
 
-#          print "after urlSplit proto="+ protocol +" destdir="+ destdir +' u='+ user +' pw='+ password +' h='+ host  +' port='+ port
+                    #print "after urlSplit proto="+ protocol +" destdir="+ destdir +' u='+ user +' pw='+ password +' h='+ host  +' port='+ port
                 elif maskline[0] == 'host':
                     host = maskline[1]
                 elif maskline[0] == 'user':
@@ -637,8 +640,10 @@ def pushWorkList():
   global qWorkLists
 
   for i in qWorkLists.keys():
-     wk = open( FET_DATA + FET_TX + i + '/.wl_' + options.source + '_' + 
-              time.strftime( "%Y%m%d%H%M%S", time.gmtime(time.time()) ) , 'w')
+     cname=clientQDirName( i )
+     createDir(cname)
+     wk = open( cname + '.wl_' + options.source + '_' +  \
+                 time.strftime( "%H%M%S", time.gmtime(time.time()) ) , 'w')
      wk.write( string.join( qWorkLists[i], '\n' ) )
      wk.close()
   qWorkLists={}
