@@ -67,15 +67,12 @@ class senderWmo(gateway.gateway):
         # Instanciation du bulletinManagerWmo selon les arguments issues du fichier
         # de configuration
         self.logger.writeLog(logger.DEBUG,"Instanciation du bulletinManagerWmo")
-        if options.client:
-            self.unBulletinManagerWmo = \
-                 bulletinManagerWmo.bulletinManagerWmo( fet.FET_DATA + fet.FET_TX + options.client ,logger)
-            self.config.remoteHost = options.host
-            self.config.localPort = options.port
-            self.config.timeout    = options.connect_timeout
-        else:
-            self.unBulletinManagerWmo = \
-                 bulletinManagerWmo.bulletinManagerWmo(self.config.pathTemp,logger)
+
+        self.unBulletinManagerWmo = bulletinManagerWmo.bulletinManagerWmo( \
+                fet.FET_DATA + fet.FET_TX + options.client ,logger)
+        self.options.remoteHost = options.host
+        self.options.localPort = options.port
+        self.options.timeout    = options.connect_timeout
         self.listeFichiersDejaChoisis = []
         self.reader = None
 
@@ -136,19 +133,12 @@ class senderWmo(gateway.gateway):
         # Instanciation du socketManagerWmo
         self.logger.writeLog(self.logger.DEBUG,"Instanciation du socketManagerWmo")
 
-        if self.options.client:
-            self.unSocketManagerWmo = \
+        self.unSocketManagerWmo = \
                  socketManagerWmo.socketManagerWmo(
                          self.logger,type='master', \
                          port=self.options.port,\
                          remoteHost=self.options.host,
                          timeout=self.options.connect_timeout)
-        else:
-            self.unSocketManagerWmo = \
-                 socketManagerWmo.socketManagerWmo(self.logger,type='master', \
-                      port=self.config.remoteHost[1],\
-                      remoteHost=self.config.remoteHost[0],
-                      timeout=self.config.timeout)
 
     def read(self):
         __doc__ =  gateway.gateway.read.__doc__ + \

@@ -67,17 +67,13 @@ class senderAm(gateway.gateway):
         # Instanciation du bulletinManagerAm selon les arguments issues du fichier
         # de configuration
         self.logger.writeLog(logger.DEBUG,"Instanciation du bulletinManagerAm")
-        if options.client:
-            self.unBulletinManagerAm = \
-                 bulletinManagerAm.bulletinManagerAm(
+        self.unBulletinManagerAm = \
+            bulletinManagerAm.bulletinManagerAm(
                  fet.FET_DATA + fet.FET_TX + options.client, logger)
             self.config.remoteHost = options.host
             self.config.localPort = options.port
             self.config.timeout    = options.connect_timeout
 
-        else:
-            self.unBulletinManagerAm = \
-                 bulletinManagerAm.bulletinManagerAm(self.config.pathTemp,logger)
         self.listeFichiersDejaChoisis = []
         self.reader = None
 

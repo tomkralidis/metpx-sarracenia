@@ -744,12 +744,13 @@ def startup(opts, logger):
         cf=pxconf.readline()
         while cf:
             cfl=cf.split()
-            if clf[0] == 'usePDS':
-                options.use_pds=isTrue(clf[1])
+            if cfl[0] == 'usePDS':
+                options.use_pds=isTrue(cfl[1])
             cf=pxconf.readline()
         pxconf.close()
     except:
-        pass
+        logger.writeLog( logger.NOTICE, "could not open global px config: " +
+                FET_ETC + 'px.conf'  )
 
     if not options.use_pds:
         initDB(logger)
@@ -765,7 +766,7 @@ def startup(opts, logger):
             opts.port = dd[5]
             opts.connect_timeout = int(clients[options.client][2])
             opts.sorter = 'MultiKeysStringSorter'
-            opts.numFiles = 4
+            opts.numFiles = 100
         else:
             logger.writeLog( logger.ERROR, "unknown client: " + options.client )
 

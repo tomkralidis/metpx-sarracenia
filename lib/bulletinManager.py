@@ -638,7 +638,7 @@ class bulletinManager:
         entete = ' '.join(bulletin.getHeader().split()[:2])
 
         if not self.mapCircuits.has_key(entete):
-            bulletin.setError('Entete non trouvée dans fichier de circuits')
+            bulletin.setError('Entete +' +entete+ ' non trouvée dans fichier de circuits')
             raise bulletinManagerException('Entete non trouvée dans fichier de circuits')
 
         # Check ici, si ce n'est pas une liste, en faire une liste

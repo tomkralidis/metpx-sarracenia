@@ -25,7 +25,7 @@ def run(logger):
     bullManager = bulletinManager.bulletinManager(
          fet.FET_DATA + fet.FET_RX + fet.options.source, logger,
          fet.FET_DATA + fet.FET_RX + fet.options.source,
-         '/dev/null',
+         '/apps/pds/RAW/-PRIORITY',
          9999,
          '\n',
          fet.options.extension,

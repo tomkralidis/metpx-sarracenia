@@ -50,7 +50,6 @@ class gateway:
     """
     def __init__(self,path,options,logger):
         self.pathToConfigFile = path
-        self.config = gateway.loadConfig(path)
         self.logger = logger
         self.options = options
 
