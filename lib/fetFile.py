@@ -162,6 +162,10 @@ def sendFiles(c, files,logger):
     for p in files:
         f = p[p.rfind('/')+1:]
         m = fet.clientMatch(c,f)
+	if not m:
+	    logger.writeLog( logger.INFO, "file " + os.path.basename(f) + " removed, no matching imask" )
+	    os.unlink(p)
+	    continue
         dfn = fet.destFileName(f,m)
 #     print "match is: ", m
         if dfn == '' or m[2] == 'NULL':
