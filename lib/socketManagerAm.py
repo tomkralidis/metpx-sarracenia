@@ -87,14 +87,22 @@ class socketManagerAm(socketManager.socketManager):
         tmp = bulletin.getBulletin()
         size = struct.calcsize('80s')
 
+        """
+        Commented by DL (2005-02-24)
         header = tmp[0:size]
         listeHeader=[]
         for i in header:
             listeHeader.append(i)
+        """
+        nulList = [chr(curses.ascii.NUL) for x in range(size)]
+        header = list(tmp[0:size])
+
+        paddedHeader = header + nulList[len(header):]
+
         for i in range(size):
-            if listeHeader[i]==chr(curses.ascii.LF):
-                listeHeader[i]=chr(curses.ascii.NUL)
-        header = string.join(listeHeader,'')
+            if paddedHeader[i]==chr(curses.ascii.LF):
+                paddedHeader[i]=chr(curses.ascii.NUL)
+        header = string.join(paddedHeader,'')
 
         #unsigned long src_inet, dst_inet
         src_inet = 0

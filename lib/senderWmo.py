@@ -221,7 +221,7 @@ class senderWmo(gateway.gateway):
         self.logger.writeLog(self.logger.DEBUG,"%d nouveaux bulletins sont envoyes",len(data))
 
         for index in range(len(data)):
-            try:
+          #  try:
                 rawBulletin = data[index]
                 unBulletinWmo = bulletinWmo.bulletinWmo(rawBulletin,self.logger,finalLineSeparator='\r\r\n')
                 succes = self.unSocketManagerWmo.sendBulletin(unBulletinWmo)
@@ -232,13 +232,14 @@ class senderWmo(gateway.gateway):
                     self.logger.writeLog(self.logger.DEBUG,"senderWmo.write(..): Effacage de " + self.reader.sortedFiles[index])
                 else:
                     self.logger.writeLog(self.logger.INFO,"%s: probleme d'envoi ", os.path.basename(self.reader.sortedFiles[index]))
+         """
             except Exception, e:
                 if e==104 or e==110 or e==32 or e==107:
                     self.logger.writeLog(self.logger.ERROR,"senderWmo.write(): la connexion est rompue: %s",str(e.args))
                 else:
                     self.logger.writeLog(self.logger.ERROR,"senderWmo.write(): erreur: %s",str(e.args))
                 raise
-
+         """
         """
         self.logger.writeLog(self.logger.DEBUG,"%d nouveaux bulletins sont envoyes",len(data))
         for key in data:
