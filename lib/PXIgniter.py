@@ -30,7 +30,7 @@ class PXIgniter(Igniter):
 
    def setGateway(self, gateway):
       self.gateway = gateway
-      print "Gateway is: " + repr(gateway)
+      #print "Gateway is: " + repr(gateway)
 
    def printComment(self, commentID):
       if commentID == 'Already start':
@@ -74,7 +74,7 @@ class PXIgniter(Igniter):
          print "_reload() has been called for %s (%s %s)" % (self.client, self.direction, self.type)
          print "No gateway object! Nothing can be done"
       else:
-         print self.gateway
+         #print self.gateway
          fet.startup(self.options, self.logger)
          self.logger.writeLog(self.logger.INFO, "%s has been reload" % self.direction)
       
