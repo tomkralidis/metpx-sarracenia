@@ -329,9 +329,9 @@ def readClients(logger):
                 elif maskline[0] == 'connect_timeout':
                     client[2] = int(maskline[1])
                 elif maskline[0] == 'order':
-                    client[3] = maskline[1]
+                    client[4] = maskline[1]
                 elif maskline[0] == 'batch':
-                    client[4] = int(maskline[1])
+                    client[5] = int(maskline[1])
                 mask=cliconf.readline()
 
         cliconf.close()
