@@ -15,17 +15,12 @@
 
   2005/01/22 - Initial Version, Peter Silva
 """
-
-
-
 import os
 import os.path
 import time
 import sys
 import stat
 import signal
-
-
 
 
 sys.path.insert(1,sys.path[0] + '/../lib')
@@ -234,7 +229,6 @@ def sendFiles(c, files,logger):
         ftp.quit()
 
 
-
 def checkDir(d,logger):
     """
     given a single directory, read all the non-hidden entries and
@@ -336,6 +330,5 @@ def filePrio( x, y ):
     xx = os.path.basename(x).split(':')
     yy = os.path.basename(y).split(':')
     return cmp ( xx[4] + xx[6], yy[4] + yy[6] )
-
 
 #checkClient( sys.argv[1], fet.clients, filePrio, logger )

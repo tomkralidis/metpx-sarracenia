@@ -13,6 +13,7 @@
 """
 import os, os.path, re, commands
 from MultiKeysStringSorter import MultiKeysStringSorter
+import fet
 
 class _DirIterator(object):
     """ Author: Sebastien Keim
@@ -55,14 +56,15 @@ class DiskReader:
 
         """
         self.regex = re.compile(r'^.*?:.*?:.*?:.*?:(\d).*?:.*?:(\d{14})$')  # Regex used to validate filenames
-        self.path = path                    # Path from where we ingest filenames
-        self.validation = validation        # Name Validation active (True or False)
-        self.logger = logger                # Use to log information
-        self.batch = batch                  # Maximum number of files that we are interested to sort
-        self.files = self._getFilesList()   # List of filenames under the path
-        self.sortedFiles = []               # Sorted filenames
-        self.data = []                      # Content of x filenames (x is set in getFilesContent())
-        self.sorterClass = sorterClass      # Sorting algorithm that will be used by sort()
+        self.path = path                          # Path from where we ingest filenames
+        self.clientName = os.path.basename(path)  # Last part of the path correspond to client name 
+        self.validation = validation              # Name Validation active (True or False)
+        self.logger = logger                      # Use to log information
+        self.batch = batch                        # Maximum number of files that we are interested to sort
+        self.files = self._getFilesList()         # List of filenames under the path
+        self.sortedFiles = []                     # Sorted filenames
+        self.data = []                            # Content of x filenames (x is set in getFilesContent())
+        self.sorterClass = sorterClass            # Sorting algorithm that will be used by sort()
 
     def _validateName(self, filename):
         """
@@ -77,6 +79,12 @@ class DiskReader:
         else:
             #print "Don't match: " + basename
             return False
+
+    def _matchPattern(self, filename):
+        pattern = fet.clientMatch(self.client, filename)
+        if pattern != None:
+           return True
+        else return False
 
     def _getFilesList(self):
 
@@ -106,42 +114,30 @@ class DiskReader:
         for file in dirIterator:
             if not os.path.isdir(file):
                 basename = os.path.basename(file)
-                if basename[0:4] == '.wl_':
-                   self._addWorkingList(file, files) 
-                   continue
-                elif basename[0] == '.' or basename[-4:] == ".tmp" or not os.access(file, os.R_OK):
+                # Files we don't want to touch
+                if basename[0] == '.' or basename[-4:] == ".tmp" or not os.access(file, os.R_OK):
                     continue
-                elif self.validation:
-                    if self._validateName(file):
-                        if len(files) >= batch:
-                            break
-                        files.append(file)
-                    else:
+                # If we use name validation 
+                if self.validation:
+                    if not self._validateName(file):
                         os.unlink(file)
                         if self.logger is not None:
                             self.logger.writeLog(self.logger.INFO, "Filename incorrect: " + file + " has been unlinked!")
-                else:
-                    if len(files) >= batch:
+                        continue
+                # Does the filename match a pattern
+                if not self._matchPattern(file):
+                    os.unlink(file)
+                    if self.logger is not None:
+                        self.logger.writeLog(self.logger.INFO, "No pattern matching: " + file + " has been unlinked!")
+                    continue
+                # We don't want to 
+                if len(files) >= batch:
                         break
-                    files.append(file)
+                # All "tests" have been passed
+                files.append(file)
+
         return files
     
-    def _addWorkingList(self, workingListName, files):
-       """
-       Add filenames contained in file workingListName to self.files (indirectly by appending 
-       them to files)
-       """
-       workingListFile = open(workingListName, 'r')
-       workingList = workingListFile.readlines()
-       for file in workingList:
-          if self.validation:
-             if self._validatName(file):
-                files.append(file)
-             elif self.logger is not None:
-                self.logger.writeLog(self.logger.INFO, "Filename incorrect: " + file + " was in " + workingListName)
-          else:
-             files.append(file)
-
     def getFilesContent(self, number=1000000):
         """
         Set and return a list having the content (data) of corresponding filenames in the
