@@ -34,7 +34,7 @@ class senderAMIS:
       self.finalTime = None
 
       self._connect()
-      self.run()
+      #self.run()
 
    def _connect(self):
       self.socketAMIS = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -55,8 +55,9 @@ class senderAMIS:
             self.logger.writeLog(self.logger.ERROR, "Address related error connecting to server: %s" % e)
             sys.exit(1)
          except socket.error, e:
-            #print "Connection error: %s, sleeping ..." % e
-            self.logger.writeLog(self.logger.ERROR, "Connection error: %s, sleeping ..." % e)
+            (type, value, tb) = sys.exc_info()
+            self.logger.writeLog(self.logger.ERROR, "Type: %s, Value: %s, Sleeping 5 seconds ..." % (type, value))
+            #self.logger.writeLog(self.logger.ERROR, "Connection error: %s, sleeping ..." % e)
             time.sleep(5)
 
    def shutdown(self):

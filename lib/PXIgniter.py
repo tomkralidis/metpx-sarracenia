@@ -14,16 +14,23 @@
 """
 import sys, os, commands, signal
 from Igniter import Igniter
+import fet
 
 class PXIgniter(Igniter):
    
-   def __init__(self, direction, type, client, cmd, lockPath, logger=None):
+   def __init__(self, direction, type, client, cmd, lockPath, options=None, logger=None):
       Igniter.__init__(self, cmd, lockPath) # Parent constructor
       self.direction = direction            # Receiver or Sender (string)
       self.type = type                      # wmo, am, etc. (string)
       self.client = client                  # Client to send or Source from which to receive
+      self.options = options                # All options
       self.logger = logger                  # Logger object
+      self.gateway = None                   # Gateway object
       eval("self." + cmd)()                 # Execute the command directly
+
+   def setGateway(self, gateway):
+      self.gateway = gateway
+      print "Gateway is: " + repr(gateway)
 
    def printComment(self, commentID):
       if commentID == 'Already start':
@@ -63,7 +70,13 @@ class PXIgniter(Igniter):
       No need for globals, self.attribute contains status
       Do the real work here. Depends of type of sender/receiver
       """
-      print "_reload() has been called"
+      if self.gateway is None:
+         print "_reload() has been called for %s (%s %s)" % (self.client, self.direction, self.type)
+         print "No gateway object! Nothing can be done"
+      else:
+         print self.gateway
+         fet.startup(self.options, self.logger)
+         self.logger.writeLog(self.logger.INFO, "%s has been reload" % self.direction)
       
    def reload(self):
       """
@@ -81,11 +94,14 @@ class PXIgniter(Igniter):
          print "FATAL: Do not reload as root. It will be a mess."
          sys.exit(2)
          
-      if Igniter.isLocked(self):
-         os.kill(self.lockpid, signal.SIGHUP)
-         sys.exit()
+      if Igniter.isLocked(self) and not commands.getstatusoutput('ps -p ' + str(self.lockpid))[0]:
+         # SIGHUP is sent to initiate the reload
+         os.kill(self.lockpid, signal.SIGHUP) 
       else:
-         print "No process to reload!"
+         print "No process to reload for %s (%s %s)!" % (self.client, self.direction, self.type)
+
+      # In any case, we exit!!
+      sys.exit(2)
 
 if __name__ == "__main__":
 
