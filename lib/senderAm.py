@@ -172,27 +172,6 @@ class senderAm(gateway.gateway):
         self.reader.sort()
         return(self.reader.getFilesContent(fet.clients[self.options.client][5]))
 
-        """
-        data = []
-
-        #lecture de la selection precedente
-        liste = self.unBulletinManagerAm.getListeNomsFichiersAbsolus()
-
-        #si rien n'a ete envoye lors de la derniere lecture,
-        #on considere le dernier envoi non vide effectue
-        if len(liste)>=1:
-                self.listeFichiersDejaChoisis = self.unBulletinManagerAm.getListeNomsFichiersAbsolus()
-
-        try:
-                #determination des bulletins a lire et lecture de leur contenu brut
-                data = self.unBulletinManagerAm.readBulletinFromDisk(self.config.listeRepertoires,self.listeFichiersDejaChoisis,priorite=1)
-
-                return data
-
-        except Exception, e:
-                self.logger.writeLog(self.logger.ERROR,"senderAm.read(): Erreur lecture: %s",str(e.args))
-                raise
-        """
 
     def write(self,data):
         __doc__ =  gateway.gateway.write.__doc__ + \
@@ -217,8 +196,6 @@ class senderAm(gateway.gateway):
         Date:
         Janvier 2005
         """
-
-        #"""
         self.logger.writeLog(self.logger.DEBUG,"%d nouveaux bulletins seront envoyes",len(data))
 
         for index in range(len(data)):
@@ -239,33 +216,3 @@ class senderAm(gateway.gateway):
                 else:
                     self.logger.writeLog(self.logger.ERROR,"senderAm.write(): erreur: %s",str(e.args))
                 raise
-        #"""
-        """
-        self.logger.writeLog(self.logger.DEBUG,"%d nouveaux bulletins sont envoyes",len(data))
-        for key in data:
-                try:
-                        #creation du bulletin am
-                        rawBulletin = data[key]
-                        unBulletinAm = bulletinAm.bulletinAm(rawBulletin,self.logger)
-                        #envoi du bulletin am
-                        succes = self.unSocketManagerAm.sendBulletin(unBulletinAm)
-
-                        #si le bulletin a ete envoye correctement, le fichier
-                        #est efface, sinon le bulletin est retire de la liste
-                        #de fichier deja envoyes
-                        if succes:
-                                self.logger.writeLog(self.logger.INFO,"bulletin %s envoye ",key)
-                                self.unBulletinManagerAm.effacerFichier(key)
-                                self.logger.writeLog(self.logger.DEBUG,"%s est efface",key)
-                        else:
-                                self.logger.writeLog(self.logger.INFO,"bulletin %s: probleme d'envoi ",key)
-                                if self.listeFichiersDejaChoisis.count(key)>0:
-                                        self.listeFichiersDejaChoisis.remove(key)
-
-                except Exception, e:
-                        if e==104 or e==110 or e==32 or e==107:
-                                self.logger.writeLog(self.logger.ERROR,"senderAm.write(): la connexion est rompue: %s",str(e.args))
-                        else:
-                                self.logger.writeLog(self.logger.ERROR,"senderAm.write(): erreur: %s",str(e.args))
-                        raise
-        """

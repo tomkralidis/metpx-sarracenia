@@ -173,26 +173,6 @@ class senderWmo(gateway.gateway):
                  eval(fet.clients[self.options.client][4]) )
         self.reader.sort()
         return(self.reader.getFilesContent(fet.clients[self.options.client][5]))
-        """
-        data = []
-        #lecture de la selection precedente
-        liste = self.unBulletinManagerWmo.getListeNomsFichiersAbsolus()
-        #si rien n'a ete envoye lors de la derniere lecture,
-        #on considere le dernier envoi non vide effectue
-        if len(liste)>=1:
-                self.listeFichiersDejaChoisis = self.unBulletinManagerWmo.getListeNomsFichiersAbsolus()
-
-        try:
-                #determination des bulletins a lire et lecture de leur contenu brut
-                data = self.unBulletinManagerWmo.readBulletinFromDisk(self.config.listeRepertoires,self.listeFichiersDejaChoisis,priorite=1)
-
-                return data
-
-        except Exception, e:
-                self.logger.writeLog(self.logger.ERROR,"senderWmo.read(): Erreur lecture: %s",str(e.args))
-                raise
-         """
-
 
     def write(self,data):
         __doc__ =  gateway.gateway.write.__doc__ + \
