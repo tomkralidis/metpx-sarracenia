@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Project SYSTEM "Project-3.5.dtd">
+<!-- Project file for project pds-nccs -->
+<!-- Saved: 2004-11-09, 13:20:29 -->
+<!-- Copyright (C) 2004 ,  -->
+<Project version="3.5">
+  <Description></Description>
+  <Version>0.1</Version>
+  <Author></Author>
+  <Email></Email>
+  <Sources>
+  </Sources>
+  <Forms>
+  </Forms>
+  <Translations>
+  </Translations>
+  <Interfaces>
+  </Interfaces>
+  <Others>
+  </Others>
+  <Vcs>
+    <VcsType>CVS</VcsType>
+    <VcsOptions>{'status': ['-v'], 'log': [''], 'global': ['-f'], 'update': ['-dP'], 'remove': ['-f'], 'add': [''], 'tag': ['-c'], 'export': [''], 'commit': [''], 'diff': ['-u3', '-p'], 'checkout': [''], 'history': ['-e', '-a']}</VcsOptions>
+    <VcsOtherData>{}</VcsOtherData>
+  </Vcs>
+</Project>
