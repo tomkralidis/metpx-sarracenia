@@ -48,7 +48,7 @@ class amSock(asyncore.dispatcher):
 			time.sleep(1)
 
 	self.close()
-	self.setblocking(False)
+	self.conn.setblocking(False)
 
     def getNextBulletin(self):
 	"""Retourne le prochain bulletin dans le buffer.
