@@ -201,6 +201,8 @@ def sendFiles(c, files,logger):
 
                     ftphost=hspec
                     ftpdir=''
+                    # We remove the first / (if there was only one => relative path, if there was two => absolute path)
+                    dspec = dspec[1:]
                 if ftpdir != dspec:
                     ftp.cwd(dspec)
                     ftpdir = dspec
