@@ -1,0 +1,38 @@
+
+Feel free to add what they did in here.  Peter made
+a first pass to get the file started, but doesn´t really know who
+did what.
+
+
+Louis-Phillippe Thérieault  
+  First pass at design, all the early proofs of concept.  First receiver, 
+First sender, and all the complex data transformations necesary on 
+receipt of messages.  Bulletin Collection.  After the first pass, and some 
+review, implemented a second pass design with more OO methodologies.
+
+Pierre Michaud
+  Worked with Louis-Phillippe of the second pass design.  Developer of the second pass senders for AM, WMO, & AMIS.
+
+Daniel Lemay
+  file-based ingest receiver and generalized priorities to senders.
+
+
+Anne-Marie Beaubien
+  Project Lead.  Responsible for testing, lead QA, general bulwark 
+against unreliability.  head of specification team.  Most of the specs.
+lead on precursor project to develop ¨Requirements for an NMMHS¨ 
+
+  
+Peter Silva
+  Project Manager.  Some requirements, first pass at the file exchange 
+tracking module to allow for priorities & direct routing.
+
+
+Alfred Gagne
+  He who knows the data.  participated in specification effort, also testing.
+
+  
+Lambros Stamadianous, Dave Spiegl 
+  - participated in specs for the precursor of this project,
+
+   

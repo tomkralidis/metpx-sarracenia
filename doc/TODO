@@ -1,0 +1,36 @@
+
+
+  -- AFTN support
+	-- need a contingency if we move the Tandem.
+
+
+  -- student project... directory watching technique study.
+	-- opendir poll, versus, poll mtime, FAM, fcntl(D_NOTIFY, fcntl(I_NOTIFY)
+	-- make a something to tickle the directory to test it.
+	-- test resource usage & responsiveness of all methods.
+		-- when the directory is almost always empty
+		-- when the directory is getting multiple files per second.
+
+
+  -- student project:
+	-- add sftp support into curl.
+
+
+  -- student project:
+	-- see if there is bandwidth control in curl, and if not
+	   see if we can add it.
+
+	
+  -- full ftp sender.
+	-- record byte count on send in log.
+	-- supports multiple protocols (http,https, sftp  etc...)
+	-- based on curl.
+
+
+  -- full file fetcher, as another prx method.
+  	-- based on Daniel's work for scribe files.
+	-- use also for gudfx stuff.
+	-- good market for this with implementation, if
+           we do it right.
+
+   
