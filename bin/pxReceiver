@@ -1,6 +1,6 @@
-#! /usr/bin/env python2
-# -*- coding: UTF-8 -*-
 #! /usr/bin/python
+# -*- coding: UTF-8 -*-
+#! /usr/bin/env python2
 # -----------------------------------------------------
 # Définition globale pour le traîtement effectué par un 
 # Receiver (socket2file).
