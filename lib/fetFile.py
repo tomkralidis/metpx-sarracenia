@@ -317,7 +317,7 @@ def filePrio( x, y ):
     """
     xx = os.path.basename(x).split(':')
     yy = os.path.basename(y).split(':')
-    return cmp ( xx[4] + xx[5], yy[4] + yy[5] )
+    return cmp ( xx[5] + xx[6], yy[5] + yy[6] )
 
 
 #checkClient( sys.argv[1], fet.clients, filePrio, logger )
