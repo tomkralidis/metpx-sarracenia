@@ -160,11 +160,13 @@ def sendFiles(c, files,logger):
     ftphost=''
     ftpdir=''
     for p in files:
+        print p
         f = p[p.rfind('/')+1:]
         m = fet.clientMatch(c,f)
 	if not m:
 	    logger.writeLog( logger.INFO, "file " + os.path.basename(f) + " removed, no matching imask" )
-	    os.unlink(p)
+            if not fet.options.worklists:
+	        os.unlink(p)
 	    continue
         dfn = fet.destFileName(f,m)
 #     print "match is: ", m
@@ -177,7 +179,8 @@ def sendFiles(c, files,logger):
                 there = dspec + '/' + dfn
                 try:
                     os.copy( p , there )
-                    os.unlink( p )
+                    if not fet.options.worklists:
+                        os.unlink( p )
                     logger.writeLog( logger.INFO, "fichier " + os.path.basename(f) + " livré à " + there )
                 except:
                     logger.writeLog( logger.ERROR, "pas capable d'ecrire" + there + ": " + repr(sys.exc_info()[0]) )
@@ -216,7 +219,8 @@ def sendFiles(c, files,logger):
                     ftp.storbinary("STOR " + tmpnam , pfn )
                     pfn.close()
                     ftp.rename( tmpnam, dfn )
-                    os.unlink( p )
+                    if not fet.options.worklists:
+                        os.unlink( p )
                     logger.writeLog( logger.INFO, "fichier " + os.path.basename(f) + " livré à "  + \
                       proto + ":" + hspec + " " + dspec + " " + dfn )
                 except:
@@ -269,9 +273,18 @@ def doClient(c,howtoprioritize,logger):
     global dmodified
 
     cname = fet.FET_DATA + fet.FET_TX + c
-    for dname in map( lambda x: os.path.join(cname,x), os.listdir( cname )):
-        cfiles = []
+    cfiles = []
 
+    for dname in map( lambda x: os.path.join(cname,x), os.listdir( cname )):
+
+        if os.path.basename(dname)[0:4] == '.wl_':
+            wlf = open( dname, 'r')
+            wl = wlf.read().split()
+            wlf.close
+            cfiles = cfiles + wl
+            os.unlink(dname)
+            continue
+        
         # if the dir has changed, then ingest.
         try:
             dstat=os.stat(dname) ;
@@ -291,8 +304,8 @@ def doClient(c,howtoprioritize,logger):
             dmodified[ dname ] = dstat.st_mtime
             cfiles= cfiles + checkDir( dname, logger )
 
+    if cfiles:
         cfiles.sort(howtoprioritize)
-
         sendFiles( c, cfiles, logger )
 
 

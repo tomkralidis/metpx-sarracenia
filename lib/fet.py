@@ -169,7 +169,7 @@ def addStandardOptions(parser):
         help="name of source (when receiving) identifying config and queue directories" )
     parser.add_option( "-c", "--client", default=None, dest="client",
         help="name of client (when tranmitting) identifying config and queue directories" )
-    parser.add_option( "-v", "--debug", default=False, type="int",
+    parser.add_option( "-v", "--debug", default=0, type="int",
         dest="debug", help="makes it ridiculously more voluble"  )
 
 
@@ -628,6 +628,37 @@ def linkFile(f,l):
 #  print "link(", f, l, ")"
     os.link( f, l )
 
+qWorkLists={}
+lastWorkListPush=0
+
+def pushWorkList():
+  """ push all work lists to client queues. 
+  """
+  global qWorkLists
+
+  for i in qWorkLists.keys():
+     wk = open( FET_DATA + FET_TX + i + '/.wl_' + options.source + '_' + 
+              time.strftime( "%Y%m%d%H%M%S", time.gmtime(time.time()) ) , 'w')
+     wk.write( string.join( qWorkLists[i], '\n' ) )
+     wk.close()
+  qWorkLists={}
+   
+
+def queueWorkList(dbfile,c):
+  """ add to worklists for a client, trigger push if the interval has expired, 
+  """
+  global lastWorkListPush
+
+  if c in qWorkLists.keys():
+     qWorkLists[c] = qWorkLists[c] + [ dbfile ]
+  else:
+     qWorkLists[c] = [ dbfile ]
+
+  now = time.time()
+  if (now - lastWorkListPush > options.worklists): 
+     pushWorkList()
+     lastWorkListPush=time.time()
+
 
 def directIngest(ingestname,clist,lfn,logger):
     """ link lfn into the db & client spools based on ingestname & clients
@@ -646,8 +677,11 @@ def directIngest(ingestname,clist,lfn,logger):
         return 1
 
     for c in clist:
-        cname=clientQDirName( c )
-        linkFile(dbn , cname + ingestname )
+        if options.worklists:
+          queueWorkList(dbn, c )
+        else:
+          cname=clientQDirName( c )
+          linkFile(dbn , cname + ingestname )
 
     logger.writeLog( logger.INFO, "queued for " + string.join(clist) )
     return 1
@@ -746,6 +780,8 @@ def startup(opts, logger):
             cfl=cf.split()
             if cfl[0] == 'usePDS':
                 options.use_pds=isTrue(cfl[1])
+            elif cfl[0] == 'worklists':
+                options.worklists=int(cfl[1])
             cf=pxconf.readline()
         pxconf.close()
     except:
