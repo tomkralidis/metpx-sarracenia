@@ -16,7 +16,7 @@ except:
   pass
 
 os.chdir(fet.FET_DATA)
-uor d in [ 'db', 'etc', 'log', 'rx', 'tx', 'etc/tx', 'etc/rx' ]:
+for d in [ 'db', 'etc', 'log', 'rx', 'tx', 'etc/tx', 'etc/rx' ]:
   try:
     os.mkdir(d)
   except:
