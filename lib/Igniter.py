@@ -72,10 +72,13 @@ class Igniter:
          else:
             self.printComment('Locked but not running')
             os.unlink(self.lock)
-
-      # Not locked or locked but not running
-      # we create the lock 
-      self.makeLock()
+      
+      if os.fork() == 0:
+         # Not locked or locked but not running
+         # we create the lock 
+         self.makeLock()
+      else:
+         sys.exit()
 
    def stop(self):
       # If it is locked ...
