@@ -16,8 +16,10 @@ INFO Jul 14 14:52:32: pdssender 6258:    ext=''
 INFO Jul 14 14:52:32: pdssender 6258:    rem_dirname=/apps/data/pdsdev/
 ===
 
+INFO Feb 01 02:16:34: /apps/pds//bin//pdsftpxfer: INFO: File 2005020100_054_R1_arctic_I_CLASSIC_qq500_gz500_uv500_000.png:charts+data+prog+regional:CMC:WEBPRODS:A LL::20050201021630:pds1   sent to wxo-b1new.cmc.ec.gc.ca as 2005020100_054_R1_arctic_I_CLASSIC_qq500_gz500_uv500_000.png    Bytes= 54768
+
 ===
-NFO Sep 09 16:54:24: pdssender 4833: Startup is OK, read /apps/pds/etc/ppp1_tandem.conf
+INFO Sep 09 16:54:24: pdssender 4833: Startup is OK, read /apps/pds/etc/ppp1_tandem.conf
 INFO Sep 09 16:54:24: pdssender 4833: Check messages in /apps/pds/log/PDSlog
 INFO Sep 13 12:50:18: /apps/pds//bin//pdsftpxfer: INFO: File CACN00_CWAO_131250_WSQ_00001:NAMrx-tandem:CWAO:CA:ASCII::20040913125007:pds1-dev   IS READY TO GO ON ppp1.cmc.ec.gc.ca
 INFO Sep 13 12:50:18: /apps/pds//bin//pdsftpxfer: INFO: File CACN00_CWAO_131250_WSQ_00001:NAMrx-tandem:CWAO:CA:ASCII::2004

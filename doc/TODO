@@ -1,23 +1,23 @@
 
-
-  -- move code to a new repository.
-        -- remove the old bin/'s
-        -- remove self.config support, commit to self.options.
+  -- remove self.config support, commit to self.options. mostly done.
+        some cruft still left.
 
   -- develop basic self-test suite.
 
-  -- add use_pds support to options.
-
   -- revamp coding standard.
-        -- change indents to 4, ban tabs. (reindent.py ... )
+        -- change indents to 4, ban tabs. (reindent.py ... ) DONE.
         -- move 'authorship' to start of file, alone. not every routine.
            If a file has more than one author major, list all at top (once)
         -- scope (public vs. private) of a routine is revealed by it's name
            this information is redundant. Date per routine is redundant.
+           available from source management system.
 
   -- clone PDS messages, to minimize impact on pds-stats & columbo.
         -- put all log messages in English.
         -- concise (there are a lot more of them.)
+        -- add bytes to each send.
+        -- use os.path.basename() so don't include whole path of bulletin.
+           in send messages.
 
   -- AFTN support -- DL
 	-- need a contingency if we move the Tandem.
@@ -43,12 +43,10 @@
 	-- add sftp support into curl.
 	-- just work with the open source project and modify it.
 
-
   -- student project:
 	-- see if there is bandwidth control in curl, and if not
 	   see if we can add it.
 
-	
   -- full ftp sender.   DL!
 	-- record byte count on send in log.
 	-- supports multiple protocols (http,https, sftp  etc...)
@@ -59,9 +57,6 @@
 	-- use also for gudfx stuff.
 	-- good market for this with implementation, if
            we do it right.
-
-  -- add destination confirmation to the process of reading header2client.conf?
-     reject non-existent clients?
 
   -- Documentation
 	-- Extract all the TIKI stuff .. dump it into docs/specs...
