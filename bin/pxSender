@@ -24,8 +24,8 @@ import fet
 import os.path
 
 def main():
-    global logger
-    global unGateway
+    #global logger
+    #global unGateway
 
     if os.geteuid() == 0:
         print "FATAL: Do not start as root. It will be a mess."
@@ -98,6 +98,8 @@ def main():
     elif options.type == 'single-file':
         import fetFile
 
+        igniter.setGateway("DUMMY")
+
         #fetFile.checkClient( options.client, fet.clients, fetFile.filePrio, logger )
         while True:
             reader = DiskReader(fet.FET_DATA + fet.FET_TX + options.client, fet.options.batch,
@@ -113,6 +115,7 @@ def main():
     else:
         raise Exception('Type de protocole non reconnu')
 
+    """
     # Définition de la méthode de shutdown "propre"
     def shutdown(sig,stack):
         global unGateway
@@ -122,11 +125,8 @@ def main():
 
         unGateway.shutdown()
         sys.exit(-1)
+    """
 
-    # Assignement des signaux avec le shutdown
-    #signal.signal(signal.SIGTERM,shutdown)
-    #signal.signal(signal.SIGINT,shutdown)
-    
     unGateway.run()
 
 if __name__ == '__main__':
