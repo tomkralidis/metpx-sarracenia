@@ -103,6 +103,8 @@ review results for messages per second, and data.
 -------------------------------------------------------------------
 2005-02-09 (DL)
 
+Note: These tests have been done on my personal computer, not a server.
+
 A filename verification function has been added to the directory sorting
 ingestor. The pattern to verify is written as a regex.
 
@@ -121,3 +123,43 @@ to the time passed to ingest.
 
 => We choose design over performance on this item.
 -------------------------------------------------------------------
+2005-03-01 (DL)
+
+Tests have been done on pds5.
+
+We were able to create 20000 links in 0.75 second. This observation has
+for consequence that we have let down worklists.
+
+-------------------------------------------------------------------
+2005-03-01 (DL)
+
+Tests have been done on pds5.
+
+The tests consist in reading and validating filenames contained in a
+directory and sorting the filenames (according to priority and timestamp). 
+
+
+Number of files     Time for reading and validating filenames   Sorting time
+---------------     -----------------------------------------   ------------
+20000                         ~ 1 sec                              ~ 1 sec
+40000                         ~ 3 sec                              ~ 1 sec
+200000                        ~ 15 sec                             ~ 8 sec
+
+
+100000                        ~ 29 sec                             ~ 4 sec
+200000                        ~ 60 sec                             ~ 8 sec
+
+100000                        ~ 26 sec                             ~ 4 sec
+200000                        ~ 52 sec                             ~ 8 sec
+
+40000                         ~ 3 sec                              ~ 1 sec
+100000                        ~ 7 sec                              ~ 4 sec
+200000                        ~ 15 sec                             ~ 7 sec
+
+
+Conclusion: Il semble y avoir linearite dans le reading et le sorting. Les
+temps de sorting sont extremement constants (25000 files/second). Les temps
+de reading dependent du load de la machine. Meme si ce load n'est pas vraiment
+perceptible par la commande uptime. Dans tous les cas presentes ci-haut, le load
+(tel que vu dans uptime) etait tres bas (moins de 1). Le taux de reading varie
+entre 3333 files/seconde et 13333 files/seconde.
