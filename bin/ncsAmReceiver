@@ -280,7 +280,10 @@ while True:
 				# Le transfert du fichier est un succes
 				utils.writeLog(log,'Ecriture du fichier <' + destDir + nomFic + '>')	
 			else:
-				listeNoms = bulletinLib.circuitRename(nomFic,string.join(unBulletin.splitlines()[0].split()[:2],' '),mapCircuits)
+				try:
+					listeNoms = bulletinLib.circuitRename(nomFic,string.join(unBulletin.splitlines()[0].split()[:2],' '),mapCircuits)
+				except Exception:
+					listeNoms = ['CIRCUITINTROUVABLE']
 
 				bulletinLib.circuitWriteBulls(unBulletin,listeNoms,tempDir)
 
