@@ -10,12 +10,12 @@
 
 import sys
 import os
+import time
 
 sys.path.insert(1, sys.path[0] + '/../lib')
 sys.path.insert(1,sys.path[0] + '/../lib/importedLibs')
 
 import fet
-
 
 def startThem(dir,name,cmd):
   for cfname in os.listdir( dir ):
@@ -24,14 +24,12 @@ def startThem(dir,name,cmd):
 
     id = cfname[:-5]
     if os.fork() == 0:
-        os.execl( sys.path[0] + '/' + name , name, id, cmd )
-
+      os.execl( sys.path[0] + '/' + name , name, id, cmd )
 
 def start(cmd):
   startThem( fet.FET_ETC + 'rx/', 'pxReceiver', cmd)
   startThem( fet.FET_ETC + 'tx/', 'pxSender', cmd)
-
-
+  time.sleep(2)
 
 if os.getuid() == 0:
   print "FATAL: Do not start as root. It will be a mess."
@@ -43,4 +41,3 @@ if len(sys.argv) < 2:
 
 start(sys.argv[1])
 sys.exit(0)
-

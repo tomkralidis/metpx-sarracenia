@@ -16,6 +16,7 @@ sys.path.append(sys.path[0] + '/../etc')
 sys.path.append(sys.path[0] + '/../lib/importedLibs')
 
 from optparse import OptionParser
+from PXIgniter import PXIgniter
 import gateway, log
 import fet
 import os.path
@@ -28,8 +29,10 @@ def main():
            print "FATAL: Do not start as root. It will be a mess."
 	   sys.exit(2)
 
+        direction = "sender"
+        
 	# Message d'usage pour l' option parser
-	usage =  "%prog <client> (start|stop)\n" \
+	usage =  "%prog <client> (start|stop|restart)\n" \
 		 "	 Un sender lit les bulletins dans un repertoire du disque et les\n" \
 		 "	 envoie a un destinataire.  de\n" 
 
@@ -62,12 +65,12 @@ def main():
 	      logger.writeLog(logger.FATAL, "fin anormale, client invalide.")
 	      print "fin anormale: client invalide."
 	      sys.exit(1)
-	 
 
-        fet.lockStopOrDie( fet.FET_DATA + fet.FET_TX + options.client + '/.lock' , options.cmd )
+        #fet.lockStopOrDie(fet.FET_DATA + fet.FET_TX + options.client + '/.lock' , options.cmd )
+        lockPath = fet.FET_DATA + fet.FET_TX + args[0]
+        igniter = PXIgniter(direction, options.type, options.client, options.cmd, lockPath)
 
 	logger.writeLog(logger.INFO, "Début du programme, fichier de config chargé correctement")
-
         logger.writeLog(logger.DEBUG,"Protocole %s sélectionné", options.type )
 
 	# Branchement selon le type de protocole	
@@ -104,8 +107,8 @@ def main():
 		sys.exit(-1)
 	
 	# Assignement des signaux avec le shutdown
-	signal.signal(signal.SIGTERM,shutdown)
-	signal.signal(signal.SIGINT,shutdown)
+	#signal.signal(signal.SIGTERM,shutdown)
+	#signal.signal(signal.SIGINT,shutdown)
 
 	unGateway.run()
 

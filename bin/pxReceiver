@@ -19,6 +19,7 @@ import os.path
 import gateway, log
 import fet
 import bulletinManager
+from PXIgniter import PXIgniter
 
 # Définition de la méthode de shutdown "propre"
 def shutdown(sig,stack):
@@ -51,18 +52,14 @@ def reloadConfig(sig,stack):
    else:
       unGateway.reloadConfig()
 
-# Assignement des signaux avec le shutdown
-signal.signal(signal.SIGTERM,shutdown)
-signal.signal(signal.SIGINT,shutdown)
-signal.signal(signal.SIGHUP,reloadConfig)
-
-
 def main():
 	global logger
 	global unGateway
 
+        direction = "receiver"
+
 	# Message d'usage pour le option parser
-	usage =  "%prog <source> (start|stop)\n" \
+	usage =  "%prog <source> (start|stop|restart)\n" \
 	         "       Un receiver reçoit les bulletins par une connection réseau.\n"
 
 	if os.getuid() == 0:
@@ -103,14 +100,15 @@ def main():
 
         fet.startup(options,logger)
 
-          
-        fet.lockStopOrDie( fet.FET_DATA + fet.FET_RX + args[0] + '/.lock' , options.cmd )
-
-	logger.writeLog(logger.INFO, "Début du programme, fichier de config chargé correctement")
-
 	if options.type != 'collector':
             options.type= fet.sources[options.source]['type']
 
+        #fet.lockStopOrDie( fet.FET_DATA + fet.FET_RX + args[0] + '/.lock' , options.cmd )
+        lockPath = fet.FET_DATA + fet.FET_RX + args[0]
+        igniter = PXIgniter(direction, options.type, options.source, options.cmd, lockPath)
+
+
+	logger.writeLog(logger.INFO, "Début du programme, fichier de config chargé correctement")
         logger.writeLog(logger.DEBUG,"Protocole %s sélectionné", options.type )
 
 	# Branchement selon le type de protocole	
