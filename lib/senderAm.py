@@ -218,7 +218,7 @@ class senderAm(gateway.gateway):
         """
 
         #"""
-        self.logger.writeLog(self.logger.DEBUG,"%d nouveaux bulletins sont envoyes",len(data))
+        self.logger.writeLog(self.logger.DEBUG,"%d nouveaux bulletins seront envoyes",len(data))
 
         for index in range(len(data)):
             try:

@@ -6,6 +6,7 @@ root = "/apps/px/txq/dummy/"
 numFiles = sys.argv[1]
 size = sys.argv[2]
 letters = list(string.letters)
+letters.remove('U')
 priority = range(1,6)
 timestamp = 20050201174200
 
