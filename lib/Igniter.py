@@ -128,6 +128,8 @@ class Igniter:
          return False
 
    def makeLock(self):
+      if not os.path.exists(self.lockPath):
+         os.makedirs(self.lockPath, 01775)
       self.pid = os.getpid()    
       lockFile = open(self.lock, 'w')
       lockFile.write(repr(self.pid))
