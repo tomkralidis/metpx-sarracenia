@@ -66,12 +66,11 @@ class DiskReader:
         self.data = []                            # Content of x filenames (x is set in getFilesContent())
         self.sorterClass = sorterClass            # Sorting algorithm that will be used by sort()
 
-    def _validateName(self, filename):
+    def _validateName(self, basename):
         """
         Validate that the filename has the following form:
         "SACN43_CWAO_012000_CYOJ_41613:ncp1:CWAO:SA:3.A.I.E::20050201200339"
         """
-        basename = os.path.basename(filename)
         match = self.regex.search(basename)
         if match:
             #print match.group(2), match.group(1)
@@ -80,8 +79,8 @@ class DiskReader:
             #print "Don't match: " + basename
             return False
 
-    def _matchPattern(self, filename):
-        pattern = fet.clientMatch(self.clientName, filename)
+    def _matchPattern(self, basename):
+        pattern = fet.clientMatch(self.clientName, basename)
         if pattern:
            return True
         else:
@@ -120,13 +119,13 @@ class DiskReader:
                     continue
                 # If we use name validation 
                 if self.validation:
-                    if not self._validateName(file):
+                    if not self._validateName(basename):
                         os.unlink(file)
                         if self.logger is not None:
                             self.logger.writeLog(self.logger.INFO, "Filename incorrect: " + file + " has been unlinked!")
                         continue
                 # Does the filename match a pattern
-                if not self._matchPattern(file):
+                if not self._matchPattern(basename):
                     os.unlink(file)
                     if self.logger is not None:
                         self.logger.writeLog(self.logger.INFO, "No pattern matching: " + file + " has been unlinked!")
