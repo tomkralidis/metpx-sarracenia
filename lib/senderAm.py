@@ -223,7 +223,7 @@ class senderAm(gateway.gateway):
         for index in range(len(data)):
             try:
                 rawBulletin = data[index]
-                unBulletinAm = bulletinAm.bulletinAm(rawBulletin,self.logger,finalLineSeparator='\r\r\n')
+                unBulletinAm = bulletinAm.bulletinAm(rawBulletin,self.logger,lineSeparator='\r\r\n')
                 succes = self.unSocketManagerAm.sendBulletin(unBulletinAm)
                 #si le bulletin a ete envoye correctement, le fichier est efface
                 if succes:
