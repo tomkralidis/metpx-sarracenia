@@ -54,7 +54,7 @@ class DiskReader:
         FIXME: The regex should be passed otherwise!  config file?
 
         """
-        self.regex = re.compile(r'^.*?:.*?:.*?:.*?:(\d).*?:.*?:(\d{13})$')  # Regex used to validate filenames
+        self.regex = re.compile(r'^.*:.*:.*:.*:(\d)*:.*:(\d{14})$')  # Regex used to validate filenames
         self.path = path                    # Path from where we ingest filenames
         self.validation = validation        # Name Validation active (True or False)
         self.logger = logger                # Use to log information
