@@ -283,7 +283,7 @@ while True:
 				try:
 					listeNoms = bulletinLib.circuitRename(nomFic,string.join(unBulletin.splitlines()[0].split()[:2],' '),mapCircuits)
 				except Exception:
-					listeNoms = ['CIRCUITINTROUVABLE']
+					listeNoms = ['CIRCUITINTROUVABLE_' + nomFic]
 
 				bulletinLib.circuitWriteBulls(unBulletin,listeNoms,tempDir)
 
