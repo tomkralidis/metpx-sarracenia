@@ -36,7 +36,7 @@ if os.getuid() == 0:
   sys.exit(2)
 
 if len(sys.argv) < 2:
-  print "USAGE: px (start|stop) "
+  print "USAGE: px (start|stop|restart|status) "
   sys.exit(1)
 
 start(sys.argv[1])
