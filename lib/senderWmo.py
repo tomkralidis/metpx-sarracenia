@@ -218,7 +218,7 @@ class senderWmo(gateway.gateway):
         Modifications: Janvier 2005
         """
 
-        self.logger.writeLog(self.logger.DEBUG,"%d nouveaux bulletins sont envoyes",len(data))
+        self.logger.writeLog(self.logger.INFO,"%d nouveaux bulletins sont envoyes",len(data))
 
         for index in range(len(data)):
                 try:
