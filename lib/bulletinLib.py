@@ -238,20 +238,3 @@ def circuitWriteBulls(bulletin,listeNoms,path):
 	except OSError, inst:
 		raise
 
-def loadPythonConfigFile(path):
-	"""Lecture du fichier de configuration du programme"""
-	if len(sys.argv) == 2:
-        	pathCfg = sys.argv[1]
-
-        	try:
-        	        fic_cfg = open(pathCfg,'r')
-        	        config = imp.load_source('config','/dev/null',fic_cfg)
-        	        fic_cfg.close()	
-			return config
-        	except IOError:
-        	        print "*** Erreur: Fichier de configuration inexistant, erreur fatale!"
-        	        sys.exit(-1)
-	else:
-	        print "*** Erreur: Aucun fichier de config en entree, erreur fatale !\n" + \
-	              "            Le chemin du fichier doit etre le chemin complet"
-	        sys.exit(-1)
