@@ -90,7 +90,7 @@ def main():
     elif options.type == 'amis':
 
         import senderAMIS
-        unGateway = senderAMIS.senderAMIS('/dev/null',options,logger)
+        senderAMIS.senderAMIS(options,logger)
 
     elif options.type == 'single-file':
         import fetFile
