@@ -78,10 +78,10 @@ class PXIgniter(Igniter):
             self.logger.writeLog(self.logger.INFO, "%s has been reload" % self.direction)
          elif self.direction == 'receiver':
             fet.startup(self.options, self.logger)
-            if self.type = 'am':
+            if self.type == 'am':
                self.gateway.unBulletinManager.reloadMapCircuit('/dev/null')
                self.gateway.unBulletinManager.reloadMapEntetes(self.gateway.pathFichierStations)
-            if self.type = 'wmo':
+            if self.type == 'wmo':
                self.gateway.unBulletinManager.reloadMapCircuit('/dev/null')
 
             self.logger.writeLog(self.logger.INFO, "%s has been reload" % self.direction)
