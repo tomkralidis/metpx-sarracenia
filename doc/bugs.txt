@@ -1,0 +1,32 @@
+
+
+Reporte     Corrige     Description
+-------     -------     -----------
+
+11/03/05    11/03/05    Lors du "px start", PxSender crash en 
+                        tentant de creer un repertoire DB.
+
+                        Fix: Delai ajoute entre les 2 premiers
+                        startup pour eviter qu'il y ait plus
+                        d'un process qui detecte un repertoire
+                        manquant (donc un repertoire a creer)
+
+
+11/03/05                pxSender (socket) crash lorsque le client
+                        a l'autre bout n'est pas disponible.
+                        pxSender devrait attendre 30 sec. et
+                        essayer a nouveau.
+
+
+
+11/03/05                pxReceiver distribue les fichiers "PROBLEM"
+                        aux clients.  Ces fichiers devraient
+                        seulement etre databases.
+
+
+14/03/05    14/03/05    pxReceiver a crashe en tentant de creer
+                        un repertoire queue deja existant.  l'erreur
+                        devrait etre captee et ignoree.
+
+
+
