@@ -56,7 +56,7 @@ def ingestDir(d,s,logger):
 
     logger.writeLog(logger.DEBUG, " examen de répertoire " + d + " débute." )
     for r in os.listdir(d):
-        if ( r[0] == '.' ) or ( r[0:4] == 'tmp_' ) or not os.access(r, os.R_OK):
+        if ( r[0] == '.' ) or ( r[0:4] == 'tmp_' ) or (r[-4:] == '.tmp' ) or not os.access(r, os.R_OK):
             continue
         i=fet.ingestName(r,s) # map reception name to ingest name
         rr=d + "/" + r
@@ -201,9 +201,10 @@ def sendFiles(c, files,logger):
                 try:
                     #FIXME: does not do the chmod thing, uses a temporary name instead.
                     pfn = open( p, 'r' )
-                    ftp.storbinary("STOR tmp_" + dfn, pfn )
+                    tmpnam = dfn + ".tmp"
+                    ftp.storbinary("STOR " + tmpnam , pfn )
                     pfn.close()
-                    ftp.rename("tmp_" + dfn, dfn )
+                    ftp.rename( tmpnam, dfn )
                     os.unlink( p )
                     logger.writeLog( logger.INFO, "fichier " + f + " livré à "  + \
                       proto + ":" + hspec + " " + dspec + " " + dfn )
@@ -223,7 +224,7 @@ def sendFiles(c, files,logger):
 
 
 
-def checkdir(d,logger):
+def checkDir(d,logger):
     """
     given a single directory, read all the non-hidden entries and
     attempt to ingest them.
@@ -231,15 +232,13 @@ def checkdir(d,logger):
     if it works, remove it.
     If not, just leave it there
 
-    pay attention to the time, and abort if it takes too long
-
     """
 
     dirfiles=[]
 
     for t in os.listdir(d):
         p=os.path.join(d,t)
-        if t[0] == '.' or not os.access( p, os.R_OK):
+        if ( t[0] == '.' ) or ( t[0:4] == 'tmp_' ) or (t[-4:] == '.tmp' ) or not os.access(p, os.R_OK):
             continue
         dirfiles = dirfiles + [ p ]
 
@@ -279,7 +278,7 @@ def doClient(c,howtoprioritize,logger):
 
         if dstat.st_mtime > dmodified[ dname ] :
             dmodified[ dname ] = dstat.st_mtime
-            cfiles= cfiles + checkdir( dname, logger )
+            cfiles= cfiles + checkDir( dname, logger )
 
         cfiles.sort(howtoprioritize)
 
