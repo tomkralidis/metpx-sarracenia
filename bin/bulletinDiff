@@ -35,6 +35,7 @@ tempDir = utils.normalizePath(config.tempDir)
 ficTmpDir1 = tempDir+'dir1_fichier'
 ficTmpDir2 = tempDir+'dir2_fichier'
 diffFilePath = config.diffResultFile
+incorrectDir = utils.normalizePath(config.incorrectDir)
 
 # Init du log
 try:
@@ -90,9 +91,15 @@ def getLesDerniersFichiers(dir1,dir2):
 
 		elif res == -1:
 			# Le nombre de fichiers est différent dans les 2 repertoires
-			ficDir1.pop(0)
+			f = ficDir1.pop(0)
+			if time.time() - os.stat(workDir1 + f).st_mtime == 60 * 5:
+				os.remove(workDir1 + f)
+				utils.writeLog(log,"Effacement du fichier " + workDir1 + f + ", comparaison impossible")
 		else:
-			ficDir2.pop(0)
+			f = ficDir2.pop(0)
+			if time.time() - os.stat(workDir2 + f).st_mtime == 60 * 5:
+				os.remove(workDir2 + f)
+				utils.writeLog(log,"Effacement du fichier " + workDir2 + f + ", comparaison impossible")
 
 	if lDir1 != []:
 		lesFichiers.append( (lDir1,lDir2) )
@@ -113,19 +120,40 @@ while True:
 
 	derniersFichiers = getLesDerniersFichiers(workDir1,workDir2)
 
-	print derniersFichiers
-
 	for t in derniersFichiers:
 		if len(t[0]) == 1:
+		# Un seul fichier a comparer
 			compRes = compareFics(workDir1 + t[0][0],workDir2 + t[1][0])
+			fichiers = t[0][0] + ' et ' + t[1][0]
 		else:
+		# Plusieurs fichiers a comparer
 			f1 = catSortWriteFichiers(workDir1, t[0], ficTmpDir1)
 			f2 = catSortWriteFichiers(workDir2, t[1], ficTmpDir2)
 			compRes = compareFics(ficTmpDir1,ficTmpDir2)
+			fichiers = '(' + ','.join(t[0]) + ') et (' + ','.join(t[1]) + ')'
 			
 			os.remove(ficTmpDir1)
 			os.remove(ficTmpDir2)
 
-		print compRes
+		if compRes != '':
+		# Une difference dans les fichiers
+			utils.writeLog(diffFile,"Difference entre " + fichiers + '\n' + compRes)
+			utils.writeLog(log,"**** Deplacement des fichiers " + fichiers + ', ils sont differents')
 
-	time.sleep(delai)
+			# Déplacement des fichiers differents
+			for f in t[0]:
+				os.rename(workDir1+f,incorrectDir+f)
+                        for f in t[1]:
+                                os.rename(workDir2+f,incorrectDir+f)
+
+		else:
+			utils.writeLog(log,"Effacement des fichiers " + fichiers + ', ils sont identiques')
+
+			# Effacement des fichiers identiques
+                        for f in t[0]:
+                                os.remove(workDir1+f)
+                        for f in t[1]:
+                                os.remove(workDir2+f)
+
+
+	time.sleep(delai) 
