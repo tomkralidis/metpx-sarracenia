@@ -66,7 +66,7 @@ class DiskReader:
     def _validateName(self, filename):
         """
         Validate that the filename has the following form:
-        SACN43_CWAO_012000_CYOJ_41613:ncp1:CWAO:SA::3.A.I.E:20050201200339"
+        "SACN43_CWAO_012000_CYOJ_41613:ncp1:CWAO:SA::3.A.I.E:20050201200339"
         """
         basename = os.path.basename(filename)
         match = self.regex.search(basename)
