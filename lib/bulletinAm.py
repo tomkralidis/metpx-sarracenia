@@ -58,8 +58,8 @@ class bulletinAm(bulletin.bulletin):
             self.station = None
 
         # Vérification de l'entête pour les bulletins dont on ne traîteras pas
-        if self.station == "PASDESTATION":
-            bulletin.bulletin.verifyHeader(self)
+#        if self.station == "PASDESTATION":
+#            bulletin.bulletin.verifyHeader(self)
 
         # Print de la station pour le debug
         self.logger.writeLog(logger.DEBUG,"Station: %s",str(self.station))
@@ -216,12 +216,14 @@ class bulletinAm(bulletin.bulletin):
         if self.getType() in ['UG','UK','US'] and self.bulletin[1] == '':
             self.bulletin.remove('')
 
-	if self.bulletin[0][0] == '\x00':
-		self.replaceChar('\x00','')
-		self.replaceChar('\x03\x04\n','')
+        if self.bulletin[0][0] == '\x01':
+            self.replaceChar('\x01','')
+            self.replaceChar('\x03\x04','')
 
-	if self.bulletin[0][:6] in ['RACN00']:
-		self.replaceChar('\x02','')
+        if self.bulletin[0][:6] in ['RACN00']:
+            self.replaceChar('\x02','')
+            self.replaceChar('\x03','')
+            self.replaceChar('\x04','')
 
         bulletin.bulletin.verifyHeader(self)
 
