@@ -182,6 +182,9 @@ def sendFiles(c, files,logger):
 
             elif proto == 'ftp':
 
+                # We remove the first / (if there was only one => relative path, if there was two => absolute path)
+                dspec = dspec[1:]
+
                 # assure ourselves that the ftp object is initialized.
                 if ftphost != hspec:
                     if ftphost != '':
@@ -202,8 +205,6 @@ def sendFiles(c, files,logger):
                     ftphost=hspec
                     ftpdir=''
                 if ftpdir != dspec:
-                    # We remove the first / (if there was only one => relative path, if there was two => absolute path)
-                    dspec = dspec[1:]
                     ftp.cwd(dspec)
                     ftpdir = dspec
 
