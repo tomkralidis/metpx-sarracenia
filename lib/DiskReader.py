@@ -81,8 +81,8 @@ class DiskReader:
             return False
 
     def _matchPattern(self, filename):
-        pattern = fet.clientMatch(self.client, filename)
-        if pattern != None:
+        pattern = fet.clientMatch(self.clientName, filename)
+        if pattern:
            return True
         else:
            return False
