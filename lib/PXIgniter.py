@@ -44,9 +44,9 @@ class PXIgniter(Igniter):
       elif commentID == 'Status, started':
          print "%s %s is running with PID %d" % (self.direction, self.client, self.lockpid)
       elif commentID == 'Status, not running':
-         print "%s %s is not running" % (self.direction, self.client)
+         print "* %s %s is not running" % (self.direction, self.client)
       elif commentID == 'Status, locked':
-         print "%s %s is locked (PID %d) but not running" % (self.direction, self.client, self.lockpid)
+         print "** %s %s is locked (PID %d) but not running" % (self.direction, self.client, self.lockpid)
 
    def start(self):
       
