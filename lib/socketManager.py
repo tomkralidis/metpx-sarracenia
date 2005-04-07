@@ -87,6 +87,7 @@ class socketManager:
            Modifications: Pierre Michaud, 2004-12-15
         """
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
         # Binding avec le port local
         # Si ce n'est pas un master - Pierre Michaud 2004-12-15
