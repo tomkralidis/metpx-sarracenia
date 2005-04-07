@@ -161,7 +161,7 @@ class socketManager:
                     # Normally, this error is generated when a SIGHUP signal is sent and the system call (socket.accept())
                     # is interrupted
                     if value[0] == 4: 
-                       self.logger.writeLog(self.logger.ERROR, "Type: %s, Value: %s" % (type, value))
+                       self.logger.writeLog(self.logger.WARNING, "Type: %s, Value: %s, [socket.accept()]" % (type, value))
                        #self.logger.writeLog(self.logger.ERROR, ''.join(traceback.format_exception(type, value, tb)))
                     # For case we are not aware at this time, we raise the exception
                     else:
@@ -321,6 +321,13 @@ class socketManager:
                 break
 
             except socket.error, inst:
+                (type, value, tb) = sys.exc_info()
+                # Normally, this error is generated when a SIGHUP signal is sent and the system call (socket.recv(32768))
+                # is interrupted
+                if value[0] == 4: 
+                    self.logger.writeLog(self.logger.WARNING, "Type: %s, Value: %s, [socket.recv(32768)]" % (type, value))
+                    break
+
                 if not onlySynch:
                 # La connexion est brisée
                     self.connected = False
