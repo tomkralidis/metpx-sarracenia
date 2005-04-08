@@ -205,7 +205,7 @@ class senderAm(gateway.gateway):
                 succes = self.unSocketManagerAm.sendBulletin(unBulletinAm)
                 #si le bulletin a ete envoye correctement, le fichier est efface
                 if succes:
-                    self.logger.writeLog(self.logger.INFO,"bulletin %s envoye ", self.reader.sortedFiles[index])
+                    self.logger.writeLog(self.logger.INFO,"bulletin %s  livré ", self.reader.sortedFiles[index])
                     self.unBulletinManagerAm.effacerFichier(self.reader.sortedFiles[index])
                     self.logger.writeLog(self.logger.DEBUG,"senderAm.write(..): Effacage de " + self.reader.sortedFiles[index])
                 else:
