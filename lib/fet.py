@@ -556,6 +556,7 @@ def destFileName(ingestname, climatch):
 
     DESTFN=fname -- change the destination file name to fname
     WHATFN       -- change the file name
+    HEADFN       -- Use first 2 fieds of as the destination file name
     NONE         -- use the entire ingest name, except...
     TIME or TIME:   -- TIME stamp appended
     TIME:RASTER:COMPRESS:GZIP -- modifiers... hmm... (forget for now...)
@@ -584,6 +585,9 @@ def destFileName(ingestname, climatch):
             time_suffix= ':' + time.strftime( "%Y%m%d%H%M%S", time.gmtime(time.time()) )
         elif (spec == 'WHATFN') or (spec == ''):  # blank results from "TIME" alone as spec
             dfn=dname
+	elif spec == 'HEADFN':
+	    head=dname.split('_')
+	    dfn=head[0] + '_' + head[1]
         elif spec == 'NONE':
             dfn=ingestname
         elif re.compile('DESTFN=.*').match(spec):
