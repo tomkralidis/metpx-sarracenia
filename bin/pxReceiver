@@ -124,16 +124,18 @@ def main():
 
     elif options.type == 'single-file':
         import fetFile
-        fetFile.checkSource( options.source, fet.sources, logger )
+        igniter.setGateway('DUMMY')
+        fetFile.checkSource( options.source, fet.sources, logger, igniter)
 
     elif options.type == 'bulletin-file':
         import bulletinFileReceiver
-        bulletinFileReceiver.run(logger)
+        igniter.setGateway('DUMMY')
+        bulletinFileReceiver.run(logger, igniter)
 
     elif options.type == 'collector':
         import collectionGateway
-        unGateway = collectionGateway.collectionGateway(
-                '/dev/null', options, logger)
+        unGateway = collectionGateway.collectionGateway('/dev/null', options, logger)
+        igniter.setGateway(unGateway)
 
     else:
         raise Exception('Type de protocole non reconnu')        # FIXME
