@@ -26,6 +26,7 @@ class PXIgniter(Igniter):
       self.options = options                # All options
       self.logger = logger                  # Logger object
       self.gateway = None                   # Gateway object
+      self.reloadMode = False               # Indicate if we are in reload mode or not
       eval("self." + cmd)()                 # Execute the command directly
 
    def setGateway(self, gateway):
@@ -73,6 +74,7 @@ class PXIgniter(Igniter):
          print "No gateway object! Nothing can be done"
       else:
          #print self.gateway
+
          if self.direction == 'sender':
             fet.startup(self.options, self.logger)
             self.logger.writeLog(self.logger.INFO, "%s has been reload" % self.direction)
@@ -81,12 +83,17 @@ class PXIgniter(Igniter):
             if self.type == 'am':
                self.gateway.unBulletinManager.reloadMapCircuit('/dev/null')
                self.gateway.unBulletinManager.reloadMapEntetes(self.gateway.pathFichierStations)
+               self.logger.writeLog(self.logger.INFO, "%s has been reload" % self.direction)
             if self.type == 'wmo':
                self.gateway.unBulletinManager.reloadMapCircuit('/dev/null')
-
-            self.logger.writeLog(self.logger.INFO, "%s has been reload" % self.direction)
-         else:
-            print "What is it? A collector!"
+               self.logger.writeLog(self.logger.INFO, "%s has been reload" % self.direction)
+            if self.type == 'single-file':
+               self.reloadMode = True
+            if self.type == 'bulletin-file':
+               self.reloadMode = True
+            if self.type == 'collector':
+               #self.gateway.reloadConfig()
+               print "Reload for collector not implemented yet"
       
    def reload(self):
       """

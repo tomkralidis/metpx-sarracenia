@@ -21,7 +21,7 @@ sys.path.insert(1,sys.path[0] + '/../lib/importedLibs')
 import gateway, log, bulletinManager
 import fet
 
-def run(logger):
+def run(logger, igniter):
     bullManager = bulletinManager.bulletinManager(
          fet.FET_DATA + fet.FET_RX + fet.options.source, logger,
          fet.FET_DATA + fet.FET_RX + fet.options.source,
@@ -34,6 +34,22 @@ def run(logger):
          fet.options.use_pds )
 
     while True:
+        # If a SIGHUP signal is received ...
+        if igniter.reloadMode == True: 
+            fet.startup(igniter.options, igniter.logger)
+            bullManager = bulletinManager.bulletinManager(
+                               fet.FET_DATA + fet.FET_RX + fet.options.source, logger,
+                               fet.FET_DATA + fet.FET_RX + fet.options.source,
+                               '/apps/pds/RAW/-PRIORITY',
+                               9999,
+                               '\n',
+                               fet.options.extension,
+                               fet.FET_ETC + 'header2client.conf',
+                               fet.options.mapEnteteDelai,
+                               fet.options.use_pds )
+            logger.writeLog(logger.INFO, "%s has been reload" % igniter.direction)
+            igniter.reloadMode = False
+
     # We put the bulletins (read from disk) in a dict (key = absolute filename)
         bulletinsBrutsDict = bullManager.readBulletinFromDisk([bullManager.pathSource])
         if len(bulletinsBrutsDict) == 0:

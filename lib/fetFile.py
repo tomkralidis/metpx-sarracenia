@@ -66,7 +66,7 @@ def ingestDir(d,s,logger):
 
 
 
-def checkSource(s, sources,logger):
+def checkSource(s, sources,logger, igniter):
     """look for source directories with data to ingest. Trigger ingestion.
 
        Priority scheduling scheme.
@@ -86,6 +86,10 @@ def checkSource(s, sources,logger):
     logger.writeLog(logger.INFO, "Début du programme, initialization completée")
 
     while(1):
+        if igniter.reloadMode == True:
+           fet.startup(igniter.options, igniter.logger)
+           igniter.reloadMode = False
+           logger.writeLog(logger.INFO, "%s has been reload" % igniter.direction)
 
         dname = fet.sourceQDirName(s)
 
