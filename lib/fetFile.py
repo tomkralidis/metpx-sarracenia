@@ -175,8 +175,8 @@ def sendFiles(c, files,logger):
             if proto == 'file':
                 there = dspec + '/' + dfn
                 try:
-                    os.copy( p , there )
-                    os.unlink( p )
+                    os.rename( p , there )
+                    #os.unlink( p )
                     logger.writeLog( logger.INFO, "fichier " + os.path.basename(f) + " livré à " + there )
                 except:
                     (type, value, tb) = sys.exc_info()
