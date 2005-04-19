@@ -645,23 +645,7 @@ def directIngest(ingestname,clist,lfn,logger):
     if ( dbn == '' ):
         return 0
 
-    # Il exsite une possibilite qu'immediatment apres que l'on ait verifie qu'un 
-    # repertoire existe, celui-ci soit detruit par un programme independant (very bad!).
-    # A cause de cela, les 2 appels a linkFile sont entoures d'une structure laide et
-    # pesante.
-    notLinked = True
-    numberOfTry = 0
-    while notLinked and numberOfTry < 3:
-        try: 
-            linkFile(lfn, dbn)
-            notLinked = False
-        except OSError, e:
-            (type, value, tb) = sys.exc_info()
-            numberOfTry += 1 
-            logger.writeLog(logger.ERROR, "Type: %s Value: %s, linkFile problem (try # %d)" 
-                            % (type, value, numberOfTry))
-            time.sleep(0.5)
-
+    linkFile(lfn, dbn)
     logger.writeLog( logger.INFO, "ingest " + dbn )
 
     if len (clist) < 1:
@@ -671,30 +655,11 @@ def directIngest(ingestname,clist,lfn,logger):
     if not (ingestname.find("PROBLEM_BULLETIN") == -1):
        return 1
     
-    badList = []
-
     for c in clist:
         cname=clientQDirName(c, ingestname)
+        linkFile(dbn , cname + ingestname)
 
-        notLinked = True
-        numberOfTry = 0
-        while notLinked and numberOfTry < 3:
-            try: 
-                linkFile(dbn , cname + ingestname)
-                notLinked = False
-            except OSError, e:
-                (type, value, tb) = sys.exc_info()
-                numberOfTry += 1 
-                logger.writeLog(logger.ERROR, "Type: %s Value: %s, linkFile problem (try # %d)" 
-                                 % (type, value, numberOfTry))
-                time.sleep(0.5)
-                if numberOfTry == 3:
-                    logger.writeLog(logger.ERROR, "Type: %s Value: %s, linkFile problem(STOP Trying!)(try # %d)" 
-                                 % (type, value, numberOfTry))
-                    badList.append(c)
-                   
-    #logger.writeLog( logger.INFO, "queued for " + string.join(clist) )
-    logger.writeLog(logger.INFO, "queued for " + string.join(filter(lambda x: x not in badList, clist)))
+    logger.writeLog( logger.INFO, "queued for " + string.join(clist) )
     return 1
 
 def ingest(ingestname,lfn,logger):
