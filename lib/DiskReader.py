@@ -4,7 +4,7 @@
 #
 # Author: Daniel Lemay
 #
-# Date: 2004-02-01
+# Date: 2005-02-01
 #
 # Description:
 #
@@ -88,17 +88,29 @@ class DiskReader:
            return False
 
     def _getFilesList(self):
+        """
+        We obtain a list of files to sort. The directory structure is the following:
+        level 1: priorities (1,2,3,4,5)
+        level 2: date (YYYYMMDDHH, 2005042218)
+        If we decide to scan a directory of level 2 (because we haven't attained the "batch" value),
+        we will scan it entirely, even if this implies that "batch" value will be exceeded
 
+        """
         priorities = ['1', '2', '3', '4', '5']
         files = []
         start = 0
 
         for priority in priorities:
-            start = len(files)
-            if start < self.batch:
-               path = self.path + '/' + priority
-               if os.path.exists(path):
-                  files += self._getFilesListForOneBranch(path, self.batch - start)
+             path = self.path + '/' + priority
+             if os.path.exists(path):
+                 dates = os.listdir(path)
+                 dates.sort()
+                 for date in dates:
+                     start = len(files)
+                     if start < self.batch:
+                         datePath = path + '/' + date
+                         if os.path.isdir(datePath):
+                             files += self._getFilesListForOneBranch(datePath, self.batch - start)
         return files
 
     def _getFilesListForOneBranch(self, path, batch):
@@ -133,9 +145,11 @@ class DiskReader:
                         if self.logger is not None:
                             self.logger.writeLog(self.logger.INFO, "No pattern matching: " + file + " has been unlinked!")
                         continue
-                # We don't want to 
-                if len(files) >= batch:
-                        break
+
+                # We don't want to exceed the batch value 
+                #if len(files) >= batch:
+                #        break
+
                 # All "tests" have been passed
                 files.append(file)
 
@@ -189,6 +203,13 @@ if __name__ == "__main__":
     (status, output) = commands.getstatusoutput("date")
     print output
     """
-    iterator = _DirIterator('/apps/px/toto' , True)
-    for file in iterator:
+    #iterator = _DirIterator('/apps/px/toto' , True)
+    reader = DiskReader('/apps/px/txq/amis', 20)
+    #for file in iterator:
+       #print file
+    print "List of all files:"
+    print reader.files
+    reader.sort()
+    print reader.files
+    for file in reader.files:
        print file
