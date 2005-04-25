@@ -710,6 +710,7 @@ def initDB(logger):
     createDir( FET_DATA + FET_RX )
     createDir( FET_DATA + FET_TX )
     createDir( FET_DATA + FET_CL )
+    createDir( FET_DATA + FET_TMP )
     createDir( FET_DATA + "db" )
     todaylink = time.strftime( "%Y%m%d", time.gmtime(time.time()))
     FET_DB = "db/" + todaylink + "/"
