@@ -106,7 +106,7 @@ class collectionGateway(gateway.gateway):
 
             else:
                 # Parcours normal (non collecté)
-                self.unBulletinManager.writeBulletinToDisk(rawBulletin,compteur=False,includeError=True)
+                self.unBulletinManager.writeBulletinToDisk(rawBulletin,compteur=True,includeError=True)
 
         # Dans tous les cas, écrire les collection s'il y a lieu
         self.unCollectionManager.writeCollection()

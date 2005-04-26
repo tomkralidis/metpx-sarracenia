@@ -633,7 +633,11 @@ def linkFile(f,l):
     """
     createDir( os.path.dirname(l) )
 #  print "link(", f, l, ")"
+    #print "link %s %s" % (f, l)
     os.link( f, l )
+    # Introduced this sleep to verify that there is not
+    # other problems
+    #time.sleep(2)
 
 
 def directIngest(ingestname,clist,lfn,logger):
