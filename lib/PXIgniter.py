@@ -57,12 +57,35 @@ class PXIgniter(Igniter):
       signal.signal(signal.SIGTERM, self._shutdown)
       signal.signal(signal.SIGINT, self._shutdown)
       signal.signal(signal.SIGHUP, self._reload)
+      self.logger.writeLog(self.logger.INFO, "%s %s (type: %s) has been started" % (self.direction, self.client, self.type))
+
+   def stop(self):
+      # If it is locked ...
+      if self.isLocked():
+         # ... and running
+         if not commands.getstatusoutput('ps -p ' + str(self.lockpid))[0]:
+            os.unlink(self.lock)
+            os.kill(self.lockpid, signal.SIGTERM)
+         # ... and not running
+         else:
+            self.printComment('Locked but not running')
+            os.unlink(self.lock)
+
+      # If it is unlocked 
+      else:
+         self.printComment('No lock')
+         sys.exit()
+
+      # Bye bye if stop is called directly
+      if not self.comingFromRestart:
+         sys.exit() 
 
    def _shutdown(self, sig, stack):
       """
       Do the real work here. Depends of type of sender/receiver
       """
       #print "shutdown() has been called"
+      self.logger.writeLog(self.logger.INFO, "%s %s (type: %s) has been stopped" % (self.direction, self.client, self.type))
       os.kill(self.lockpid, signal.SIGKILL)
 
    def _reload(self, sig, stack):
