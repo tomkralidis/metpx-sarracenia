@@ -446,6 +446,7 @@ class bulletinManager:
 
                 self.logger.writeLog(self.logger.WARNING,e)
                 return ('PROBLEM_BULLETIN ' + bulletin.getHeader() + strCompteur + self.getExtension(bulletin,error=True)).replace(' ','_')
+
         elif bulletin.getError() != None and not error:
             self.logger.writeLog( self.logger.WARNING, "Le bulletin est erronné " + bulletin.getError()[0] )
             return ('PROBLEM_BULLETIN ' + bulletin.getHeader() + strCompteur + self.getExtension(bulletin,error)).replace(' ','_')
@@ -554,7 +555,7 @@ class bulletinManager:
 
            Charge le fichier de header2circuit et assigne un map avec comme cle
            champs:
-                'routing_groups' -- list of clients to which the messages are to be routed.
+                'routing_groups' -- list of clients to which the messages 
 '                priority'       -- priority to assign to the message.
 
            FIXME: Peter a fixé le chemin a /apps/px/etc/header2circuit.conf

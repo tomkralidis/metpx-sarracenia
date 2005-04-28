@@ -106,6 +106,8 @@ class collectionGateway(gateway.gateway):
 
             else:
                 # Parcours normal (non collecté)
+                self.logger.writeLog(self.logger.DEBUG, "RAW BULLETIN: %s" % rawBulletin) #DL20050428
+                self.logger.writeLog(self.logger.DEBUG, "Don't need to be collected => bulletinManager treatment") #DL20050428
                 self.unBulletinManager.writeBulletinToDisk(rawBulletin,compteur=True,includeError=True)
 
         # Dans tous les cas, écrire les collection s'il y a lieu

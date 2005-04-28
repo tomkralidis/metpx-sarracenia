@@ -2,8 +2,8 @@
 """Gestionnaire de 'collections'"""
 
 import re, os, time, string, gdbm, pickle
-import bulletinManager, bulletinManagerAm, bulletinPlain, bulletinCollection
-import fet
+import bulletin, bulletinManager, bulletinManagerAm, bulletinPlain, bulletinCollection
+import fet,sys
 
 __version__ = '2.0'
 
@@ -72,7 +72,7 @@ class collectionManager(bulletinManager.bulletinManager):
 
     def __init__(self, \
             logger, \
-            pathTemp=fet.FET_DATA + fet.FET_CL, \
+            pathTemp=fet.FET_DATA + fet.FET_TMP, \
             pathFichierCollection = fet.FET_ETC + 'collection_stations.conf', \
             collectParms = None, \
             ficCircuits= fet.FET_ETC + 'header2client.conf' , \
@@ -85,7 +85,7 @@ class collectionManager(bulletinManager.bulletinManager):
             opts=fet.options):
 
         if pathDest != None: # trigger FET
-            collectionParams = collectParms
+            opts.collectionParams = collectParms
             opts.delaiMaxSeq = delai
             opts.extension = extension
 
@@ -94,13 +94,20 @@ class collectionManager(bulletinManager.bulletinManager):
         self.pathSource = self.__normalizePath(pathSource)
         self.pathDest = self.__normalizePath(pathDest)
 
+        self.collectionParams = self.options.collectionParams
+        self.delaiMaxSeq = opts.delaiMaxSeq
+        self.extension = opts.extension
+        self.use_pds = opts.use_pds
+
         self.maxCompteur = 99999
         self.compteur = 0
         self.statusNeedToBeUpdated = False
 
         self.lineSeparator = lineSeparator
         self.logger = logger
+        #self.logger.writeLog(self.logger.INFO, self.collectionParams)
 
+         
         self.initMapEntetes(pathFichierCollection)
         self.statusFile = self.pathTemp + statusFile
         self.statusDb = None
@@ -200,7 +207,7 @@ class collectionManager(bulletinManager.bulletinManager):
                     self.logger.writeLog(self.logger.DEBUG,"Création de la séquence: %s", bbbType)
 
                     self.mainDataMap['sequenceMap'][header+bbbType] = \
-                            {'token':bbbType + 'B','deleteTime':time.time() + 60.0 * 60.0 * float(delaiMaxSeq)}
+                            {'token':bbbType + 'B','deleteTime':time.time() + 60.0 * 60.0 * float(self.delaiMaxSeq)}
                     newBBB = bbbType + 'A'
                 elif bbb == 'COR':
                     newBBB = 'COR'
@@ -294,7 +301,7 @@ class collectionManager(bulletinManager.bulletinManager):
             if not self.mainDataMap['sequenceMap'].has_key(entete + ' ' + 'RR'):
                 # Pas de séquence de démarée
                 self.mainDataMap['sequenceMap'][entete + ' ' + 'RR'] = \
-                        {'token':'RRA','deleteTime':time.time() + 60.0 * 60.0 * float(delaiMaxSeq)}
+                        {'token':'RRA','deleteTime':time.time() + 60.0 * 60.0 * float(self.delaiMaxSeq)}
 
             # Génération du RRx pour la collection en retard
             newBBB = self.mainDataMap['sequenceMap'][entete + ' ' + 'RR']['token']
@@ -308,7 +315,11 @@ class collectionManager(bulletinManager.bulletinManager):
         station = bulletinCollection.bulletinCollection.getStation(rawBulletin)
         data = bulletinCollection.bulletinCollection.getData(rawBulletin)
 
-        self.mainDataMap['collectionMap'][rawBulletin.splitlines()[0]].addData(station,data)
+        try:
+           self.mainDataMap['collectionMap'][rawBulletin.splitlines()[0]].addData(station,data)
+        except bulletin.bulletinException, e:
+           pass 
+
 
     def isInCollectionPeriod(self,rawBulletin):
         """isInCollectionPeriod(rawBulletin) -> bool
@@ -381,7 +392,10 @@ class collectionManager(bulletinManager.bulletinManager):
         station = bulletinCollection.bulletinCollection.getStation(rawBulletin)
         data = bulletinCollection.bulletinCollection.getData(rawBulletin)
 
-        self.mainDataMap['collectionMap'][rawBulletin.splitlines()[0]].addData(station,data)
+        try:
+            self.mainDataMap['collectionMap'][rawBulletin.splitlines()[0]].addData(station,data)
+        except bulletin.bulletinException, e:
+            pass
 
     def getWriteTime(self,timeStamp,nb_min):
         """getWriteTime(timeStamp,nb_min) -> writeTime
@@ -481,9 +495,24 @@ class collectionManager(bulletinManager.bulletinManager):
                 self.logger.writeLog(self.logger.DEBUG,"Écriture de la collection: %s", reason)
 
                 fileName = self.getFileName(self.mainDataMap['collectionMap'][k],compteur=False)
+                
+                #self.logger.writeLog(self.logger.INFO, "Filename= %s" % fileName) #DL20050427
 
                 self.writeToDisk(fileName, self.mainDataMap['collectionMap'][k])
+                """
+                DL20050428
+                if self.use_pds: 
+                    self.writeToDisk(fileName, self.mainDataMap['collectionMap'][k])
+                else:
 
+                    entete = ' '.join(unBulletin.getHeader().split()[:2])
+
+                    if self.mapCircuits.has_key(entete):
+                        clist = self.mapCircuits[entete]['routing_groups']
+                    else:
+                        clist = []
+                    fet.directIngest(nomFichier, clist, tempNom, self.logger)
+                """
                 del self.mainDataMap['collectionMap'][k]
 
                 self.statusNeedToBeUpdated = True
@@ -627,6 +656,7 @@ class collectionManager(bulletinManager.bulletinManager):
         try:
             if self.getBullTimestamp(rawBulletin)[-2:] == '00':
             # Doit finir (l'heure) par 00
+
                 bbb = self.getBBB(rawBulletin)
 
                 return  rawBulletin[:2] in self.collectionParams or ( bbb != None and bbb[0] in ['C','R','A'] )
@@ -634,6 +664,8 @@ class collectionManager(bulletinManager.bulletinManager):
             else:
                 return False
         except:
+            (type, value, tb) = sys.exc_info()
+            self.logger.writeLog(self.logger.INFO, "Type= %s, Value= %s" % (type, value))
             # Si quelconque erreur, on retourne Faux
             return False
 
@@ -762,19 +794,21 @@ class collectionManager(bulletinManager.bulletinManager):
         os.write( unFichier , unBulletin.getBulletin(includeError=True) )
         os.close( unFichier )
         os.chmod(self.pathTemp + nomFichier,0644)
+        
+        if self.use_pds:  #DL20050428
 
-        # Fetch du path de destination
-        pathDest = self.getFinalPath(unBulletin)
+            # Fetch du path de destination
+            pathDest = self.getFinalPath(unBulletin)
 
-        # Si le répertoire n'existe pas, le créer
-        if not os.access(pathDest,os.F_OK):
-            os.mkdir(pathDest, 0755)
+            # Si le répertoire n'existe pas, le créer
+            if not os.access(pathDest,os.F_OK):
+                os.mkdir(pathDest, 0755)
 
-        # Déplacement du fichier vers le répertoire final
-        os.rename( self.pathTemp + nomFichier , pathDest + nomFichier )
+            # Déplacement du fichier vers le répertoire final
+            os.rename( self.pathTemp + nomFichier , pathDest + nomFichier )
 
-        # Le transfert du fichier est un succes
-        self.logger.writeLog(self.logger.INFO, "Ecriture du fichier <%s>",pathDest + nomFichier)
+            # Le transfert du fichier est un succes
+            self.logger.writeLog(self.logger.INFO, "Ecriture du fichier <%s>",pathDest + nomFichier)
 
     def __normalizePath(self,path):
         """normalizePath(path) -> path
@@ -864,7 +898,7 @@ class collectionManager(bulletinManager.bulletinManager):
         nbHourBullTime = 24 * int(bullTime[0:2]) + int(bullTime[2:4])
 
         # Si la différence est plus grande que le maximum permis
-        return abs(nbHourNow - nbHourBullTime) > delaiMaxSeq
+        return abs(nbHourNow - nbHourBullTime) > self.delaiMaxSeq
 
     def setCollectionParams(self,colP):
         """setCollectionParams(self,colP)
