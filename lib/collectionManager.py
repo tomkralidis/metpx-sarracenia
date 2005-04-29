@@ -496,23 +496,26 @@ class collectionManager(bulletinManager.bulletinManager):
 
                 fileName = self.getFileName(self.mainDataMap['collectionMap'][k],compteur=False)
                 
-                #self.logger.writeLog(self.logger.INFO, "Filename= %s" % fileName) #DL20050427
+                #self.logger.writeLog(self.logger.DEBUG, "Filename= %s" % fileName) #DL20050427
+                #self.logger.writeLog(self.logger.DEBUG, "Temp path= %s" % self.pathTemp) #DL20050427
 
                 self.writeToDisk(fileName, self.mainDataMap['collectionMap'][k])
-                """
-                DL20050428
-                if self.use_pds: 
-                    self.writeToDisk(fileName, self.mainDataMap['collectionMap'][k])
-                else:
 
-                    entete = ' '.join(unBulletin.getHeader().split()[:2])
+                #DL20050428
+                if not self.use_pds: 
+                    
+                    tempNom = self.pathTemp + fileName
+
+                    entete = ' '.join(self.mainDataMap['collectionMap'][k].getHeader().split()[:2])
 
                     if self.mapCircuits.has_key(entete):
                         clist = self.mapCircuits[entete]['routing_groups']
                     else:
                         clist = []
-                    fet.directIngest(nomFichier, clist, tempNom, self.logger)
-                """
+
+                    fet.directIngest(fileName, clist, tempNom, self.logger)
+                    os.unlink(tempNom)
+
                 del self.mainDataMap['collectionMap'][k]
 
                 self.statusNeedToBeUpdated = True
