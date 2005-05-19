@@ -37,7 +37,7 @@ def startThem(dir,name,cmd):
 
 def start(cmd):
     startThem( fet.FET_ETC + 'rx/', 'pxReceiver', cmd)
-    time.sleep(0.1) # sleep B
+    time.sleep(0.3) # sleep B
     startThem( fet.FET_ETC + 'tx/', 'pxSender', cmd)
     time.sleep(2)   # sleep C
 
