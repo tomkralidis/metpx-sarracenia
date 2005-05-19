@@ -724,8 +724,13 @@ def initDB(logger):
     if os.path.exists( tl ):
         lnk = os.readlink( tl )
         if ( todaylink != lnk ):
-            os.unlink( tl )
-            os.symlink( todaylink, tl )
+            try:
+                os.unlink( tl )
+                os.symlink( todaylink, tl )
+            except OSError:
+                # FIXME: Bad way (try, except) to handle a concurrency problem
+                pass                   
+
             if os.path.exists( lnk ):
                 os.unlink( yl )
                 os.symlink( lnk, yl )
