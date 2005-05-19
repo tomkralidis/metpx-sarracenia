@@ -385,16 +385,16 @@ class bulletin:
         """
         header = self.getHeader()
 
+        if header=='':
+            self.setError('Entete vide')
+            return
+
         # Changement qui doit être fait avant de vérifier l'entête,
         # le tandem enlève le 'z' ou 'Z' à la fin de l'entête
         # s'il y a lieu.
         if header[-1]  in ['z','Z']:
             header = header[:-1]
             self.setHeader(header)
-
-        if header=='':
-            self.setError('Entete vide')
-            return
 
         tokens = header.split()
 
