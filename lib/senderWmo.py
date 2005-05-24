@@ -205,14 +205,14 @@ class senderWmo(gateway.gateway):
                 try:
                         rawBulletin = data[index]
                         unBulletinWmo = bulletinWmo.bulletinWmo(rawBulletin,self.logger,finalLineSeparator='\r\r\n')
-			#nbBytesToSend = len(unBulletinWmo)
+                        #nbBytesToSend = len(unBulletinWmo)
                         succes = self.unSocketManagerWmo.sendBulletin(unBulletinWmo)
                         #si le bulletin a ete envoye correctement, le fichier est efface
                         if succes:
                                 #self.logger.writeLog(self.logger.INFO,"(%5d Bytes) Bulletin %s livré ",
-				#                     nbBytesToSend, os.path.basename(self.reader.sortedFiles[index]) )
+                                #                     nbBytesToSend, os.path.basename(self.reader.sortedFiles[index]) )
                                 self.logger.writeLog(self.logger.INFO,"Bulletin %s livré ",
-				                     os.path.basename(self.reader.sortedFiles[index]) )
+                                                     os.path.basename(self.reader.sortedFiles[index]) )
                                 self.unBulletinManagerWmo.effacerFichier(self.reader.sortedFiles[index])
                                 self.logger.writeLog(self.logger.DEBUG,"senderWmo.write(..): Effacage de " + self.reader.sortedFiles[index])
                         else:
