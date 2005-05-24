@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 """
 #############################################################################################
 # Name: senderAMIS.py
@@ -78,13 +79,15 @@ class senderAMIS:
          for index in range(len(data)):
             bullAMIS = self.encapsulate(data[index])
             nbBytesToSend = len(bullAMIS)
+	    nbBytes = nbBytesToSend
             while nbBytesToSend > 0: 
                nbBytesSent = self.socketAMIS.send(bullAMIS)
                bullAMIS = bullAMIS[nbBytesSent:]
                nbBytesToSend = len(bullAMIS)
                self.totBytes += nbBytesSent
                #print self.totBytes
-            self.logger.writeLog(self.logger.INFO,"Bulletin %s (%d bytes) livré", os.path.basename(self.reader.sortedFiles[index]), nbBytesToSend)
+            self.logger.writeLog(self.logger.INFO,"(%5d Bytes) Bulletin %s livré", 
+	                         nbBytes, os.path.basename(self.reader.sortedFiles[index]))
             try:
                os.unlink(self.reader.sortedFiles[index])
                self.logger.writeLog(self.logger.DEBUG,"%s has been erased", os.path.basename(self.reader.sortedFiles[index]))
@@ -96,16 +99,17 @@ class senderAMIS:
       else:
          time.sleep(1)
 
-      """
-      if (self.totBytes > 54000):
-         result = open('/apps/px/result', 'w')
-         result.write(self.printSpeed())
-         sys.exit()
-      """
+      if (self.totBytes > 108000):
+         self.logger.writeLog(self.logger.INFO, self.printSpeed() + " Bytes/sec")
+         #result = open('/apps/px/result', 'w')
+         #result.write(self.printSpeed())
+         #sys.exit()
 
    def printSpeed(self):
       elapsedTime = time.time() - self.initialTime
       speed = self.totBytes/elapsedTime
+      self.totBytes = 0
+      self.initialTime = time.time()
       return "Speed = %i" % int(speed)
 
    def encapsulate(self, data):
