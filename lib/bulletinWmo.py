@@ -47,6 +47,9 @@ class bulletinWmo(bulletin.bulletin):
         if self.bulletin[0][:2] in ['UK']:
             self.replaceChar('\x01','')
 
+        if self.bulletin[0][:4] in ['SICO']:
+            self.replaceChar('\x01','')
+
         if self.bulletin[0][:2] in ['SO','SR']:
             self.replaceChar('\x02','')
 
