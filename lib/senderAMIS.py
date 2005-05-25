@@ -79,7 +79,7 @@ class senderAMIS:
          for index in range(len(data)):
             bullAMIS = self.encapsulate(data[index])
             nbBytesToSend = len(bullAMIS)
-	    nbBytes = nbBytesToSend
+            nbBytes = nbBytesToSend
             while nbBytesToSend > 0: 
                nbBytesSent = self.socketAMIS.send(bullAMIS)
                bullAMIS = bullAMIS[nbBytesSent:]
@@ -87,7 +87,7 @@ class senderAMIS:
                self.totBytes += nbBytesSent
                #print self.totBytes
             self.logger.writeLog(self.logger.INFO,"(%5d Bytes) Bulletin %s livré", 
-	                         nbBytes, os.path.basename(self.reader.sortedFiles[index]))
+                                 nbBytes, os.path.basename(self.reader.sortedFiles[index]))
             try:
                os.unlink(self.reader.sortedFiles[index])
                self.logger.writeLog(self.logger.DEBUG,"%s has been erased", os.path.basename(self.reader.sortedFiles[index]))
