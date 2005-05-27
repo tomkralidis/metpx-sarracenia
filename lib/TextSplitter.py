@@ -14,7 +14,25 @@
 import sys, os, commands, signal
 
 class TextSplitter:
-   
+    """
+    If you have some protocol that define the way each line of data must terminate
+    and also determine the maximum length the encapsulated message can have, you can
+    use this class to split the data (text) in blocks that will respect the maximum
+    predetermined size. 
+    
+    For that you have to know:
+
+    text: This is the data (if end of lines are included, they will be replaced by the
+    one contained in alignment) you want to split (no splitting will be done if it is
+    not necessary).
+
+    maxSize: This is the maximum size of the encapsulated message.
+
+    alignment: This is the "end of line" marker you want.
+
+    overhead: This is the number of fixed character added by the protocol to 
+              encapsulate the message.
+    """
     def __init__(self, text, maxSize, alignment="\n", overhead=5):
         self.__text = text                       # Original text (a string)
         self.__maxSize = maxSize                 # Maximum size for each string
