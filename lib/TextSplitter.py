@@ -23,9 +23,11 @@ class TextSplitter:
         self.__alignmentLength = len(alignment)  # Length of the alignment function
         self.__lines = text.splitlines()         # Original text, splitted in lines (alignment removed)
         self.__blocks = []                       # Final blocks of text that respect the maximum size
+        #self.breakLongText()                     
 
     def setText(self, text):
         self.__text = text
+        self.__lines = text.splitlines()
 
     def getText(self):
         return self.__text
@@ -60,6 +62,9 @@ class TextSplitter:
     def getLines(self):
         return self.__lines
 
+    def getBlocks(self):
+        return self.__blocks
+
     def breakLongLine(self, line):
         """
         Breaks long line in block of text that respect the maximum size for this 
@@ -83,24 +88,55 @@ class TextSplitter:
 
         return blocks
 
-    def breakLongText1(self):
+    def breakLongText(self):
         """
         Will break text in group of maxsize. Contrary to breakLongText, this 
         method will procede correctly in case of line longer than maxSize.
         """
 
+        global block, count
+        block = ""
         blocks = []
         count = self.__overhead
-        maxLength = self.__maxSize
+
+        def processLine(line):
+            global block, count
+
+            #print "processLine() has been called with: %s" % line
+
+            # The line is too long, we have to split it.
+            if len(line) >= self.__maxSize - self.__alignmentLength - self.__overhead:
+                # If a block is in use, add it to blocks, before splitting the long line
+                if not block == "":
+                    blocks.append(block)
+                    block = ""
+                    count = self.__overhead
+                # Add all the blocks that come from splitting the long line
+                blocks.extend(self.breakLongLine(line))
+            else:
+                lineLength = len(line) + self.__alignmentLength
+                if (count + lineLength) < self.__maxSize:
+                    block += line + self.__alignment
+                    count += lineLength
+                else: # If we append the line, the block will be too long. We start a new block
+                      # and we process the line that we cannot apppend.
+                    blocks.append(block)
+                    block = ""
+                    count = self.__overhead
+                    # We process the line with a recursive call
+                    processLine(line)
 
         for line in self.__lines:
-            if len(line) >= self.__maxSize - self.__
-
-
-
+            processLine(line)
         
+        # If not empty, we append the last unfilled block
+        if not block == "":
+            blocks.append(block)
 
-    def breakLongText(self):
+        self.__blocks = blocks 
+        return blocks
+
+    def breakLongText1(self):
         """
         Will break text in group of maxsize. If a given line is longer than
         maxSize, a problem will result. If this is a situation with which we 
@@ -138,4 +174,3 @@ class TextSplitter:
 
         self.__blocks = blocks 
         return blocks
-
