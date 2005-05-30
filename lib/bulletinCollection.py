@@ -57,11 +57,6 @@ class bulletinCollection(bulletin.bulletin):
         self.mapCollection['header'] = header
         self.mapCollection['mapStations'] = mapStations.copy()
 
-        # Si SI/SM: Inserer AAXX jjhh4\n
-        if header[:2] in ["SM","SI"]:
-           self.mapCollection['header'] = header + '\n' + "AAXX " + header.split()[2][0:4] + "4"
-                            
-
         self.logger.writeLog(self.logger.INFO,"Création d'une nouvelle collection: %s",header)
         self.logger.writeLog(self.logger.VERYVERBOSE,"writeTime de la collection: %s",time.asctime(time.gmtime(writeTime)))
 
@@ -244,6 +239,11 @@ class bulletinCollection(bulletin.bulletin):
 
         coll.append(header)
         # Ajout du header à la collection
+
+        # Si SI/SM: Inserer AAXX jjhh4\n
+	# LP: Correction, 05/30/2005
+        if header[:2] in ["SM","SI"]:
+           coll.append("AAXX " + header.split()[2][0:4] + "4")
 
         keys = self.mapCollection['mapStations'].keys()
         keys.sort()
