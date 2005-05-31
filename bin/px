@@ -8,9 +8,7 @@
 # killall prx
 # rm -f /apps/px/[rt]x/.lock
 
-import sys
-import os
-import time
+import sys, os, os.path, time, pwd
 
 sys.path.insert(1, sys.path[0] + '/../lib')
 sys.path.insert(1,sys.path[0] + '/../lib/importedLibs')
@@ -35,6 +33,14 @@ def startThem(dir,name,cmd):
                 time.sleep(0.1)  # sleep A
             os.execl( sys.path[0] + '/' + name , name, id, cmd )
 
+    # Special case for collection
+    if name == "pxReceiver":
+       if os.path.exists("/apps/px/etc/collection.conf"):
+          id = "collector"
+          time.sleep(0.1)
+          os.execl( sys.path[0] + '/' + name , name, id, cmd )
+       
+
 def start(cmd):
     startThem( fet.FET_ETC + 'rx/', 'pxReceiver', cmd)
     time.sleep(0.3) # sleep B
@@ -42,8 +48,10 @@ def start(cmd):
     time.sleep(2)   # sleep C
 
 if os.getuid() == 0:
-    print "FATAL: Do not start as root. It will be a mess."
-    sys.exit(2)
+    pdsUID = pwd.getpwnam("pds")[2]
+    os.setuid(pdsUID)
+    #print "FATAL: Do not start as root. It will be a mess."
+    #sys.exit(2)
 
 if len(sys.argv) < 2:
     print "USAGE: px (start|stop|restart|status) "

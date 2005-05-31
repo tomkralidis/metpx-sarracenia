@@ -8,7 +8,7 @@
 # Auteur:       Louis-Philippe Thériault
 # Date:         Octobre 2004
 
-import sys, signal, traceback
+import sys, signal, traceback, pwd
 
 sys.path.insert(1,sys.path[0] + '/../lib')
 sys.path.insert(1,sys.path[0] + '/../etc')
@@ -63,8 +63,10 @@ def main():
              "       Un receiver reçoit les bulletins par une connection réseau.\n"
 
     if os.getuid() == 0:
-        print "FATAL: Do not start as root. It will be a mess."
-        sys.exit(2)
+        pdsUID = pwd.getpwnam("pds")[2]
+        os.setuid(pdsUID)
+        #print "FATAL: Do not start as root. It will be a mess."
+        #sys.exit(2)
 
     # Instanciation du option parser
     parser = OptionParser(usage)
