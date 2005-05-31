@@ -57,10 +57,12 @@ class Igniter:
       if self.comingFromRestart:
          self.comingFromRestart = False
 
+      """
       # Verify user is not root
       if os.getuid() == 0:
          print "FATAL: Do not start as root. It will be a mess!"
          sys.exit(2)
+      """
       
       # If it is locked ... 
       if self.isLocked(): 

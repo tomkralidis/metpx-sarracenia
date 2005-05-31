@@ -27,6 +27,11 @@ class PXIgniter(Igniter):
       self.logger = logger                  # Logger object
       self.gateway = None                   # Gateway object
       self.reloadMode = False               # Indicate if we are in reload mode or not
+
+      #  Special case for the collections
+      if self.type == "collector" and self.client == None:
+         self.client = "collector"
+         
       eval("self." + cmd)()                 # Execute the command directly
 
    def setGateway(self, gateway):
