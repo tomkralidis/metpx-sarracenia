@@ -26,6 +26,8 @@ for circuit in circuits:
     prioDirs = commands.getoutput('ls -1 --ignore=PROBLEM %s' % (minimalPath))
     prioDirs = prioDirs.splitlines() # Type changed
     for prio in prioDirs:
+        if len(prio) > 1:
+            continue
         partialPath = minimalPath + '/' + prio
         dateDirs = commands.getoutput('ls -1 --ignore=%s %s' % (currentTime, partialPath))
         dateDirs = dateDirs.splitlines() # Type changed
