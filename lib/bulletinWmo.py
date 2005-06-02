@@ -38,7 +38,7 @@ class bulletinWmo(bulletin.bulletin):
             self.replaceChar('\r','')
             return
 
-        if self.bulletin[0][:2] in ['SD','SO','WS','SR','SX','FO','WA','AC','FA']:
+        if self.bulletin[0][:2] in ['SD','SO','WS','SR','SX','FO','WA','AC','FA','FB']:
             self.replaceChar('\x1e','')
 
         if self.bulletin[0][:2] in ['SR','SX']:
