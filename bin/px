@@ -29,17 +29,18 @@ def startThem(dir,name,cmd):
         id = cfname[:-5]
         counter += 1
         if os.fork() == 0:
-            if counter == 2:
-                time.sleep(0.1)  # sleep A
-            os.execl( sys.path[0] + '/' + name , name, id, cmd )
+             if counter == 2:
+                 time.sleep(0.1)  # sleep A
+             os.execl( sys.path[0] + '/' + name , name, id, cmd )
 
-    # Special case for collection
+    # Special case for collection: won't be done in the children because their
+    # last statement is os.excl()
     if name == "pxReceiver":
-       if os.path.exists("/apps/px/etc/collection.conf"):
-          id = "collector"
-          time.sleep(0.1)
-          os.execl( sys.path[0] + '/' + name , name, id, cmd )
-       
+        if os.path.exists("/apps/px/etc/collection.conf"):
+            id = "collector"
+            if os.fork() == 0:
+                time.sleep(0.1)
+                os.execl( sys.path[0] + '/' + name , name, id, cmd )
 
 def start(cmd):
     startThem( fet.FET_ETC + 'rx/', 'pxReceiver', cmd)
