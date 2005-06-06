@@ -729,16 +729,37 @@ def initDB(logger):
                 os.symlink( todaylink, tl )
             except OSError:
                 # FIXME: Bad way (try, except) to handle a concurrency problem
+                (type, value, tb) = sys.exc_info()
+                logger.writeLog(logger.ERROR, "Type: %s, Value: %s" % (type, value))
                 pass                   
 
             if os.path.exists( lnk ):
-                os.unlink( yl )
-                os.symlink( lnk, yl )
+                try:
+                    os.unlink( yl )
+                    os.symlink( lnk, yl )
+                except OSError:
+                    # FIXME: Bad way (try, except) to handle a concurrency problem
+                    (type, value, tb) = sys.exc_info()
+                    logger.writeLog(logger.ERROR, "Type: %s, Value: %s" % (type, value))
+                    pass                   
 
     else:
-        os.symlink( todaylink, tl )
+        try:
+            os.symlink( todaylink, tl )
+        except OSError:
+            # FIXME: Bad way (try, except) to handle a concurrency problem
+            (type, value, tb) = sys.exc_info()
+            logger.writeLog(logger.ERROR, "Type: %s, Value: %s" % (type, value))
+            pass                   
+
         if os.path.exists( yl ):
-            os.unlink( yl )
+            try:
+                os.unlink( yl )
+            except OSError:
+                # FIXME: Bad way (try, except) to handle a concurrency problem
+                (type, value, tb) = sys.exc_info()
+                logger.writeLog(logger.ERROR, "Type: %s, Value: %s" % (type, value))
+                pass                   
 
     logger.writeLog( logger.INFO, "dbinit done")
 
