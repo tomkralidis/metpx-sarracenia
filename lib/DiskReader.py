@@ -168,8 +168,9 @@ class DiskReader:
                 fileDesc = open(file, 'r')
                 self.data.append(fileDesc.read())
             except:
-                self.logger.writeLog(self.logger.ERROR,"senderWmo.read(..): Erreur lecture:" + file)
-                raise
+                self.logger.writeLog(self.logger.WARNING,"DiskReader.getFilesContent(): " + file + " not on disk anymore")
+                # We don't raise the exception because we assume that this error has been created
+                # by a legitimate process that has cleared some client queue.
         return self.data
 
     def sort(self):
