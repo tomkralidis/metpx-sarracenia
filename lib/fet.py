@@ -797,7 +797,8 @@ def startup(opts, logger):
 
     readClients(logger)
     readSources(logger)
-    readCollections(options,logger)
+    if os.path.exists(FET_ETC + "collection.conf"):
+        readCollections(options,logger)
     if options.client:
         if options.client in clients.keys():
             opts.type = clients[options.client][3]
