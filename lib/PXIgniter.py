@@ -98,23 +98,46 @@ class PXIgniter(Igniter):
       Do the real work here. Depends of type of sender/receiver
       """
       if self.gateway is None:
-         print "_reload() has been called for %s (%s %s)" % (self.client, self.direction, self.type)
-         print "No gateway object! Nothing can be done"
+         #print "_reload() has been called for %s (%s %s)" % (self.client, self.direction, self.type)
+         #print "No gateway object! Nothing can be done"
+
+         # Because we don't have a gateway object, it means that we can only reread the configuration
+         # file of the source/client, not particular files like Circuit and Stations, because
+         # they haven't been read at this time anyway.
+         #fet.startup(self.options, self.logger)
+         #self.logger.writeLog(self.logger.INFO, "%s has been reload" % self.direction)
+
+         # If we are there, it is because we don't have a gateway object, if means that we are 
+         # waiting for a connection, the easiest way to reread the configuration file of 
+         # the sources/clients AND the value of the variables in the configuration file of this
+         # particular source/client is by restarting it!
+         if os.fork() == 0:
+            self.restart()
+            self.logger.writeLog(self.logger.INFO, "%s has been reloaded by restarting it" % self.direction)
+         else:
+            pass
       else:
          #print self.gateway
 
          if self.direction == 'sender':
             fet.startup(self.options, self.logger)
-            self.logger.writeLog(self.logger.INFO, "%s has been reload" % self.direction)
+            self.logger.writeLog(self.logger.INFO, "%s has been reloaded" % self.direction)
+            #self.logger.writeLog(self.logger.WARNING, "%s has not been reloaded" % self.direction)
          elif self.direction == 'receiver':
             fet.startup(self.options, self.logger)
             if self.type == 'am':
+               self.gateway.unBulletinManager.extension = self.options.extension
+               self.gateway.unBulletinManager.AddSMHeader = self.options.AddSMHeader
+               #print self.options
+               #print "ext: %s" % (self.options.extension)
+               #print "addSM: %s" % (self.options.AddSMHeader)
                self.gateway.unBulletinManager.reloadMapCircuit('/dev/null')
                self.gateway.unBulletinManager.reloadMapEntetes(self.gateway.pathFichierStations)
-               self.logger.writeLog(self.logger.INFO, "%s has been reload" % self.direction)
+               self.logger.writeLog(self.logger.INFO, "%s has been reloaded" % self.direction)
             if self.type == 'wmo':
+               self.gateway.unBulletinManager.extension = self.options.extension
                self.gateway.unBulletinManager.reloadMapCircuit('/dev/null')
-               self.logger.writeLog(self.logger.INFO, "%s has been reload" % self.direction)
+               self.logger.writeLog(self.logger.INFO, "%s has been reloaded" % self.direction)
             if self.type == 'single-file':
                self.reloadMode = True
             if self.type == 'bulletin-file':
