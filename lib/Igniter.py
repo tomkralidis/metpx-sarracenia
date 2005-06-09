@@ -107,7 +107,7 @@ class Igniter:
       self.comingFromRestart = True
       self.stop()
       self.start()
-      self.printComment('Restarted successfully') 
+      #self.printComment('Restarted successfully') 
 
    def status(self):
       # If it is locked ... 
