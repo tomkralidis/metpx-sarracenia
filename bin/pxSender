@@ -46,11 +46,16 @@ def main():
 
     options,args = parser.parse_args()
 
-    # Un seul argument doit être fourni
-    if len(args) > 2:
-        parser.error("trop d'arguments fournis")
+    # Deux arguments doivent etre fournis (source et commande)
+    if len(args) == 2:
+        if args[1] not in ['start', 'stop', 'status', 'restart', 'reload']:
+            parser.error("Wrong command name")
+    elif len(args) == 1:
+        parser.error("Client or command missing")
     elif len(args) == 0:
-        parser.error("aucun client fourni")
+        parser.error("Client and command missing")
+    elif len(args) > 2:
+        parser.error("Too many arguments")
 
     options.client = args[0]
     options.cmd    = args[1]
