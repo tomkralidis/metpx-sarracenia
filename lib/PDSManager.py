@@ -10,42 +10,33 @@
 #
 #############################################################################################
 """
-import os, os.path, commands, re, pickle, time, logging
-import SystemManager
+
+import os, os.path, sys, commands, re, pickle, time, logging
+import SystemManager, PDSPaths
 from SystemManager import SystemManager
 
 class PDSManager(SystemManager):
+    
+    def __init__(self, drdb):
+        """
+        drdb: True or False, True if we use apps2 instead of apps
+        """
 
-    # Maybe all these names should be put in a file PDSPath.py? Not sure, if in fact
-    # a PDSManager is a entry point to PDS API!
+        if drdb:
+            PDSPaths.drdbPaths() 
+        else:
+            PDSPaths.normalPaths() 
 
-    # Useful directories
-    ROOT = '/apps/pds/'
-    BIN = ROOT + 'bin/'
-    LOG = ROOT + 'log/'
-    ETC = ROOT + 'etc/'
-    RXQ = ROOT + 'RAW/'
-    TXQ = ROOT + 'home/'
-    DB = ROOT + 'pdsdb/'
-    INFO = ROOT + 'info/'
-    RX_CONF = ETC
-    TX_CONF = ETC 
-
-    # Useful files
-    PROD = "pdschkprod.conf"
-    SWITCH = "pdsswitch.conf"
-    STARTUP = "PDSstartupinfo"
-    TOGGLE = "ToggleSender"
-    RESEND = "pdsresend"
-
-    # Useful paths (directory + file)
-    FULLPROD = ETC + PROD
-    FULLSWITCH = ETC + SWITCH
-    FULLSTARTUP = INFO + STARTUP
-    FULLTOGGLE = BIN + TOGGLE
-
-    def __init__(self):
         SystemManager.__init__(self)
+        self.LOG = PDSPaths.LOG  # Will be used by DirCopier
+
+
+    def afterInit(self):
+        
+        if not os.path.isdir(PDSPaths.ROOT):
+            self.logger.error("This directory: %s does not exist!" % (PDSPaths.ROOT))
+            sys.exit(15)
+
         self.setRxNames()
         self.setTxNames()
         self.setRxPaths()
@@ -74,7 +65,7 @@ class PDSManager(SystemManager):
         """
         rxNames = []
 
-        prodfile = open (PDSManager.FULLPROD, "r")
+        prodfile = open (PDSPaths.FULLPROD, "r")
         lines = prodfile.readlines()
 
         for line in lines:
@@ -92,7 +83,7 @@ class PDSManager(SystemManager):
         """
         txNames = []
 
-        startup = open(PDSManager.FULLSTARTUP, "r")
+        startup = open(PDSPaths.FULLSTARTUP, "r")
         lines = startup.readlines()
 
         for line in lines:
@@ -110,7 +101,7 @@ class PDSManager(SystemManager):
         """
         rxPaths = []
         for name in self.rxNames:
-            rxPaths.append(PDSManager.RXQ + name + '/')
+            rxPaths.append(PDSPaths.RXQ + name + '/')
         self.rxPaths = rxPaths
 
     def setTxPaths(self):
@@ -120,7 +111,7 @@ class PDSManager(SystemManager):
         """
         txPaths = []
         for name in self.txNames:
-            txPaths.append(PDSManager.TXQ + name + '/incoming/')
+            txPaths.append(PDSPaths.TXQ + name + '/incoming/')
         self.txPaths = txPaths
 
 

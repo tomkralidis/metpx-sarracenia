@@ -11,30 +11,38 @@
 #############################################################################################
 
 """
-import os, os.path, commands, re, pickle, time, logging, fnmatch
-import SystemManager
+import os, os.path, sys, commands, re, pickle, time, logging, fnmatch
+import SystemManager, PXPaths
 from SystemManager import SystemManager
 
 class PXManager(SystemManager):
-# Maybe all these names should be put in a file PXPath.py? Not sure, if in fact
-# a PXManager is a entry point to PX API!
 
-    ROOT = '/apps/px/'
-    #BIN = ROOT + 'bin/'
-    #LIB = ROOT + 'lib/'
-    #LOG = ROOT + 'log/'
-    ETC = ROOT + 'etc/'
-    RXQ = ROOT + 'rxq/'
-    TXQ = ROOT + 'txq/'
-    DB = ROOT + 'db/'
-    RX_CONF = ETC + 'rx/'
-    TX_CONF = ETC + 'tx/'
+    def __init__(self, drdb):
 
-    def __init__(self):
-        self.setRxNames()           
-        self.setTxNames()
-        self.setRxPaths()
-        self.setTxPaths()
+        """
+        drdb: True or False, True if we use apps2 instead of apps
+        """
+
+        if drdb:
+            PXPaths.drdbPaths() 
+        else:
+            PXPaths.normalPaths() 
+
+        SystemManager.__init__(self)
+        self.LOG = PXPaths.LOG          # Will be used by DirCopier
+
+
+    def afterInit(self):
+
+        if not os.path.isdir(PXPaths.ROOT):
+            self.logger.error("This directory: %s does not exist!" % (PXPaths.ROOT))
+            sys.exit(15)
+
+        #self.setRxNames()           
+        #self.setTxNames()
+        #self.setRxPaths()
+        #self.setTxPaths()
+        self.rxPaths = ['/apps/px/toto/', '/apps/px/titi/', '/apps/px/tata/']
 
     def setRunningRxNames(self):
         """
@@ -56,7 +64,7 @@ class PXManager(SystemManager):
         We don't verify if these receivers have a process associated to them.
         """
         rxNames = []
-        for file in os.listdir(PXManager.RX_CONF):
+        for file in os.listdir(PXPaths.RX_CONF):
             if file[-5:] != '.conf':
                 continue
             else:
@@ -69,7 +77,7 @@ class PXManager(SystemManager):
         We don't verify if these senders have a process associated to them.
         """
         txNames = []
-        for file in os.listdir(PXManager.TX_CONF):
+        for file in os.listdir(PXPaths.TX_CONF):
             if file[-5:] != '.conf':
                 continue
             else:
@@ -83,7 +91,7 @@ class PXManager(SystemManager):
         """
         rxPaths = []
         for name in self.rxNames:
-            rxPaths.append(PXManager.RXQ + name + '/')
+            rxPaths.append(PXPaths.RXQ + name + '/')
         self.rxPaths = rxPaths
 
     def setTxPaths(self):
@@ -97,7 +105,7 @@ class PXManager(SystemManager):
         priorities = [str(x) for x in range(1,10)]
 
         for name in self.txNames:
-            txPaths.append(PXManager.TXQ + name + '/')
+            txPaths.append(PXPaths.TXQ + name + '/')
 
         for path in txPaths:
             for priority in [pri for pri in os.listdir(path) if pri in priorities]: 

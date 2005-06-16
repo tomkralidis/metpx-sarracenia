@@ -19,26 +19,17 @@ class SystemManagerException(Exception):
 
 class SystemManager:
 
-    # Maybe all these names should be put in a file PXPath.py? Not sure, if in fact
-    # a PXManager is a entry point to PX API!
-    ROOT = '/apps/px/'
-    BIN = ROOT + 'bin/'
-    ETC = ROOT+ 'etc/'
-    LIB = ROOT + 'lib/'
-    LOG = ROOT + 'log/'
-    RXQ = ROOT + 'rxq/'
-    TXQ = ROOT + 'txq/'
-    DB = ROOT + 'db/'
-    RX_CONF = ETC + 'rx/'
-    TX_CONF = ETC + 'tx/'
-
     def __init__(self):
+        self.logger = None
         self.rxNames = []            # Name is based on filename found in RX_CONF
         self.txNames = []            # Name is based on filename found in TX_CONF
         self.runningRxNames = []     # We only keep the Rx for which we can find a PID
         self.runningTxNames = []     # We only keep the Tx for which we can find a PID 
         self.rxPaths = [] 
         self.txPaths = [] 
+
+    def setLogger(self, logger):
+        self.logger = logger
 
     def getRunningRxNames(self):
         return self.runningRxNames
@@ -81,6 +72,41 @@ class SystemManager:
 
     def setTxPaths(self):
         raise SystemManagerException('Abstract method: not implemented in SystemManager Class')
+
+    def copyFiles(self, sourceDir, targetDir, logger):
+        """
+        Copy all files under the given sourceDir(supposed to begin by a /apps2/) to 
+        the /apps/... on the same machine
+        """
+        if os.path.isdir(sourceDir):
+            files = os.listdir(sourceDir)
+        else:
+            print "This is not a directory (%s)" % (sourceDir)
+            return
+
+        for file in files:
+            try:
+                # FIXME
+                # If targetDir doesn't exist, does I create it?
+                # Should create a file with all the files that are copied
+                shutil.copy2(sourceDir + file, targetDir + file)
+            except:
+                # FIXME: Find the correct exceptions that can arrive here
+                print "Problem while shutil.copy2(%s, %s)" % (sourceDir + file, targetDir + file)
+
+    def setFilesToDelete(self, filename):
+        """
+        Create a list from all the entries in the filename. This list
+        will contains all the files we want to delete on /apps/ of the 
+        broken machine before it restarts.
+        """
+        pass
+
+    def deleteFiles(self, files):
+        """
+        Delete all files from the given list.
+        """
+        pass
 
 if __name__ == '__main__':
   
