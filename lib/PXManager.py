@@ -31,7 +31,6 @@ class PXManager(SystemManager):
         SystemManager.__init__(self)
         self.LOG = PXPaths.LOG          # Will be used by DirCopier
 
-
     def afterInit(self):
 
         if not os.path.isdir(PXPaths.ROOT):

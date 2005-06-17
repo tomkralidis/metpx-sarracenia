@@ -30,7 +30,6 @@ class PDSManager(SystemManager):
         SystemManager.__init__(self)
         self.LOG = PDSPaths.LOG  # Will be used by DirCopier
 
-
     def afterInit(self):
         
         if not os.path.isdir(PDSPaths.ROOT):
