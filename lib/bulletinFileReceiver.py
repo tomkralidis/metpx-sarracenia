@@ -53,7 +53,7 @@ def run(logger, igniter):
 
     # We put the bulletins (read from disk) in a dict (key = absolute filename)
         #bulletinsBrutsDict = bullManager.readBulletinFromDisk([bullManager.pathSource])
-        reader = DiskReader(bullManager.pathSource, fet.options.batch, False, 4, False, logger)
+        reader = DiskReader(bullManager.pathSource, batch=1000, validation=False, mtime=3, prioTree=False, logger=logger)
         reader.sort()
         data = reader.getFilesContent(reader.batch)
 
@@ -72,7 +72,7 @@ def run(logger, igniter):
 
         for index in range(len(data)):
             nb_bytes = len(data[index])
-            logger.writeLog(logger.DEBUG, "Lecture de %s: %d bytes" % (reader.sortedFiles[index], nb_bytes))
+            logger.writeLog(logger.INFO, "Lecture de %s: %d bytes" % (reader.sortedFiles[index], nb_bytes))
             bullManager.writeBulletinToDisk(data[index], True, True)
             try:
                 os.unlink(reader.sortedFiles[index])

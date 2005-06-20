@@ -154,6 +154,7 @@ class DiskReader:
                 # If we use stats informations (useful with rcp)
                 if self.mtime:
                     if  not time.time() - os.stat(file)[ST_MTIME] > self.mtime:
+                        self.logger.writeLog(self.logger.DEBUG, "File (%s) too recent (mtime = %d)" % (file, self.mtime))
                         continue
 
                 # We don't want to exceed the batch value 
