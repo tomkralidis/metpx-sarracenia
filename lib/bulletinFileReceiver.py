@@ -51,7 +51,7 @@ def run(logger, igniter):
             logger.writeLog(logger.INFO, "%s has been reload" % igniter.direction)
             igniter.reloadMode = False
 
-    # We put the bulletins (read from disk) in a dict (key = absolute filename)
+        # We put the bulletins (read from disk) in a dict (key = absolute filename)
         #bulletinsBrutsDict = bullManager.readBulletinFromDisk([bullManager.pathSource])
         reader = DiskReader(bullManager.pathSource, batch=1000, validation=False, mtime=3, prioTree=False, logger=logger)
         reader.sort()
@@ -61,15 +61,7 @@ def run(logger, igniter):
             time.sleep(1)
             continue
 
-        """
         # Write (and name correctly) the bulletins to disk, erase them after
-        for key in bulletinsBrutsDict.keys():
-            nb_bytes = len(bulletinsBrutsDict[key])
-            logger.writeLog(logger.DEBUG, "Lecture de %s: %d bytes" % (key, nb_bytes))
-            bullManager.writeBulletinToDisk(bulletinsBrutsDict[key], True, True)
-            os.unlink(key) # erase the file
-        """
-
         for index in range(len(data)):
             nb_bytes = len(data[index])
             logger.writeLog(logger.INFO, "Lecture de %s: %d bytes" % (reader.sortedFiles[index], nb_bytes))
