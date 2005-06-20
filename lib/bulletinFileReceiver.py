@@ -14,11 +14,12 @@
  2005/02 PSilva
         thwacked into a lib to convert to 'options' method for
 """
-import sys, os, signal, time
+import sys, os, os.path, signal, time
 sys.path.insert(1,sys.path[0] + '/../lib')
 sys.path.insert(1,sys.path[0] + '/../lib/importedLibs')
 
 import gateway, log, bulletinManager
+from DiskReader import DiskReader
 import fet
 
 def run(logger, igniter):
@@ -51,14 +52,32 @@ def run(logger, igniter):
             igniter.reloadMode = False
 
     # We put the bulletins (read from disk) in a dict (key = absolute filename)
-        bulletinsBrutsDict = bullManager.readBulletinFromDisk([bullManager.pathSource])
-        if len(bulletinsBrutsDict) == 0:
+        #bulletinsBrutsDict = bullManager.readBulletinFromDisk([bullManager.pathSource])
+        reader = DiskReader(bullManager.pathSource, fet.options.batch, False, 4, False, logger)
+        reader.sort()
+        data = reader.getFilesContent(reader.batch)
+
+        if len(data) == 0:
             time.sleep(1)
             continue
 
+        """
         # Write (and name correctly) the bulletins to disk, erase them after
         for key in bulletinsBrutsDict.keys():
             nb_bytes = len(bulletinsBrutsDict[key])
             logger.writeLog(logger.DEBUG, "Lecture de %s: %d bytes" % (key, nb_bytes))
             bullManager.writeBulletinToDisk(bulletinsBrutsDict[key], True, True)
             os.unlink(key) # erase the file
+        """
+
+        for index in range(len(data)):
+            nb_bytes = len(data[index])
+            logger.writeLog(logger.DEBUG, "Lecture de %s: %d bytes" % (reader.sortedFiles[index], nb_bytes))
+            bullManager.writeBulletinToDisk(data[index], True, True)
+            try:
+                os.unlink(reader.sortedFiles[index])
+                logger.writeLog(logger.DEBUG,"%s has been erased", os.path.basename(reader.sortedFiles[index]))
+            except OSError, e:
+                (type, value, tb) = sys.exc_info()
+                logger.writeLog(logger.ERROR, "Unable to unlink %s ! Type: %s, Value: %s"
+                                    % (reader.sortedFiles[index], type, value))

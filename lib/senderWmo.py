@@ -168,7 +168,9 @@ class senderWmo(gateway.gateway):
         self.reader = DiskReader(
                  fet.FET_DATA + fet.FET_TX + self.options.client,
                  fet.clients[self.options.client][5],
-                 True,
+                 True,  # name validation
+                 0,     # we don't check modification time
+                 True,  # priority tree
                  self.logger,
                  eval(fet.clients[self.options.client][4]) )
         self.reader.sort()

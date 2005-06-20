@@ -11,8 +11,9 @@
 #############################################################################################
 
 """
-import os, os.path, re, commands
+import os, os.path, re, commands, time
 from MultiKeysStringSorter import MultiKeysStringSorter
+from stat import *
 import fet
 
 class _DirIterator(object):
@@ -45,7 +46,7 @@ class _DirIterator(object):
 
 class DiskReader:
 
-    def __init__(self, path, batch=20000, validation=False, logger=None, sorterClass=None):
+    def __init__(self, path, batch=20000, validation=False, mtime=0, prioTree=False, logger=None, sorterClass=None):
         """
         Set the root path and the sorter class used for sorting
 
@@ -62,7 +63,11 @@ class DiskReader:
         self.patternMatching = validation         # Pattern matching active (True or False)
         self.logger = logger                      # Use to log information
         self.batch = batch                        # Maximum number of files that we are interested to sort
-        self.files = self._getFilesList()         # List of filenames under the path
+        self.mtime = mtime                        # If we want to check modification time before taking a file                             
+        if prioTree: # If we want to use predifine priority directories tree
+            self.files = self._getFilesList()                          # List of filenames under the priorities
+        else:
+            self.files = self. _getFilesListForOneBranch(path, batch)  # List of filenames under the path
         self.sortedFiles = []                     # Sorted filenames
         self.data = []                            # Content of x filenames (x is set in getFilesContent())
         self.sorterClass = sorterClass            # Sorting algorithm that will be used by sort()
@@ -146,6 +151,11 @@ class DiskReader:
                             self.logger.writeLog(self.logger.INFO, "No pattern matching: " + file + " has been unlinked!")
                         continue
 
+                # If we use stats informations (useful with rcp)
+                if self.mtime:
+                    if  not time.time() - os.stat(file)[ST_MTIME] > self.mtime:
+                        continue
+
                 # We don't want to exceed the batch value 
                 #if len(files) >= batch:
                 #        break
@@ -205,7 +215,8 @@ if __name__ == "__main__":
     print output
     """
     #iterator = _DirIterator('/apps/px/toto' , True)
-    reader = DiskReader('/apps/px/txq/amis', 20)
+    #reader = DiskReader('/apps/px/txq/amis', 20)
+    reader = DiskReader('/apps/px/toto', 20, False, 5, False)
     #for file in iterator:
        #print file
     print "List of all files:"

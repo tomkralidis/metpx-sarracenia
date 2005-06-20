@@ -167,6 +167,8 @@ class senderAm(gateway.gateway):
                  fet.FET_DATA + fet.FET_TX + self.options.client,
                  fet.clients[self.options.client][5],
                  True, # name validation
+                 0,    # we don't check modification time
+                 True, # priority tree
                  self.logger,
                  eval(self.options.sorter))
         self.reader.sort()
