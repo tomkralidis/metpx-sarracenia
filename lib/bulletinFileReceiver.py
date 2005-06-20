@@ -53,6 +53,7 @@ def run(logger, igniter):
 
         # We put the bulletins (read from disk) in a dict (key = absolute filename)
         #bulletinsBrutsDict = bullManager.readBulletinFromDisk([bullManager.pathSource])
+        # If a file has been modified in less than mtime (3 seconds now), we don't touch it
         reader = DiskReader(bullManager.pathSource, batch=1000, validation=False, mtime=3, prioTree=False, logger=logger)
         reader.sort()
         data = reader.getFilesContent(reader.batch)
