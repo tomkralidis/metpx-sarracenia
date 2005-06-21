@@ -80,6 +80,13 @@ class SystemManager:
         Copy all files (no directories) under the given sourceDir(supposed to begin by a /apps2/) to 
         the /apps/... on the same machine
         """
+        if os.path.normpath(sourceDir) == os.path.normpath(targetDir):
+            if self.logger is None:
+                print "Source and target are identical. We do nothing!"
+            else:
+                self.logger.error("Source and target are identical. We do nothing!")
+            return
+
         if os.path.isdir(sourceDir):
             files = os.listdir(sourceDir)
         else:
@@ -172,7 +179,6 @@ class SystemManager:
                     
         if deleteLog is not None:
             delLog.close()
-
 
 if __name__ == '__main__':
   

@@ -10,6 +10,8 @@
 #
 #############################################################################################
 """
+import os.path
+
 def normalPaths():
 
     global ROOT, BIN, LIB, LOG, ETC, RXQ, TXQ, DB, RX_CONF, TX_CONF
@@ -25,11 +27,11 @@ def normalPaths():
     RX_CONF = ETC + 'rx/'
     TX_CONF = ETC + 'tx/'
 
-def drdbPaths():
+def drdbPaths(rootPath):
 
     global ROOT, BIN, LIB, LOG, ETC, RXQ, TXQ, DB, RX_CONF, TX_CONF
 
-    ROOT = '/apps2/px/'
+    ROOT = os.path.normpath(rootPath) + '/'
     BIN = ROOT + 'bin/'
     LIB = ROOT + 'lib/'
     LOG = '/apps/px/' + 'log/'

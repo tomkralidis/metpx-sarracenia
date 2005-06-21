@@ -10,14 +10,15 @@
 #
 #############################################################################################
 """
+import os.path
 
 def normalPaths():
 
-    # Useful directories
     global ROOT, BIN, LOG, ETC, RXQ, TXQ, DB, INFO, RX_CONF, TX_CONF
     global PROD, SWITCH, STARTUP, TOGGLE, RESEND
     global FULLPROD, FULLSWITCH, FULLSTARTUP, FULLTOGGLE
 
+    # Useful directories
     ROOT = '/apps/pds/'
     BIN = ROOT + 'bin/'
     LOG = ROOT + 'log/'
@@ -42,7 +43,7 @@ def normalPaths():
     FULLSTARTUP = INFO + STARTUP
     FULLTOGGLE = BIN + TOGGLE
 
-def drdbPaths():
+def drdbPaths(rootPath):
     """
     The only difference with normalPaths is the ROOT (apps2)
     """
@@ -51,7 +52,7 @@ def drdbPaths():
     global FULLPROD, FULLSWITCH, FULLSTARTUP, FULLTOGGLE
 
     # Useful directories
-    ROOT = '/apps2/pds/'
+    ROOT = os.path.normpath(rootPath) + '/'
     BIN = ROOT + 'bin/'
     LOG = '/apps/pds/' + 'log/'  # We always want to log on /apps
     ETC = ROOT + 'etc/'
