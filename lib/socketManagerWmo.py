@@ -90,6 +90,8 @@ class socketManagerWmo(socketManager.socketManager):
         """
         bulletinStr = chr(curses.ascii.SOH) + '\r\r\n' + self.getNextCounter(5) + '\r\r\n' + bulletin.getBulletin(useFinalLineSeparator=True) + '\r\r\n' + chr(curses.ascii.ETX)
 
+        repr(bulletinStr)
+
         return string.zfill(len(bulletinStr),8) + bulletin.getDataType() + bulletinStr
 
     def getNextCounter(self,x):

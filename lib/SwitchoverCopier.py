@@ -53,6 +53,7 @@ def usage():
 class SwitchoverCopier:
 
     LOG_LEVEL = "INFO"                   # Logging level
+    STANDARD_ROOT = 'test'
 
     def __init__(self):
 
@@ -96,7 +97,8 @@ class SwitchoverCopier:
 
         for sourceDir in self.rxPaths:
             parts = sourceDir.split('/')
-            self.manager.copyFiles(sourceDir, self.getDestDir(sourceDir, 'apps'), '/apps/px/switchover/' + '_'.join(parts[1:]) + '.log')   
+            self.manager.copyFiles(sourceDir, self.getDestDir(sourceDir, SwitchoverCopier.STANDARD_ROOT),
+                                                              '/apps/px/switchover/' + '_'.join(parts[1:]) + '.log')   
 
         os.umask(0022)
 
