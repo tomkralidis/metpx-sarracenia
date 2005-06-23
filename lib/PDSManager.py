@@ -17,13 +17,13 @@ from SystemManager import SystemManager
 
 class PDSManager(SystemManager):
     
-    def __init__(self, drdbPath=False):
+    def __init__(self, drbdPath=False):
         """
-        drdbPath: drdb path or False, drdb path if we use other root than /apps
+        drbdPath: drbd path or False, drbd path if we use other root than /apps
         """
 
-        if drdbPath:
-            PDSPaths.drdbPaths(drdbPath) 
+        if drbdPath:
+            PDSPaths.drbdPaths(drbdPath) 
         else:
             PDSPaths.normalPaths() 
 

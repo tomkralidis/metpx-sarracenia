@@ -17,14 +17,14 @@ from SystemManager import SystemManager
 
 class PXManager(SystemManager):
 
-    def __init__(self, drdbPath=False):
+    def __init__(self, drbdPath=False):
 
         """
-        drdbPath: drdb path or False, drdb path if we use other root than /apps
+        drbdPath: drbd path or False, drbd path if we use other root than /apps
         """
 
-        if drdbPath:
-            PXPaths.drdbPaths(drdbPath) 
+        if drbdPath:
+            PXPaths.drbdPaths(drbdPath) 
         else:
             PXPaths.normalPaths() 
 
@@ -33,9 +33,11 @@ class PXManager(SystemManager):
 
     def afterInit(self):
 
+        """
         if not os.path.isdir(PXPaths.ROOT):
             self.logger.error("This directory: %s does not exist!" % (PXPaths.ROOT))
             sys.exit(15)
+        """
 
         #self.setRxNames()           
         #self.setTxNames()

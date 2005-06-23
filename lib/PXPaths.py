@@ -27,7 +27,7 @@ def normalPaths():
     RX_CONF = ETC + 'rx/'
     TX_CONF = ETC + 'tx/'
 
-def drdbPaths(rootPath):
+def drbdPaths(rootPath):
 
     global ROOT, BIN, LIB, LOG, ETC, RXQ, TXQ, DB, RX_CONF, TX_CONF
 

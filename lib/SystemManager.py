@@ -77,8 +77,9 @@ class SystemManager:
 
     def copyFiles(self, sourceDir, targetDir, copyLog=None):
         """
-        Copy all files (no directories) under the given sourceDir(supposed to begin by a /apps2/) to 
-        the /apps/... on the same machine
+        Copy all files (no directories) under the given sourceDir to the targetDir on the
+        same machine. copyLog is the absolute name of a log file which contains the absolute
+        name of all the copied files.
         """
         if os.path.normpath(sourceDir) == os.path.normpath(targetDir):
             if self.logger is None:
@@ -90,7 +91,10 @@ class SystemManager:
         if os.path.isdir(sourceDir):
             files = os.listdir(sourceDir)
         else:
-            print "This is not a directory (%s)" % (sourceDir)
+            if self.logger is None:
+                print "This is not a directory (%s)" % (sourceDir)
+            else:
+                self.logger.error("This is not a directory (%s)" % (sourceDir))
             return
 
         if not os.path.isdir(targetDir):
@@ -100,10 +104,13 @@ class SystemManager:
                 if self.logger is None:
                     print "Unable to create directory (%s)" % (targetDir)
                 else:
-                   self.logger.error("Unable to create directory (%s)" % (targetDir))
+                    (type, value, tb) = sys.exc_info()
+                    self.logger.error("Unable to create directory (%s)" % (targetDir))
+                    self.logger.error("Type: %s, Value: %s" % (type, value))
                 return
 
         if copyLog is not None:
+            self.createDir(os.path.dirname(copyLog))
             cpLog = open(copyLog, 'w')
 
         for file in files:
@@ -114,24 +121,29 @@ class SystemManager:
             try:
                 # FIXME
                 # Should create a file with all the files that are copied
-                shutil.copy2(sourceDir + file, targetDir + file)
+                shutil.copyfile(sourceDir + file, targetDir + file)
+                os.chmod(targetDir + file, 0644)
+
                 if copyLog is not None:
                     cpLog.write(targetDir + file + '\n')
             except:
                 # FIXME: Find the correct exceptions that can arrive here
                 (type, value, tb) = sys.exc_info()
                 if self.logger is None:
-                    print "Problem while shutil.copy2(%s, %s)" % (sourceDir + file, targetDir + file)
+                    print "Problem while shutil.copyfile(%s, %s)" % (sourceDir + file, targetDir + file)
                 else:
-                    self.logger.error("Problem with shutil.copy2(%s, %s) => Type: %s, Value: %s" % 
+                    self.logger.error("Problem with shutil.copyfile(%s, %s) => Type: %s, Value: %s" % 
                                                      (sourceDir + file, targetDir + file, type, value))
                                                      
         if copyLog is not None:
+            os.chmod(copyLog, 0644)
             cpLog.close()
 
     def createDir(self, dir):
+        oldUmask = os.umask(0022)
         if not os.path.isdir(dir):
             os.makedirs(dir, 0755)
+        os.umask(oldUmask)
 
     def changePrefixPath(self, path):
         if path[0:7] == '/apps2/':

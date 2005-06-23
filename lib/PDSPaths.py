@@ -43,7 +43,7 @@ def normalPaths():
     FULLSTARTUP = INFO + STARTUP
     FULLTOGGLE = BIN + TOGGLE
 
-def drdbPaths(rootPath):
+def drbdPaths(rootPath):
     """
     The only difference with normalPaths is the ROOT (apps2)
     """
