@@ -39,7 +39,7 @@
 """
 
 from Logger import Logger
-import os, sys, getopt
+import os, pwd, sys, getopt
 
 def usage():
     print "\nUsage:\n"
@@ -54,6 +54,10 @@ class SwitchoverCopier:
 
     LOG_LEVEL = "INFO"                   # Logging level
     STANDARD_ROOT = 'test'
+
+    if not os.getuid() ==  pwd.getpwnam('pds')[2]:
+        pdsUID = pwd.getpwnam("pds")[2]
+        os.setuid(pdsUID)
 
     def __init__(self):
 
