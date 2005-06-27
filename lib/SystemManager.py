@@ -158,7 +158,7 @@ class SystemManager:
                 self.logger.warning("This directory (%s) doesn't begin  by /apps2/" % (path))
                 return None
 
-    def deleteFiles(self, copyLog, deleteLog=None):
+    def deleteSwitchoverFiles(self, copyLog, deleteLog=None):
         """
         Delete all files listed in the copyLog
         """
@@ -166,32 +166,27 @@ class SystemManager:
             cpLog = open(copyLog, 'r')
         except:
             (type, value, tb) = sys.exc_info()
-            if self.logger is None:
+            if deleteLog is None:
                 print "Problem opening %s , Type: %s Value: %s" % (cpLog, type, value)
             else:
-               self.logger.error("Problem opening %s , Type: %s Value: %s" % (cpLog, type, value))
-
-        if deleteLog is not None:
-            delLog = open(deleteLog, 'w')
+               deleteLog.error("Problem opening %s , Type: %s Value: %s" % (cpLog, type, value))
 
         filesToDelete = cpLog.readlines()
+        cpLog.close()
 
         for file in filesToDelete:
             file = file.strip()
             try:
                 os.unlink(file)
                 if deleteLog is not None:
-                    delLog.write(file +  "\n")
+                    deleteLog.info("%s has been deleted" % file)
             except:
                 (type, value, tb) = sys.exc_info()
-                if self.logger is None:
+                if deleteLog is None:
                     print "Problem deleting %s , Type: %s Value: %s" % (file, type, value)
                 else:
-                    self.logger.error("Problem deleting %s , Type: %s Value: %s" % (file, type, value))
+                    deleteLog.error("Problem deleting %s , Type: %s Value: %s" % (file, type, value))
                     
-        if deleteLog is not None:
-            delLog.close()
-
 if __name__ == '__main__':
   
     manager = SystemManager()
@@ -202,5 +197,5 @@ if __name__ == '__main__':
     manager.changePrefixPath('/apps/px/toto/')
     manager.changePrefixPath('/apps/px/tutu/')
     manager.copyFiles('/apps/px/toto/', '/apps/px/tarteau/', '/apps/px/tarteau/copy.log')
-    manager.deleteFiles('/apps/px/tarteau/copy.log', '/apps/px/tarteau/delete.log')
+    #manager.deleteFiles('/apps/px/tarteau/copy.log', '/apps/px/tarteau/delete.log')
 

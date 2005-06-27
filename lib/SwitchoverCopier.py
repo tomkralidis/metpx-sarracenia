@@ -39,7 +39,7 @@
 """
 
 from Logger import Logger
-import os, pwd, sys, getopt
+import os, pwd, sys, time, getopt
 
 def usage():
     print "\nUsage:\n"
@@ -68,11 +68,13 @@ class SwitchoverCopier:
             from PXManager import PXManager
             manager = PXManager(SwitchoverCopier.DRBD + '/px/')
             LOG_NAME = manager.LOG + 'SwitchoverCopier.log'    # Log's name
+            SwitchoverCopier.SWITCH_DIR = '/apps/px/switchover/'
 
         elif SwitchoverCopier.SYSTEM == 'PDS':
             from PDSManager import PDSManager
             manager = PDSManager(SwitchoverCopier.DRBD + '/pds/')
             LOG_NAME = manager.LOG + 'SwitchoverCopier.log'   # Log's name
+            SwitchoverCopier.SWITCH_DIR = '/apps/pds/switchover/'
 
         self.logger = Logger(LOG_NAME, SwitchoverCopier.LOG_LEVEL, "Copier")
         self.logger = self.logger.getLogger()
@@ -95,6 +97,7 @@ class SwitchoverCopier:
         return '/'.join(parts)
 
     def copy(self):
+        timestamp = time.strftime("%Y%m%d%H%M%S", time.gmtime())
         os.umask(0777)
         #for sourceDir in self.txPaths:
         #    self.manager.copyFiles(sourceDir, self.getDestDir(sourceDir))   
@@ -102,7 +105,7 @@ class SwitchoverCopier:
         for sourceDir in self.rxPaths:
             parts = sourceDir.split('/')
             self.manager.copyFiles(sourceDir, self.getDestDir(sourceDir, SwitchoverCopier.STANDARD_ROOT),
-                                                              '/apps/px/switchover/' + '_'.join(parts[1:]) + '.log')   
+                                                              SwitchoverCopier.SWITCH_DIR + '_'.join(parts[1:]) + timestamp + '.log')   
 
         os.umask(0022)
 
