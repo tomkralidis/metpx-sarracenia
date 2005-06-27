@@ -53,7 +53,7 @@ def usage():
 class SwitchoverCopier:
 
     LOG_LEVEL = "INFO"                   # Logging level
-    STANDARD_ROOT = 'test'
+    STANDARD_ROOT = 'apps'               # Files from the DRBD partition will be copied on /STANDARD_ROOT/...
 
     if not os.getuid() ==  pwd.getpwnam('pds')[2]:
         pdsUID = pwd.getpwnam("pds")[2]

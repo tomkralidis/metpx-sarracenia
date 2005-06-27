@@ -43,7 +43,6 @@ def usage():
 class SwitchoverDeleter:
 
     LOG_LEVEL = "INFO"                   # Logging level
-    STANDARD_ROOT = 'test'
 
     # Make sure that user pds run this program
     if not os.getuid() ==  pwd.getpwnam('pds')[2]:
