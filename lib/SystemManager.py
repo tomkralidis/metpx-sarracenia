@@ -75,6 +75,20 @@ class SystemManager:
     def setTxPaths(self):
         raise SystemManagerException('Abstract method: not implemented in SystemManager Class')
 
+    def copyRemoteDir(self, user, machine, sourceDir, targetDir):
+        source = user + "@" + machine + ":" + sourceDir + '*'
+        target = targetDir
+
+        self.createDir(targetDir)
+
+        command = "scp " + source + " " + target
+
+        (status, output) = commands.getstatusoutput(command)
+
+        if output == "scp: /apps/px/switchover/*: No such file or directory":
+            # No files in the directory
+            pass    
+            
     def copyFiles(self, sourceDir, targetDir, copyLog=None):
         """
         Copy all files (no directories) under the given sourceDir to the targetDir on the

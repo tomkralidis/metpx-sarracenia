@@ -25,7 +25,7 @@
 # 
 #   Usage:
 #
-#   SwitchoverDeleter (-s|--system) {PDS | PX}\n"
+#   SwitchoverDeleter (-s|--system) {PDS | PX} -m MACHINE\n"
 #
 #############################################################################################
 """
@@ -35,8 +35,10 @@ import os, pwd, sys, getopt
 
 def usage():
     print "\nUsage:\n"
-    print "SwitchoverDeleter (-s|--system) {PDS | PX}\n"
-    print "-s, --system: PDS or PX"
+    print "SwitchoverDeleter (-s|--system) {PDS | PX} -m MACHINE\n"
+    print "-s, --system: PDS or PX\n"
+    print "-m MACHINE where MACHINE is the name of the host where we find files containing"
+    print "the name of the files to delete. (These files will be obtained by scp)\n"
 
 class SwitchoverDeleter:
 
@@ -79,11 +81,16 @@ class SwitchoverDeleter:
 
     def delete(self):
         
-        if os.path.isdir(SwitchoverDeleter.SWITCH_DIR):
-            files = os.listdir(SwitchoverDeleter.SWITCH_DIR)
+        localSwitchoverDir = SwitchoverDeleter.SWITCH_DIR[:-1] + "_from_" + SwitchoverDeleter.MACHINE + '/'
+        # copy remote files (these files contain the filenames of the files copied by SwitchoverCopier) to
+        # loca directory.
+        self.manager.copyRemoteDir('pds', SwitchoverDeleter.MACHINE, SwitchoverDeleter.SWITCH_DIR, localSwitchoverDir)
+        
+        if os.path.isdir(localSwitchoverDir):
+            files = os.listdir(localSwitchoverDir)
 
             for file in files:
-                file = SwitchoverDeleter.SWITCH_DIR + file
+                file = localSwitchoverDir + file
                 # regular file
                 if os.path.isfile(file):
                     self.manager.deleteSwitchoverFiles(file, self.logger)
@@ -98,8 +105,9 @@ class SwitchoverDeleter:
     def getOptionsParser(self):
         
         system = False
+        machine = False
         try:
-            opts, args = getopt.getopt(sys.argv[1:], 's:h', ['help', 'system='])
+            opts, args = getopt.getopt(sys.argv[1:], 'm:s:h', ['help', 'system='])
             #print opts
             #print args
         except getopt.GetoptError:
@@ -118,9 +126,12 @@ class SwitchoverDeleter:
                 else:
                     usage()
                     sys.exit(2)
+            if option == '-m':
+                machine = True
+                SwitchoverDeleter.MACHINE = value
 
         # We must give a system
-        if system is False:  
+        if system is False or machine is False:  
             usage()
             sys.exit(2)
 
