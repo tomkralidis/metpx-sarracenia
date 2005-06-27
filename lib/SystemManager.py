@@ -128,9 +128,8 @@ class SystemManager:
             cpLog = open(copyLog, 'w')
 
         for file in files:
-            
-            # We are not interessed in directory
-            if os.path.isdir(file):
+            # We are not interessed in directory, file beginning with a dot or ending in .tmp
+            if os.path.isdir(sourceDir + file) or file[0] == '.' or file[-4:] == ".tmp":
                 continue
             try:
                 # FIXME
