@@ -33,17 +33,16 @@ class PXManager(SystemManager):
 
     def afterInit(self):
 
-        """
         if not os.path.isdir(PXPaths.ROOT):
             self.logger.error("This directory: %s does not exist!" % (PXPaths.ROOT))
             sys.exit(15)
-        """
 
-        #self.setRxNames()           
-        #self.setTxNames()
-        #self.setRxPaths()
-        #self.setTxPaths()
-        self.rxPaths = ['/apps/px/toto/', '/apps/px/titi/', '/apps/px/tata/']
+        self.setRxNames()           
+        self.setTxNames()
+        self.setRxPaths()
+        self.setTxPaths()
+
+        #self.rxPaths = ['/apps/px/toto/', '/apps/px/titi/', '/apps/px/tata/']
 
     def setRunningRxNames(self):
         """
