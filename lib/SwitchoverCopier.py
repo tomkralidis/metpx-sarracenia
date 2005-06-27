@@ -146,4 +146,3 @@ if __name__ == '__main__':
 
     copier =  SwitchoverCopier()
     copier.copy()
-    time.sleep(60)
