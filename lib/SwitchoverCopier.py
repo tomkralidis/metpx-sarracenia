@@ -21,7 +21,8 @@
 #   directories correspond to receivers and senders is done by an appropriate manager (PDS or PX).
 # 
 #   The files copied will be logged and these logs (one per directory, location: /apps/{px|pds}/switchover)
-#   will be used to erase these files on machine1:/apps/
+#   will be used (when the dead machine is revived, it will call SwitchoverDeleter.py)
+#   to erase these files on machine1:/apps/
 # 
 #   Usage:
 #
