@@ -56,13 +56,13 @@ class SwitchoverDeleter:
         if SwitchoverDeleter.SYSTEM == 'PX': 
             from PXManager import PXManager
             manager = PXManager('/apps/px/')
-            LOG_NAME = manager.LOG + 'SwitchoverDeleter.log'    # Log's name
+            LOG_NAME = manager.LOG + 'PX_SwitchoverDeleter.log'    # Log's name
             SwitchoverDeleter.SWITCH_DIR = '/apps/px/switchover/'
 
         elif SwitchoverDeleter.SYSTEM == 'PDS':
             from PDSManager import PDSManager
             manager = PDSManager('/apps/pds/')
-            LOG_NAME = manager.LOG + 'SwitchoverDeleter.log'   # Log's name
+            LOG_NAME = manager.LOG + 'PDS_SwitchoverDeleter.log'   # Log's name
             SwitchoverDeleter.SWITCH_DIR = '/apps/pds/switchover/'
 
         self.logger = Logger(LOG_NAME, SwitchoverDeleter.LOG_LEVEL, "Deleter")

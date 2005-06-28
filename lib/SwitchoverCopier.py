@@ -67,13 +67,13 @@ class SwitchoverCopier:
         if SwitchoverCopier.SYSTEM == 'PX': 
             from PXManager import PXManager
             manager = PXManager(SwitchoverCopier.DRBD + '/px/')
-            LOG_NAME = manager.LOG + 'SwitchoverCopier.log'    # Log's name
+            LOG_NAME = manager.LOG + 'PX_SwitchoverCopier.log'    # Log's name
             SwitchoverCopier.SWITCH_DIR = '/apps/px/switchover/'
 
         elif SwitchoverCopier.SYSTEM == 'PDS':
             from PDSManager import PDSManager
             manager = PDSManager(SwitchoverCopier.DRBD + '/pds/')
-            LOG_NAME = manager.LOG + 'SwitchoverCopier.log'   # Log's name
+            LOG_NAME = manager.LOG + 'PDS_SwitchoverCopier.log'   # Log's name
             SwitchoverCopier.SWITCH_DIR = '/apps/pds/switchover/'
 
         self.logger = Logger(LOG_NAME, SwitchoverCopier.LOG_LEVEL, "Copier")
