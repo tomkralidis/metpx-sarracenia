@@ -107,6 +107,11 @@ class SwitchoverCopier:
             self.manager.copyFiles(sourceDir, self.getDestDir(sourceDir, SwitchoverCopier.STANDARD_ROOT),
                                                               SwitchoverCopier.SWITCH_DIR + '_'.join(parts[1:]) + timestamp + '.log')   
 
+        for clientDir in self.txPaths:
+            parts = clientDir.split('/')
+            self.manager.copyFiles(clientDir, self.getDestDir(clientDir, SwitchoverCopier.STANDARD_ROOT),
+                                                              SwitchoverCopier.SWITCH_DIR + '_'.join(parts[1:]) + timestamp + '.log')   
+
         os.umask(0022)
 
     def getOptionsParser(self):
