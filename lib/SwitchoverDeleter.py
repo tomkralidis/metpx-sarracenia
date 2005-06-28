@@ -92,18 +92,21 @@ class SwitchoverDeleter:
             else:
                 filenames.append(parts[7])
 
-        ftp = ftplib.FTP(SwitchoverDeleter.MACHINE)
-        ftp.login('pds', 'Lred7ans')
-        ftp.cwd(SwitchoverDeleter.SWITCH_DIR)
-        # Equivalent to ftp.dir()
-        ftp.retrlines('LIST', extractFilename)
-        
-        for file in filenames:
-           fd = open(localSwitchoverDir + file, 'w')
-           ftp.retrbinary("RETR " + file, fd.write)
-           ftp.delete(file)
+        try:
+            ftp = ftplib.FTP(SwitchoverDeleter.MACHINE)
+            ftp.login('pds', 'Lred7ans')
+            ftp.cwd(SwitchoverDeleter.SWITCH_DIR)
+            # Equivalent to ftp.dir()
+            ftp.retrlines('LIST', extractFilename)
+            for file in filenames:
+                fd = open(localSwitchoverDir + file, 'w')
+                ftp.retrbinary("RETR " + file, fd.write)
+                ftp.delete(file)
 
-        ftp.quit()
+            ftp.quit()
+        except:
+            (type, value, tb) = sys.exc_info()
+            self.logger.error("FTP Problem: Type: %s Value: %s" % (type, value))
 
         if os.path.isdir(localSwitchoverDir):
             files = os.listdir(localSwitchoverDir)
