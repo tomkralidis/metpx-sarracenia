@@ -31,7 +31,7 @@
 """
 
 from Logger import Logger
-import os, pwd, sys, getopt
+import os, pwd, sys, getopt, ftplib
 
 def usage():
     print "\nUsage:\n"
@@ -77,6 +77,48 @@ class SwitchoverDeleter:
         parts[1] = replacement
 
         return '/'.join(parts)
+
+    def ftpDelete(self):
+         
+        filenames = []
+        localSwitchoverDir = SwitchoverDeleter.SWITCH_DIR[:-1] + "_from_" + SwitchoverDeleter.MACHINE + '/'
+        self.manager.createDir(localSwitchoverDir)
+         
+        # Will be called on each line of retrlines
+        def extractFilename(line):
+            parts = line.split()
+            if len(parts) <  8:
+                pass
+            else:
+                filenames.append(parts[7])
+
+        ftp = ftplib.FTP(SwitchoverDeleter.MACHINE)
+        ftp.login('pds', 'Lred7ans')
+        ftp.cwd(SwitchoverDeleter.SWITCH_DIR)
+        # Equivalent to ftp.dir()
+        ftp.retrlines('LIST', extractFilename)
+        
+        for file in filenames:
+           fd = open(localSwitchoverDir + file, 'w')
+           ftp.retrbinary("RETR " + file, fd.write)
+           ftp.delete(file)
+
+        ftp.quit()
+
+        if os.path.isdir(localSwitchoverDir):
+            files = os.listdir(localSwitchoverDir)
+
+            for file in files:
+                file = localSwitchoverDir + file
+                # regular file
+                if os.path.isfile(file):
+                    self.manager.deleteSwitchoverFiles(file, self.logger)
+                    try:
+                        os.unlink(file)
+                        self.logger.info("Container  %s has been deleted" % file)
+                    except:
+                        (type, value, tb) = sys.exc_info()
+                        self.logger.error("Problem deleting %s (container file), Type: %s Value: %s" % (file, type, value))
 
     def delete(self):
         
@@ -137,5 +179,6 @@ class SwitchoverDeleter:
 if __name__ == '__main__':
 
     deleter =  SwitchoverDeleter()
-    deleter.delete()
+    #deleter.delete()
+    deleter.ftpDelete()
     deleter.logger.info("Ending program SwitchoverDeleter")
