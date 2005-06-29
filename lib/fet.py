@@ -382,7 +382,7 @@ type -- URL indicating connection type
 
 """
 sourcedefaults = {
-    'extension':':MISSING:MISSING:MISSING:MISSING',
+    'extension':':MISSING:MISSING:MISSING:MISSING:MISSING',
     'type':None,
     'mapEnteteDelai':None,
     'port':0,
@@ -404,7 +404,7 @@ def readSources(logger):
 
         sourceid = cfname[:-5]
         srcconf = open( FET_ETC + 'rx/' + cfname, 'r' )
-        source = sourcedefaults
+        source = sourcedefaults.copy()
         src=srcconf.readline()
         while src :
             srcline=src.split()
@@ -470,7 +470,9 @@ def ingestName(r,s):
            perform the mapping, perhaps using rmasks ? & other args.
     """
     rs = r.split(':')
+    print rs
     ss = sources[s]['extension'].split(':')
+    print ss
 
     if ( len(rs) == 1 ) or rs[1] == '' :
         rs = rs + [ ss[1] ]
@@ -484,6 +486,7 @@ def ingestName(r,s):
         rs = rs + [ ss[5] ]
     rs = rs + [ time.strftime( "%Y%m%d%H%M%S", time.gmtime(time.time()) ) ]
 
+    print "Final string: %s" % string.join(rs, ':')
     return string.join(rs,':')
 
 
