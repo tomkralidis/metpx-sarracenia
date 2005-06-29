@@ -470,9 +470,7 @@ def ingestName(r,s):
            perform the mapping, perhaps using rmasks ? & other args.
     """
     rs = r.split(':')
-    print rs
     ss = sources[s]['extension'].split(':')
-    print ss
 
     if ( len(rs) == 1 ) or rs[1] == '' :
         rs = rs + [ ss[1] ]
@@ -486,7 +484,6 @@ def ingestName(r,s):
         rs = rs + [ ss[5] ]
     rs = rs + [ time.strftime( "%Y%m%d%H%M%S", time.gmtime(time.time()) ) ]
 
-    print "Final string: %s" % string.join(rs, ':')
     return string.join(rs,':')
 
 
