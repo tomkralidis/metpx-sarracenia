@@ -382,7 +382,7 @@ type -- URL indicating connection type
 
 """
 sourcedefaults = {
-    'extension':':MISSING:MISSING:MISSING:MISSING:MISSING',
+    'extension':':MISSING:MISSING:MISSING:MISSING:',
     'type':None,
     'mapEnteteDelai':None,
     'port':0,
