@@ -16,6 +16,7 @@ import os, sys, time, socket, curses.ascii
 import fet
 from DiskReader import DiskReader
 from MultiKeysStringSorter import MultiKeysStringSorter
+from CacheManager import CacheManager
 
 class senderAMIS: 
    
@@ -33,6 +34,8 @@ class senderAMIS:
       self.totBytes = 0
       self.initialTime = time.time()
       self.finalTime = None
+
+      self.cacheManager = CacheManager(maxEntries=10000, timeout=3*3600)
 
       self._connect()
       #self.run()
@@ -79,6 +82,18 @@ class senderAMIS:
       if len(data) >= 1:
          self.logger.writeLog(self.logger.INFO,"%d new bulletins will be sent", len(data))
          for index in range(len(data)):
+
+            # If data[index] is already in cache, we don't send it
+            if self.cacheManager.find(data[index]) is not None:
+                try:
+                   os.unlink(self.reader.sortedFiles[index])
+                   self.logger.writeLog(self.logger.INFO,"%s has been erased (was cached)", os.path.basename(self.reader.sortedFiles[index]))
+                except OSError, e:
+                   (type, value, tb) = sys.exc_info()
+                   self.logger.writeLog(self.logger.ERROR, "Unable to unlink %s ! Type: %s, Value: %s" 
+                                        % (self.reader.sortedFiles[index], type, value))
+                continue
+
             bullAMIS = self.encapsulate(data[index])
             nbBytesToSend = len(bullAMIS)
             nbBytes = nbBytesToSend
@@ -97,6 +112,8 @@ class senderAMIS:
                (type, value, tb) = sys.exc_info()
                self.logger.writeLog(self.logger.ERROR, "Unable to unlink %s ! Type: %s, Value: %s" 
                                     % (self.reader.sortedFiles[index], type, value))
+         self.logger.writeLog(self.logger.INFO, "Caching stats: %s " % str(self.cacheManager.getStats()))
+         #self.logger.writeLog(self.logger.INFO, "Cache: %s " % str(self.cacheManager.cache))
 
       else:
          time.sleep(1)
