@@ -6,7 +6,7 @@
 #
 # Date: 2005-06-30
 #
-# Description:
+# Description: U
 #
 #############################################################################################
 
@@ -58,11 +58,11 @@ class CacheManager(object):
         self.cache = {}
 
     def TimeoutClear(self):
-        # Remove all the elements that are older than older acceptable time
+        # Remove all the elements that are older than oldest acceptable time
         print self.getStats()
-        olderAcceptableTime = time.time() - self.timeout
+        oldestAcceptableTime = time.time() - self.timeout
         for item  in self.cache.items():
-            if item[1][0] < olderAcceptableTime:
+            if item[1][0] < oldestAcceptableTime:
                 del self.cache[item[0]]
 
     def getStats(self):
