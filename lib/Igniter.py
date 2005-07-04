@@ -7,7 +7,30 @@
 # Date: 2005-02-25
 #
 # Description: Use to start, stop, restart and obtain status of any python program 
-#           
+# 
+# For an example of how this can be used, check the code example below
+#
+#   !/usr/bin/env python
+#   import sys, Igniter
+#
+#   lockPath = '/apps/px/'
+#
+#   if len(sys.argv) != 2:
+#       print "Usage: testIgnit.py {start | stop | status}"
+#       sys.exit(2)
+#   else: cmd = sys.argv[1]
+#
+#   if cmd in ['start', 'stop', 'status']:
+#       igniter = Igniter.Igniter(cmd, lockPath)
+#       eval("igniter." + cmd)()
+#   else:
+#       print "Wrong command!"
+#       print "Usage: testIgnit.py {start | stop | status}"
+#       sys.exit(2)
+#   while True:
+#       #real code goes here
+#       pass
+# 
 #############################################################################################
 
 """
@@ -21,7 +44,7 @@ class Igniter:
       """
       This method could be "extended" for particular need in a subclass
       """
-      self.cmd = cmd                                        # 'start', 'stop', 'restart' 
+      self.cmd = cmd                                        # In ['start', 'stop', 'restart', 'status'] 
       self.pid = os.getpid()                                # Process ID
       self.lockpid = None                                   # Process ID in the .lock file
       self.lockPath = lockPath                              # Path where the lock file (.lock) is.
