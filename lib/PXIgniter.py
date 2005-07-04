@@ -122,6 +122,9 @@ class PXIgniter(Igniter):
          if self.direction == 'sender':
             fet.startup(self.options, self.logger)
             self.logger.writeLog(self.logger.INFO, "%s has been reloaded" % self.direction)
+            if self.type == 'amis':
+                self.gateway.cacheManager.clear()
+                self.logger.writeLog(self.logger.INFO, "Cache has been cleared") 
             #self.logger.writeLog(self.logger.WARNING, "%s has not been reloaded" % self.direction)
          elif self.direction == 'receiver':
             fet.startup(self.options, self.logger)
