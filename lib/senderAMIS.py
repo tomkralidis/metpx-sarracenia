@@ -112,7 +112,11 @@ class senderAMIS:
                (type, value, tb) = sys.exc_info()
                self.logger.writeLog(self.logger.ERROR, "Unable to unlink %s ! Type: %s, Value: %s" 
                                     % (self.reader.sortedFiles[index], type, value))
-         self.logger.writeLog(self.logger.INFO, "Caching stats: %s " % str(self.cacheManager.getStats()))
+         #self.logger.writeLog(self.logger.INFO, "Caching stats: %s " % str(self.cacheManager.getStats()))
+         (stats, cached, total) = self.cacheManager.getStats()
+         percentage = "%2.2f %% of the last %i requests were cached (implied %i files were deleted)" % (cached/total * 100,  total, cached)
+         self.logger.writeLog(self.logger.INFO, "Caching stats: %s => %s" % (str(stats), percentage))
+
          #self.logger.writeLog(self.logger.INFO, "Cache: %s " % str(self.cacheManager.cache))
 
       else:

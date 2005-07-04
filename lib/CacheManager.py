@@ -74,8 +74,17 @@ class CacheManager(object):
                 compteurs[item[1][1]] += 1
             else:
                 compteurs[item[1][1]] = 1
-        return compteurs
+        
+        total = 0.0
+        cached = 0.0
 
+        for (key, value) in compteurs.items():
+            cached += (key-1) * value
+            total += key * value
+
+        #percentage = "%2.2f %% of the last %i requests were cached (implied %i files were deleted)" % (cached/total * 100,  total, cached)
+
+        return (compteurs, cached, total)
 
 if __name__ == '__main__':
   
@@ -91,4 +100,4 @@ if __name__ == '__main__':
     #print manager.cache
     manager.find('mimi')
     #print manager.cache
-    #print manager.getStats()
+    print manager.getStats()
