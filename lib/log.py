@@ -33,6 +33,7 @@ class log:
 
     def __init__(self,filename,debug=100):
         self.debug = debug
+        sys.stderr = open(filename, 'a')
 
         # Init du handler et du formatter pour le log normal
         unTimedRotatingFileHandler = logging.handlers.TimedRotatingFileHandler(filename, when='midnight', interval=1, backupCount=5)
