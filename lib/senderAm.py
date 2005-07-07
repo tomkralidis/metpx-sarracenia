@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-import gateway
+import sys, gateway
 import socketManagerAm
 import bulletinManagerAm
 import bulletinAm
@@ -205,20 +205,21 @@ class senderAm(gateway.gateway):
                 rawBulletin = data[index]
                 unBulletinAm = bulletinAm.bulletinAm(rawBulletin,self.logger,lineSeparator='\r\r\n')
                 #nbBytesToSend = len(unBulletinAm)
+
+                # C'est dans l'appel a sendBulletin que l'on verifie si la connexion doit etre reinitialisee ou non
                 succes = self.unSocketManagerAm.sendBulletin(unBulletinAm)
+
                 #si le bulletin a ete envoye correctement, le fichier est efface
                 if succes:
                     #self.logger.writeLog(self.logger.INFO,"(%5d Bytes) Bulletin %s  livré ", 
                     #                     nbBytesToSend, self.reader.sortedFiles[index])
-                    self.logger.writeLog(self.logger.INFO,"Bulletin %s  livré ", 
-                                         self.reader.sortedFiles[index])
+                    self.logger.writeLog(self.logger.INFO,"Bulletin %s  livré ", self.reader.sortedFiles[index])
                     self.unBulletinManagerAm.effacerFichier(self.reader.sortedFiles[index])
                     self.logger.writeLog(self.logger.DEBUG,"senderAm.write(..): Effacage de " + self.reader.sortedFiles[index])
                 else:
                     self.logger.writeLog(self.logger.INFO,"bulletin %s: probleme d'envoi ", self.reader.sortedFiles[index])
+
             except Exception, e:
-                if e==104 or e==110 or e==32 or e==107:
-                    self.logger.writeLog(self.logger.ERROR,"senderAm.write(): la connexion est rompue: %s",str(e.args))
-                else:
-                    self.logger.writeLog(self.logger.ERROR,"senderAm.write(): erreur: %s",str(e.args))
-                raise
+            # e==104 or e==110 or e==32 or e==107 => connexion rompue
+                (type, value, tb) = sys.exc_info()
+                self.logger.writeLog(self.logger.ERROR,"Type: %s, Value: %s" % (type, value))
