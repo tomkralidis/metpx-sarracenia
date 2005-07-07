@@ -81,8 +81,8 @@ class senderAMIS:
    def write(self, data):
       if len(data) >= 1:
          self.logger.writeLog(self.logger.INFO,"%d new bulletins will be sent", len(data))
-         for index in range(len(data)):
 
+         for index in range(len(data)):
             # If data[index] is already in cache, we don't send it
             if self.cacheManager.find(data[index]) is not None:
                 try:
@@ -157,11 +157,11 @@ class senderAMIS:
             self.write(data)
          except socket.error, e:
             (type, value, tb) = sys.exc_info()
-            self.logger.writeLog(self.logger.ERROR, "Sender error %s ! Type: %s, Value: %s" 
+            self.logger.writeLog(self.logger.ERROR, "Sender error (%s) ! Type: %s, Value: %s" 
                                  % (self.reader.sortedFiles[index], type, value))
             
-            self.logger.writeLog(self.logger.ERROR, "Sending error: %s" % e)
-            # FIXME: We can try to reconnect
+            # We try to reconnect. 
+            self._connect()
 
          #time.sleep(0.2)
 
