@@ -32,7 +32,6 @@ class PXManager(SystemManager):
         self.LOG = PXPaths.LOG          # Will be used by DirCopier
 
     def afterInit(self):
-
         if not os.path.isdir(PXPaths.ROOT):
             self.logger.error("This directory: %s does not exist!" % (PXPaths.ROOT))
             sys.exit(15)
@@ -41,23 +40,123 @@ class PXManager(SystemManager):
         self.setTxNames()
         self.setRxPaths()
         self.setTxPaths()
-
         #self.rxPaths = ['/apps/px/toto/', '/apps/px/titi/', '/apps/px/tata/']
 
+    def initNames(self):
+        if not os.path.isdir(PXPaths.ROOT):
+            self.logger.error("This directory: %s does not exist!" % (PXPaths.ROOT))
+            sys.exit(15)
+
+        self.setRxNames()           
+        self.setTxNames()
+
+    def initShouldRunNames(self):
+        if not os.path.isdir(PXPaths.ROOT):
+            self.logger.error("This directory: %s does not exist!" % (PXPaths.ROOT))
+            sys.exit(15)
+
+        self.setShouldRunRxNames()           
+        self.setShouldRunTxNames()
+
+    def initRunningNames(self):
+        if not os.path.isdir(PXPaths.ROOT):
+            self.logger.error("This directory: %s does not exist!" % (PXPaths.ROOT))
+            sys.exit(15)
+
+        self.setRunningRxNames()
+        self.setRunningTxNames()
+
+    def getNotRunningRxNames(self):
+        return self.notRunningRxNames
+
+    def getNotRunningTxNames(self):
+        return self.notRunningTxNames
+        
+    ##########################################################################################################
+    # Running Names (sources and clients):
+    # 1) Have a .conf file in /apps/px/etc/[rt]x
+    # 2) Have a lock file (.lock) in /apps/px/[rt]xq/NAME
+    # 3) A ps confirm that the pid contained in the .lock file is running 
+    ##########################################################################################################
     def setRunningRxNames(self):
         """
         Set a list of receivers' name. We choose receivers that have a .conf file in RX_CONF
-        and we verify that these receivers have a process associated to them.
+        and we verify that these receivers have a .lock and a process associated to them.
         """
-        pass
+        runningRxNames = []
+        notRunningRxNames = []
+        shouldRunRxNames = self.getShouldRunRxNames()
+        for name in shouldRunRxNames:
+            try:
+                pid = open(PXPaths.RXQ + name + '/' + '.lock', 'r').read()
+                if not commands.getstatusoutput('ps -p ' + pid)[0]:
+                    # Process is running
+                    runningRxNames.append(name)
+                else:
+                    notRunningRxNames.append(name)
+            except:
+                #FIXME 
+                pass
 
+        self.runningRxNames = runningRxNames
+        self.notRunningRxNames = notRunningRxNames
+    
     def setRunningTxNames(self):
         """
         Set a list of senders' name. We choose senders that have a .conf file in TX_CONF 
-        and we verify that these senders have a process associated to them.
+        and we verify that these senders have a .lock and a process associated to them.
         """
-        pass
+        runningTxNames = []
+        notRunningTxNames = []
+        shouldRunTxNames = self.getShouldRunTxNames()
+        for name in shouldRunTxNames:
+            try:
+                pid = open(PXPaths.TXQ + name + '/' + '.lock', 'r').read()
+                if not commands.getstatusoutput('ps -p ' + pid)[0]:
+                    # Process is running
+                    runningTxNames.append(name)
+                else:
+                    notRunningTxNames.append(name)
+            except:
+                #FIXME 
+                pass
 
+        self.runningTxNames = runningTxNames
+        self.notRunningTxNames = notRunningTxNames
+
+    ##########################################################################################################
+    # Should be running names (sources and clients):
+    # 1) Have a .conf file in /apps/px/etc/[rt]x
+    # 2) Have a lock file (.lock) in /apps/px/[rt]xq/NAME
+    ##########################################################################################################
+    def setShouldRunRxNames(self):
+        """
+        Set a list of receivers' name. We choose receivers that have a .conf file in RX_CONF
+        and we verify that these receivers have a .lock  associated to them.
+        """
+        shouldRunRxNames = []
+        rxNames =  self.getRxNames()
+        for name in rxNames:
+            if os.path.isfile(PXPaths.RXQ + name + '/' + '.lock'):
+                shouldRunRxNames.append(name)
+        self.shouldRunRxNames = shouldRunRxNames
+
+    def setShouldRunTxNames(self):
+        """
+        Set a list of senders' name. We choose senders that have a .conf file in TX_CONF 
+        and we verify that these senders have a .lock associated to them.
+        """
+        shouldRunTxNames = []
+        txNames =  self.getTxNames()
+        for name in txNames:
+            if os.path.isfile(PXPaths.TXQ + name + '/' + '.lock'):
+                shouldRunTxNames.append(name)
+        self.shouldRunTxNames = shouldRunTxNames
+
+    ##########################################################################################################
+    # Names and paths (sources and clients):
+    # 1) Have a .conf file in /apps/px/etc/[rt]x
+    ##########################################################################################################
     def setRxNames(self):
         """
         Set a list of receivers' name. We choose receivers that have a .conf file in RX_CONF.
@@ -127,5 +226,20 @@ if __name__ == '__main__':
     manager = PXManager()
     #print manager.getRxNames()
     #print manager.getTxNames()
-    print manager.getRxPaths()
-    print manager.getTxPaths()
+    #print manager.getRxPaths()
+    #print manager.getTxPaths()
+
+    manager.initNames()
+    manager.initShouldRunNames()
+    manager.initRunningNames()
+
+    print manager.getRxNames()
+    print manager.getTxNames()
+    print manager.getShouldRunRxNames()
+    print manager.getShouldRunTxNames()
+    print "**************Running names*************"
+    print manager.getRunningRxNames()
+    print manager.getRunningTxNames()
+    print "**************Not Running names*************"
+    print manager.getNotRunningRxNames()
+    print manager.getNotRunningTxNames()

@@ -20,24 +20,52 @@ class SystemManagerException(Exception):
 class SystemManager:
 
     def __init__(self):
-        self.logger = None           # self.setLogger will be used by the application using a Manager 
-        self.rxNames = []            # Names are based on filenames found in RX_CONF
-        self.txNames = []            # Names are based on filenames found in TX_CONF
-        self.runningRxNames = []     # We only keep the Rx for which we can find a PID
-        self.runningTxNames = []     # We only keep the Tx for which we can find a PID 
-        self.rxPaths = []            # Receivers (input directories in PDS parlance) paths
-        self.txPaths = []            # Transmitters (clients in PDS parlance, senders in PX parlance) paths
+        self.logger = None                     # self.setLogger will be used by the application using a Manager 
+        self.rxNames = []                      # Names are based on filenames found in RX_CONF
+        self.txNames = []                      # Names are based on filenames found in TX_CONF
+        self.shouldRunRxNames = []             # Names are based on filenames found in RX_CONF and the presence of a .lock
+        self.shouldRunTxNames = []             # Names are based on filenames found in TX_CONF and the presence of a .lock
+        self.runningRxNames = []               # We only keep the Rx for which we can find a PID
+        self.runningTxNames = []               # We only keep the Tx for which we can find a PID 
+        self.rxPaths = []                      # Receivers (input directories in PDS parlance) paths
+        self.txPaths = []                      # Transmitters (clients in PDS parlance, senders in PX parlance) paths
 
     def setLogger(self, logger):
         self.logger = logger
 
+    ##########################################################################################################
+    # Should be running Names (sources and clients): 
+    ##########################################################################################################
+    def getShouldRunRxNames(self):
+        return self.shouldRunRxNames
+
+    def setShouldRunRxNames(self):
+        """
+        Set a list of receivers' name. We choose receivers that have a .conf file in RX_CONF
+        and we verify that these receivers have a .lock associated to them.
+        """
+        raise SystemManagerException('Abstract method: not implemented in SystemManager Class')
+
+    def getShouldRunTxNames(self):
+        return self.shouldRunTxNames
+
+    def setShouldRunTxNames(self):
+        """
+        Set a list of senders' name. We choose senders that have a .conf file in TX_CONF 
+        and we verify that these senders have a .lock associated to them.
+        """
+        raise SystemManagerException('Abstract method: not implemented in SystemManager Class')
+
+    ##########################################################################################################
+    # Running Names (sources and clients): 
+    ##########################################################################################################
     def getRunningRxNames(self):
         return self.runningRxNames
 
     def setRunningRxNames(self):
         """
         Set a list of receivers' name. We choose receivers that have a .conf file in RX_CONF
-        and we verify that these receivers have a process associated to them.
+        and we verify that these receivers have a .lock and a process associated to them.
         """
         raise SystemManagerException('Abstract method: not implemented in SystemManager Class')
 
@@ -47,10 +75,13 @@ class SystemManager:
     def setRunningTxNames(self):
         """
         Set a list of senders' name. We choose senders that have a .conf file in TX_CONF 
-        and we verify that these senders have a process associated to them.
+        and we verify that these senders have a .lock and a process associated to them.
         """
         raise SystemManagerException('Abstract method: not implemented in SystemManager Class')
 
+    ##########################################################################################################
+    # Names (sources and clients)
+    ##########################################################################################################
     def getRxNames(self):
         return self.rxNames
 
@@ -75,6 +106,7 @@ class SystemManager:
     def setTxPaths(self):
         raise SystemManagerException('Abstract method: not implemented in SystemManager Class')
 
+    ##########################################################################################################
     def copyRemoteDir(self, user, machine, sourceDir, targetDir):
         source = user + "@" + machine + ":" + sourceDir + '*'
         target = targetDir
