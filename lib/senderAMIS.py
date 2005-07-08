@@ -35,7 +35,7 @@ class senderAMIS:
       self.initialTime = time.time()
       self.finalTime = None
 
-      self.cacheManager = CacheManager(maxEntries=10000, timeout=3*3600)
+      self.cacheManager = CacheManager(maxEntries=120000, timeout=8*3600)
 
       self._connect()
       #self.run()
