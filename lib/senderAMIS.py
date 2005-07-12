@@ -157,8 +157,7 @@ class senderAMIS:
             self.write(data)
          except socket.error, e:
             (type, value, tb) = sys.exc_info()
-            self.logger.writeLog(self.logger.ERROR, "Sender error (%s) ! Type: %s, Value: %s" 
-                                 % (self.reader.sortedFiles[index], type, value))
+            self.logger.writeLog(self.logger.ERROR, "Sender error! Type: %s, Value: %s" % (type, value))
             
             # We try to reconnect. 
             self._connect()
