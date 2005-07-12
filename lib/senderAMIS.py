@@ -159,6 +159,13 @@ class senderAMIS:
             (type, value, tb) = sys.exc_info()
             self.logger.writeLog(self.logger.ERROR, "Sender error! Type: %s, Value: %s" % (type, value))
             
+            # We close the socket
+            try:
+                self.socketAMIS.close()
+            except:
+                (type, value, tb) = sys.exc_info()
+                self.logger.writeLog(self.logger.ERROR, "Problem in closing socket! Type: %s, Value: %s" % (type, value))
+
             # We try to reconnect. 
             self._connect()
 
