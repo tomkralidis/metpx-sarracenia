@@ -206,9 +206,11 @@ def sendFiles(c, files,logger):
                         time.sleep(10)  # relax, buy a cherry blossom, don't be shy.
                         return #FIXME: no point to continue looping...
 
+                    originalDir = ftp.pwd()
                     ftphost=hspec
                     ftpdir=''
                 if ftpdir != dspec:
+                    ftp.cwd(originalDir)
                     ftp.cwd(dspec)
                     ftpdir = dspec
 
