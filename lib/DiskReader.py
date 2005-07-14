@@ -56,6 +56,12 @@ class DiskReader:
         FIXME: The regex should be passed otherwise!  config file?
 
         """
+        # self.regex = re.compile(r'^[^:]*?:[^:]*?:[^:]*?:[^:]*?:(\d)[^:]*?:[^:]*?:(\d{14})$')
+        # This regex would be better than the one actually in use because it don't match the following entry:
+        # "A:B:C:WXO_DAN:BAD:3:ALLO:20050714183623"
+        # Surprisingly this entry match (priority in 6th position, should be in 5th) in spite of the use of *? operator ???
+        # Maybe we already accept some file badly named, so it's risky to change the regex now
+
         self.regex = re.compile(r'^.*?:.*?:.*?:.*?:(\d).*?:.*?:(\d{14})$')  # Regex used to validate filenames
         self.path = path                          # Path from where we ingest filenames
         self.clientName = os.path.basename(path)  # Last part of the path correspond to client name 
