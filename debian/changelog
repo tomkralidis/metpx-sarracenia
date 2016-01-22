@@ -1,3 +1,13 @@
+metpx-sarracenia (2.16.01a5) unstable; urgency=medium
+
+  * sr_config added delete,reset option
+  * sr_consumer uses reset to delete queue before declaration
+  * sr_sftp bug fix, added delete option after download
+  * sr_ftp added delete option after download
+  * sr_poll bug fix
+
+ -- Michel Grenier <michel.grenier2@canada.ca>  Fri, 22 Jan 2016 17:16:37 -0500
+
 metpx-sarracenia (2.16.01a4) unstable; urgency=medium
 
   * sr_config : parsing changed, method configure added
