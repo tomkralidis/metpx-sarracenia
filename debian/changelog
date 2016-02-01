@@ -1,3 +1,9 @@
+metpx-sarracenia (2.16.02a1) UNRELEASED; urgency=medium
+
+  *  fix to sr_log : foreground, broker default None, exchange forced to xl_brokeruser
+
+ -- Michel Grenier <aspymjg@zerocool>  Mon, 01 Feb 2016 16:24:39 -0500
+
 metpx-sarracenia (2.16.01a8) unstable; urgency=medium
 
   * fixed makefile for debian documentation 
