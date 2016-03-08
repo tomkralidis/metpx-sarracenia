@@ -1,3 +1,10 @@
+metpx-sarracenia (2.16.03a2) UNRELEASED; urgency=medium
+
+  * sr_post/sr_config fix for path and document_root...
+    applies abspath and realpath ...
+
+ -- Michel Grenier <aspymjg@zerocool>  Tue, 08 Mar 2016 11:40:08 -0500
+
 metpx-sarracenia (2.16.03a1) unstable; urgency=medium
 
   * sr_audit add old sr_admin func through --pump
